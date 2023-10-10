@@ -10,7 +10,7 @@ git init //run only once
 git add .
 git commit -m "some random message"
 git remote add origin <github_url>  //run only once 
-git push -u origin master
+git push -u origin main
 
 
 Run the Code
