@@ -77,6 +77,8 @@ class CustomServer {
     this.server = http.createServer(async (req, res) => {
       const method = req.method;
       const parsedURL = url.parse(req.url, true);
+      req.queryParameters = parsedURL.query;
+
       if (method == 'PUT' || method == 'POST' || method == 'DELETE') {
         await new Promise((resolve, reject) => {
           let body = '';
