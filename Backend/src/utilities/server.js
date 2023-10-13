@@ -58,6 +58,58 @@ class CustomRequest {
 }
 
 /**
+ * Custom Router class for creating routes for easy development
+ */
+class CustomRoutes {
+  /**
+   * Creates a Custom Route Instance
+   */
+  constructor() {
+    this.routes = {
+      GET: {},
+      POST: {},
+      PUT: {},
+      DELETE: {},
+    };
+  }
+  /**
+   * Register a GET route.
+   * @param {string} url - The URL path for the GET route.
+   * @param {Function} handler - The handler function to execute when the route is matched.
+   */
+  get(url, handler) {
+    this.routes.GET[url] = handler;
+  }
+
+  /**
+   * Register a POST route.
+   * @param {string} url - The URL path for the POST route.
+   * @param {Function} handler - The handler function to execute when the route is matched.
+   */
+  post(url, handler) {
+    this.routes.POST[url] = handler;
+  }
+
+  /**
+   * Register a PUT route.
+   * @param {string} url - The URL path for the PUT route.
+   * @param {Function} handler - The handler function to execute when the route is matched.
+   */
+  put(url, handler) {
+    this.routes.PUT[url] = handler;
+  }
+
+  /**
+   * Register a DELETE route.
+   * @param {string} url - The URL path for the DELETE route.
+   * @param {Function} handler - The handler function to execute when the route is matched.
+   */
+  delete(url, handler) {
+    this.routes.DELETE[url] = handler;
+  }
+}
+
+/**
  * CustomServer class for creating an HTTP server \
  * with routing and middleware support.
  */
@@ -226,6 +278,20 @@ class CustomServer {
   }
 
   /**
+   * Set routes from a CustomRoutes object.
+   * @param {CustomRoutes} customRoutes - The CustomRoutes object containing routes to be added.
+   */
+  setRoutes(customRoutes) {
+    // Get the routes from the CustomRoutes object
+    const {GET, POST, PUT, DELETE} = customRoutes.routes;
+
+    // Add the routes to the server's routes
+    this.routes.GET = {...this.routes.GET, ...GET};
+    this.routes.POST = {...this.routes.POST, ...POST};
+    this.routes.PUT = {...this.routes.PUT, ...PUT};
+    this.routes.DELETE = {...this.routes.DELETE, ...DELETE};
+  }
+  /**
    * Start listening on the specified port.
    *
    * @param {number} port - The port number to listen on.
@@ -236,4 +302,4 @@ class CustomServer {
   }
 }
 
-module.exports = {CustomServer, CustomResponse, CustomRequest};
+module.exports = {CustomServer, CustomResponse, CustomRequest, CustomRoutes};

@@ -78,11 +78,11 @@ const userSchema = new Schema({
   currentAddress: addressSchema,
   permanentAddress: addressSchema,
   licenseNumber: {type: String},
-  disabled: {type: Boolean},
+  isdisabled: {type: Boolean},
   userActive: {type: Boolean, default: true},
 });
 
 // Create the User model
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+module.exports = {User, addressSchema};
