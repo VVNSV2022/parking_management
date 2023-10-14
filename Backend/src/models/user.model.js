@@ -3,10 +3,21 @@ const Schema = mongoose.Schema;
 
 // Define the address schema
 const addressSchema = new Schema({
-  streetNumber: String,
-  aptUnit: String,
-  city: String,
-  state: String,
+  streetNumber: {
+    type: String,
+    required: true, // Marked as required
+  },
+  aptUnit: {
+    type: String,
+  },
+  city: {
+    type: String,
+    required: true, // Marked as required
+  },
+  state: {
+    type: String,
+    required: true, // Marked as required
+  },
   zipcode: {
     type: String,
     validate: {
@@ -16,8 +27,10 @@ const addressSchema = new Schema({
       },
       message: 'Invalid ZIP code format. Should be a 5-digit number.',
     },
+    required: true, // Marked as required
   },
 });
+
 
 // Define the user schema with validations
 const userSchema = new Schema({
@@ -49,6 +62,16 @@ const userSchema = new Schema({
       message: 'Invalid email address format.',
     },
   },
+  phoneNumber: {
+    type: String,
+    validate: {
+      validator: function(phone) {
+        // Simple regex pattern for US phone number (10 digits)
+        return /^\d{10}$/.test(phone);
+      },
+      message: 'Invalid phone number format. Please enter a 10-digit phone number.',
+    },
+  },
   username: {
     type: String,
     required: true,
@@ -59,8 +82,6 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
-    maxLength: [150, 'Password cannot exceed 150 characters.'],
-    minLength: [3, 'Password is too short'],
   },
   dateOfBirth: {
     type: Date,
@@ -75,14 +96,38 @@ const userSchema = new Schema({
       message: 'User must be at least 16 years old.',
     },
   },
+  isEmailVerified: {type: Boolean, default: false},
+  isPhoneVerified: {type: Boolean, default: false},
   currentAddress: addressSchema,
   permanentAddress: addressSchema,
   licenseNumber: {type: String},
-  isdisabled: {type: Boolean},
+  isdisabled: {type: Boolean, default: false},
   userActive: {type: Boolean, default: true},
+});
+
+// user token
+const tokenSchema = new Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  accessToken: {
+    type: String,
+    required: true,
+  },
+  refreshToken: {
+    type: String,
+    required: true,
+  },
+  tokenCreatedAt: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
 });
 
 // Create the User model
 const User = mongoose.model('User', userSchema);
+const Token = mongoose.model('Token', tokenSchema);
 
-module.exports = {User, addressSchema};
+module.exports = {User, addressSchema, Token};

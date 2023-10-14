@@ -40,6 +40,43 @@ class CustomResponse {
 
     res.end(JSON.stringify(body));
   }
+
+  /**
+   *
+   * @param {http.ServerResponse} res - response object
+   * @param {String} key - cookie key value
+   * @param {String} value - cookie value for index key
+   * @param {Object} options - options to set the cookie
+   */
+  setCookie(res, key, value, options = {}) {
+    const cookie = `${key}=${value}`;
+    if (options.expires) {
+      cookie += `; Expires=${options.expires.toUTCString()}`;
+    }
+    if (options.path) {
+      cookie += `; Path=${options.path}`;
+    }
+    if (options.domain) {
+      cookie += `; Domain=${options.domain}`;
+    }
+    if (options.secure) {
+      cookie += `; Secure`;
+    }
+    if (options.httpOnly) {
+      cookie += `; HttpOnly`;
+    }
+
+    res.setHeader('Set-Cookie', cookie);
+  }
+
+  /**
+     *
+     * @param {String} key - Cookie with index key
+     */
+  removeCookie(key) {
+    options.expires = new Date(0);
+    this.setCookie(key, '', options);
+  }
 }
 
 /**
@@ -130,6 +167,8 @@ class CustomServer {
       const method = req.method;
       const parsedURL = url.parse(req.url, true);
       req.queryParameters = parsedURL.query;
+      // parsing the cookies
+      this.parseCookies(req);
 
       if (method == 'PUT' || method == 'POST' || method == 'DELETE') {
         await new Promise((resolve, reject) => {
@@ -240,42 +279,23 @@ class CustomServer {
     this.routes.DELETE[url] = handler;
   }
 
-  /**
-   * Set an HTTP response header.
-   * @param {http.ServerResponse} res - The HTTP response object.
-   * @param {string} key - The header key.
-   * @param {string} value - The header value.
-   */
-  setResponseHeader(res, key, value) {
-    res.setHeader(key, value);
-  }
 
   /**
-   * Remove an HTTP response header.
-   * @param {http.ServerResponse} res - The HTTP response object.
-   * @param {string} key - The header key to remove.
-   */
-  removeResponseHeader(res, key) {
-    res.removeHeader(key);
-  }
-
-  /**
-   * Set an HTTP response with a JSON body.
    *
-   * @param {http.ServerResponse} res - The HTTP response object.
-   * @param {Object} body - The response body as an object.
-   * @param {number} [statusCode=200] - The HTTP status code (default is 200).
-   * @param {Object} [headers={}] - Custom headers to set in the response.
+   * @param {http.ServerRequest} req - http request object
    */
-  setResponse(res, body, statusCode = 200, headers = {}) {
-    if (!headers['Content-Type'] && !res.getHeader('Content-Type')) {
-      headers['Content-Type'] = 'application/json';
+  parseCookies(req) {
+    req.cookies = {};
+    if (req.headers.cookie) {
+      cookieHeader.split(';').forEach((cookie) => {
+        const parts = cookie.split('=');
+        const name = parts[0].trim();
+        const value = decodeURIComponent(parts[1]);
+        req.cookies[name] = value;
+      });
     }
-
-    res.writeHead(statusCode, headers);
-
-    res.end(JSON.stringify(body));
   }
+
 
   /**
    * Set routes from a CustomRoutes object.

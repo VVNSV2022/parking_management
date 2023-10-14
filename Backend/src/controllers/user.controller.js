@@ -1,4 +1,4 @@
-const UserSchema = require('../models/user.model.js');
+const {User, Token} = require('../models/user.model.js');
 
 /**
  * Create a new user in the database.
@@ -9,7 +9,7 @@ const UserSchema = require('../models/user.model.js');
  */
 async function createUser(userData) {
   try {
-    const userDoc = new UserSchema(userData);
+    const userDoc = new User(userData);
     const savedUser = await userDoc.save();
     return savedUser;
   } catch (err) {
@@ -27,7 +27,7 @@ async function createUser(userData) {
  */
 async function getUserById(userId) {
   try {
-    const userData = await UserSchema.findOne({
+    const userData = await User.findOne({
       userId: userId,
       userActive: true,
     });
@@ -47,8 +47,8 @@ async function getUserById(userId) {
  */
 async function getUserByEmail(emailID) {
   try {
-    const userData = await UserSchema.findOne({
-      emailID: emailID,
+    const userData = await User.findOne({
+      email: emailID,
       userActive: true,
     });
     return userData;
@@ -67,7 +67,7 @@ async function getUserByEmail(emailID) {
  */
 async function deleteUser(userId) {
   try {
-    const result = await UserSchema.findOneAndUpdate(
+    const result = await User.findOneAndUpdate(
         {userId: userId},
         {userActive: false},
     );
@@ -78,4 +78,56 @@ async function deleteUser(userId) {
   }
 }
 
-module.exports = {createUser, getUserById, getUserByEmail, deleteUser};
+/**
+ *
+ * @param {String} userId - user id
+ * @param {String} accessToken  - access token created at time of login
+ * @param {String} refreshToken - refreshtoken used to verify user
+ * @return {result}
+ */
+async function loginUser(userId, accessToken, refreshToken) {
+  try {
+    const tokenData = new Token({userId: userId, accessToken: accessToken, refreshToken: refreshToken});
+    const result = await tokenData.save();
+    return result;
+  } catch (err) {
+    console.error('Error occurred while writing login details to database', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {String} userId  - user id
+ * @return {result}
+ */
+async function logoutUser(userId) {
+  try {
+    const deletedUser = await Token.findOneAndRemove({userId: userId});
+    if (!deletedUser) {
+      throw new Error('User not found in the token database');
+    }
+    return deletedUser;
+  } catch (err) {
+    console.error('Error occurred while deleting the login details to database', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {string} userId - userid
+ * @return {result} usertoken
+ */
+async function findUserToken(userId) {
+  try {
+    const userToken = await Token.findOne({userId: userId});
+    return userToken;
+  } catch (err) {
+    console.error('Error occured while searching the token of user', err.message);
+    throw err;
+  }
+}
+
+
+module.exports = {createUser, getUserById, getUserByEmail, deleteUser, loginUser, logoutUser, findUserToken};
