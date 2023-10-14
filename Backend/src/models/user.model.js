@@ -31,7 +31,6 @@ const addressSchema = new Schema({
   },
 });
 
-
 // Define the user schema with validations
 const userSchema = new Schema({
   userId: {
@@ -69,7 +68,8 @@ const userSchema = new Schema({
         // Simple regex pattern for US phone number (10 digits)
         return /^\d{10}$/.test(phone);
       },
-      message: 'Invalid phone number format. Please enter a 10-digit phone number.',
+      message:
+        'Invalid phone number format. Please enter a 10-digit phone number.',
     },
   },
   username: {

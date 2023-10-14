@@ -48,31 +48,36 @@ class CustomResponse {
    * @param {String} value - cookie value for index key
    * @param {Object} options - options to set the cookie
    */
-  setCookie(res, key, value, options = {}) {
-    const cookie = `${key}=${value}`;
-    if (options.expires) {
-      cookie += `; Expires=${options.expires.toUTCString()}`;
-    }
-    if (options.path) {
-      cookie += `; Path=${options.path}`;
-    }
-    if (options.domain) {
-      cookie += `; Domain=${options.domain}`;
-    }
-    if (options.secure) {
-      cookie += `; Secure`;
-    }
-    if (options.httpOnly) {
-      cookie += `; HttpOnly`;
-    }
+  setCookies(res, ...cookies) {
+    const cookieStrings = cookies.map((cookie) => {
+      const {key, value, options} = cookie;
+      let cookieString = `${key}=${value}`;
 
-    res.setHeader('Set-Cookie', cookie);
+      if (options && options.expires) {
+        cookieString += `; Expires=${options.expires.toUTCString()}`;
+      }
+      if (options && options.path) {
+        cookieString += `; Path=${options.path}`;
+      }
+      if (options && options.domain) {
+        cookieString += `; Domain=${options.domain}`;
+      }
+      if (options && options.secure) {
+        cookieString += `; Secure`;
+      }
+      if (options && options.httpOnly) {
+        cookieString += `; HttpOnly`;
+      }
+
+      return cookieString;
+    });
+    res.setHeader('Set-Cookie', cookieStrings);
   }
 
   /**
-     *
-     * @param {String} key - Cookie with index key
-     */
+   *
+   * @param {String} key - Cookie with index key
+   */
   removeCookie(key) {
     options.expires = new Date(0);
     this.setCookie(key, '', options);
@@ -279,7 +284,6 @@ class CustomServer {
     this.routes.DELETE[url] = handler;
   }
 
-
   /**
    *
    * @param {http.ServerRequest} req - http request object
@@ -287,6 +291,7 @@ class CustomServer {
   parseCookies(req) {
     req.cookies = {};
     if (req.headers.cookie) {
+      const cookieHeader = req.headers.cookie;
       cookieHeader.split(';').forEach((cookie) => {
         const parts = cookie.split('=');
         const name = parts[0].trim();
@@ -295,7 +300,6 @@ class CustomServer {
       });
     }
   }
-
 
   /**
    * Set routes from a CustomRoutes object.

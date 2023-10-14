@@ -10,10 +10,11 @@ const authRouter = new CustomRoutes();
 const response = new CustomResponse();
 
 authRouter.post('/register', async (req, res)=>{
-  console.log(req.body);
   const {firstname, lastname, email, username, password, phonenumber, dateOfBirth, currentAddress, permanentAddress, isdisabled} = req.body;
   try {
+    // verify whether values are passed and in the valid format
     if (firstname && lastname && email && username && password && /^\d{10}$/.test(phonenumber) && isValidAddress(currentAddress) && isValidAddress(permanentAddress)) {
+      // check whether user exists with this email address
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
         return response.setResponse(res, {message: 'There is an account with this email address'}, 403);
@@ -87,20 +88,35 @@ authRouter.post('/login', async (req, res)=>{
     const accessToken = await generateAccessToken(user.userId);
     const refreshToken = await generateRefreshToken(user.userId);
 
-    // add token into the database
+    // check if the token into the database
     const exisitingToken = await findUserToken(user.userId);
     if (exisitingToken) {
       return response.setResponse(res, {message: 'user is already logged in the database', success: false}, 405);
     }
 
+    // add the token into the database
     const isUserLoggedIn = await loginUser(user.userId, accessToken, refreshToken);
-    
+
     if (!isUserLoggedIn) {
       return response.setResponse(res, {message: 'Got an error while logging the user in to the app', success: false}, 405);
     }
-    
-    response.setCookie(res, 'accessToken', accessToken, {expires: new Date(Date.now() + 15 * 60)});
-    response.setCookie(res, 'refreshToken', refreshToken, {expires: new Date(Date.now() + 7 * 24 * 60 * 60)});
+
+    // setting access token and refresh tokens to the cookies
+    response.setCookies(res, {
+      key: 'accessToken',
+      value: accessToken,
+      options: {
+        expires: new Date(Date.now() + 15 * 60),
+      },
+    },
+    {
+      key: 'refreshToken',
+      value: refreshToken,
+      options: {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60),
+      },
+    });
+
     return response.setResponse(res, {message: 'user is logged in to the account', success: true}, 200);
   } catch (error) {
     console.error('Error Occurred while loggin in the user', error.message);
@@ -113,12 +129,13 @@ authRouter.post('/logout', async (req, res)=>{
   try {
     const accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
-    if (!userId && !accessToken && !refreshToken) {
+    if (!userId || !accessToken || !refreshToken) {
       return response.setResponse(res, {message: 'send all the details to logout the account', success: false}, 402);
     }
-    const decodedAccessToken = verifyToken(accessToken, 'ACCESS');
-    const decodedRefreshToken = verifyToken(refreshToken, 'REFRESH');
-    if ( !(decodedAccessToken == userId) && !(decodedRefreshToken == userId)) {
+    const decodedAccessToken = await verifyToken(accessToken, 'ACCESS');
+    const decodedRefreshToken = await verifyToken(refreshToken, 'REFRESH');
+    console.log(decodedAccessToken, decodedRefreshToken);
+    if ( !(decodedAccessToken == userId) || !(decodedRefreshToken == userId)) {
       return response.setResponse(res, {message: 'the token does not matched with the userId', success: false}, 407);
     }
     await logoutUser(userId);

@@ -10,7 +10,10 @@ async function convertPassToHash(plainTextPassword) {
     const result = await bcrypt.hash(plainTextPassword, saltRounds);
     return result;
   } catch (err) {
-    console.error('Error occured while converting passoword to hash', err.message);
+    console.error(
+        'Error occured while converting passoword to hash',
+        err.message,
+    );
     throw err;
   }
 }
@@ -26,7 +29,10 @@ async function convertHashToPass(providedPassword, storedHash) {
     const result = await bcrypt.compare(providedPassword, storedHash);
     return result;
   } catch (err) {
-    console.error('Error occured while converting hash to password', err.message);
+    console.error(
+        'Error occured while converting hash to password',
+        err.message,
+    );
     throw err;
   }
 }

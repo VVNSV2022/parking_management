@@ -18,7 +18,9 @@ async function generateAccessToken(userId) {
     };
 
     // Create the access token
-    const accessToken = await jwt.sign(payload, accessSecretKey, {algorithm: 'HS256'});
+    const accessToken = await jwt.sign(payload, accessSecretKey, {
+      algorithm: 'HS256',
+    });
 
     return accessToken;
   } catch (error) {
@@ -41,7 +43,9 @@ async function generateRefreshToken(userId) {
       exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // Expiration time (7 days)
     };
 
-    const refreshToken = await jwt.sign(payload, refreshSecretKey, {algorithm: 'HS256'});
+    const refreshToken = await jwt.sign(payload, refreshSecretKey, {
+      algorithm: 'HS256',
+    });
 
     return refreshToken;
   } catch (error) {
