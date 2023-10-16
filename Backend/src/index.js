@@ -3,6 +3,7 @@ const result = require('dotenv').config();
 const {CustomServer, CustomResponse} = require('./utilities/server.js');
 const {dbInit} = require('./models/dbInitialisation.js');
 const authRouter = require('./routes/auth.routes.js');
+const firebaseInit = require('./thirdParty/firebaseInit.js');
 
 const server = new CustomServer();
 const response = new CustomResponse();
@@ -13,6 +14,7 @@ if (result.error) {
 }
 const port = process.env.PORT;
 dbInit(process.env.MONGO_DB_URL);
+firebaseInit();
 
 server.setRoutes(authRouter);
 server.get('/', (req, res) => {

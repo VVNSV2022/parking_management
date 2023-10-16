@@ -45,6 +45,41 @@ const paymentSchema = new mongoose.Schema({
   },
 });
 
+const membershipSchema = new mongoose.Schema({
+  membershipId: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+  membershipType: {
+    type: String,
+    required: true,
+    enum: ['WEEKLY', 'MONTHLY', 'QUATERLY'],
+  },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+  },
+  membershipPrice: {
+    type: Number,
+    required: true,
+  },
+  regionId: {
+    type: String,
+    required: true,
+  },
+});
+
 const Payment = mongoose.model('Payment', paymentSchema);
 
-module.exports = Payment;
+const Membership = mongoose.model('Membership', membershipSchema);
+
+module.exports = {Payment, Membership};

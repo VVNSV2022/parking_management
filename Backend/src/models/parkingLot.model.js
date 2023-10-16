@@ -49,9 +49,9 @@ const parkingLotSchema = new mongoose.Schema({
 
 const parkingLotPricingSchema = new mongoose.Schema({
   parking_lot_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ParkingLot',
+    type: String,
     required: true,
+    unique: true,
   },
   hourly_rate: {
     type: Number,
@@ -68,6 +68,27 @@ const parkingLotPricingSchema = new mongoose.Schema({
   },
 });
 
+const regionSchema = new mongoose.Schema({
+  regionId: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  regionName: {
+    type: String,
+    required: true,
+  },
+  platinumPrice: {
+    type: Number,
+  },
+  goldPrice: {
+    type: Number,
+  },
+  bronzePrice: {
+    type: Number,
+  },
+});
+
 const ParkingLotPricing = mongoose.model(
     'ParkingLotPricing',
     parkingLotPricingSchema,
@@ -75,4 +96,6 @@ const ParkingLotPricing = mongoose.model(
 
 const ParkingLot = mongoose.model('ParkingLot', parkingLotSchema);
 
-module.exports = {ParkingLot, ParkingLotPricing};
+const Region = mongoose.model('Region', regionSchema);
+
+module.exports = {ParkingLot, ParkingLotPricing, Region};

@@ -76,14 +76,27 @@ class CustomResponse {
 
   /**
    *
+   * @param {http.CustomResponse} res - http Custom response object
    * @param {String} key - Cookie with index key
    */
-  removeCookie(key) {
-    options.expires = new Date(0);
-    this.setCookie(key, '', options);
+  removeCookies(res, ...keys) {
+    const cookies = res.getHeader('Set-Cookie');
+    let finalCookies;
+    if (cookies) {
+      // Remove specified cookies based on keys
+      finalCookies = cookies.map((cookie)=>{
+        const key = cookie.split('=')[0];
+        if (keys.includes(key)) {
+          return `${key}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        }
+        return cookie;
+      });
+    }
+    // After removing the cookies, set the updated cookies in the response.
+    res.setHeader('Set-Cookie', finalCookies);
+    // this.setCookies(res, finalCookies.map((cookie) => ({key: cookie.split('=')[0], value: cookie.split('=')[1],})));
   }
 }
-
 /**
  * CustomRequest class for handling HTTP request related operations.
  */
@@ -298,6 +311,8 @@ class CustomServer {
         const value = decodeURIComponent(parts[1]);
         req.cookies[name] = value;
       });
+    } else {
+      req.cookies = {};
     }
   }
 
