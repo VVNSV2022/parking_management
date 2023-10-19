@@ -11,6 +11,7 @@ function firebaseInit() {
   try {
     initializeApp({
       credential: cert(serviceAccount),
+      projectId: process.env.projectId,
       storageBucket: process.env.storageBucket,
     });
     console.log('firebase is initialised successfully');

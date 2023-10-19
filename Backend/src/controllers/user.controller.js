@@ -1,4 +1,5 @@
 const {User, Token} = require('../models/user.model.js');
+const {authCreate} = require('../thirdParty/firebaseAuth.js');
 
 /**
  * Create a new user in the database.
@@ -9,8 +10,7 @@ const {User, Token} = require('../models/user.model.js');
  */
 async function createUser(userData) {
   try {
-    const userDoc = new User(userData);
-    const savedUser = await userDoc.save();
+    const savedUser = await authCreate(userData);
     return savedUser;
   } catch (err) {
     console.error('Error occurred while creating a user...');
