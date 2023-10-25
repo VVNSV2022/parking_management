@@ -31,7 +31,6 @@ const reservationSchema = new mongoose.Schema({
   },
   parking_spot: {
     type: String,
-    required: true,
   },
   reservation_created_time: {
     type: Date,
