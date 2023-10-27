@@ -2,44 +2,32 @@ require('dotenv').config();
 
 const stripe = require('stripe')(process.env.SecretKey);
 
+
 /**
  *
  * @param {string} userId - unique user id
  * @param {string} paymentType - type of the payment card or bank account
- * @param {object} paymentDetails - details for the type of payment
+ * @param {object} paymentToken - details for the type of payment encrypted
  * @param {object} billingDetails -a ddress details
  * @return {object} - paymentmethod
  */
-async function createPaymentIntent(userId, paymentType, paymentDetails, billingDetails={}) {
+async function createPaymentIntent(userId, paymentType, paymentToken, billingDetails={}) {
   try {
     const paymentInfo = {
-      payment_type: paymentType,
+      type: paymentType,
       billing_details: billingDetails,
-      meta_data: {
+      metadata: {
         user_id: userId,
       },
     };
     if (paymentType=='card') {
-      paymentInfo.card = paymentDetails;
-    } else {
-      paymentInfo.us_bank_account = paymentDetails;
-    }
+      paymentInfo.card = {token: paymentToken};
+    }// else {
+    //   paymentInfo.ach_debit = {token: paymentToken};
+    // }
     // Create a Payment Method
     const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
-
-    // Attach the Payment Method to the user
-    await stripe.paymentMethods.attach(paymentMethod.id, {
-      customer: userId,
-    });
-
-    // Verify the Payment Method (only for bank accounts)
-    if (paymentType === 'bank_account') {
-      await stripe.paymentMethods.verify(paymentMethod.id, {
-        amounts: [0.5, 0.6, 1, 1.1], // Example verification amounts
-      });
-    }
-
-    return paymentMethod.id;
+    return paymentMethod;
   } catch (err) {
     console.error('Error occured while creating the payment Intent for the user: ', err.message);
     throw err;
@@ -48,13 +36,13 @@ async function createPaymentIntent(userId, paymentType, paymentDetails, billingD
 
 /**
  *
- * @param {string} paymentId - unique payment intent for the users payment id
+ * @param {string} paymentMethodId - unique payment intent for the users payment id
  * @return {object} - paymentmethod
  */
-async function deletePaymentIntent(paymentId) {
+async function deletePaymentIntent(paymentMethodId) {
   try {
     const paymentMethod = await stripe.paymentMethods.detach(
-        paymentId,
+        paymentMethodId,
     );
     return paymentMethod;
   } catch (err) {
@@ -65,34 +53,46 @@ async function deletePaymentIntent(paymentId) {
 
 /**
  *
- * @param {string} userId - unique id of the user
+*  @param {string} userId - unique id of the user
  * @param {Number} amount - money
- * @param {object} paymentMethodDetails - details of the payment method
  * @param {string} description - description of the payment
- * @return {object} - confirmed payment id
+ * @param {*} savedpaymentMethodID - saved payment method ID
+ * @param {*} newPaymentMethodID - new payment method ID
+ * @param {*} newPaymentMethodType - new payment method type
+ * @return {object} - result
  */
-async function makeOneTimePayment(userId, amount, paymentMethodDetails, description) {
+async function makeOneTimePayment(userId, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
 // only card is accepted here
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntentInfo = {
       amount: amount, // Amount in cents (e.g., $20.00)
       currency: 'usd',
-      confirm: true,
-      payment_method_data: paymentMethodDetails,
-      payment_method_types: 'card',
-      customer: userId,
+      
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never',
+      },
       description: description,
-      meta_data: {
+      metadata: {
         userId: userId,
       },
       use_stripe_sdk: true,
-    });
+    };
+
+    if (savedpaymentMethodID) {
+      paymentIntentInfo.payment_method = savedpaymentMethodID;
+    } else if (newPaymentMethodID) {
+      paymentIntentInfo.payment_method_types = newPaymentMethodType;
+      paymentIntentInfo.payment_method_data = newPaymentMethodID;
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentInfo);
 
     // Confirm the Payment Intent
-    const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
+    // const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
 
-    console.log('One-time Payment:', confirmedPaymentIntent);
-    return confirmedPaymentIntent;
+    console.log('One-time Payment:', paymentIntent);
+    return paymentIntent;
   } catch (error) {
     console.error('Error making one-time payment:', error.message);
     throw error;
@@ -106,29 +106,79 @@ async function makeOneTimePayment(userId, amount, paymentMethodDetails, descript
  * @param {string} paymentMethodId - saved payment id
  * @return {object} - payment Intent
  */
-async function useSavedPaymentMethod(userId, productAmount, paymentMethodId) {
+// async function useSavedPaymentMethod(userId, productAmount, paymentMethodId) {
+//   try {
+//     // Create a Payment Intent using the saved payment method
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: productAmount, // Amount in cents (e.g., $20.00)
+//       currency: 'usd',
+//       payment_method: paymentMethodId,
+//     });
+
+//     // Confirm the Payment Intent
+//     const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
+
+//     if (confirmedPaymentIntent.status === 'succeeded') {
+//       console.log('Payment successful.');
+//       return confirmedPaymentIntent;
+//     } else {
+//       console.error('Payment failed.');
+//       return 0;
+//     }
+//   } catch (error) {
+//     console.error('Error charging the user:', error);
+//     throw error;
+//   }
+// };
+
+/**
+ *
+ * @param {number} amount - amount for that payment
+ * @param {string} paymentIntentID - id of the payment intent
+ * @return {object} refund result
+ */
+async function refundPayment(amount, paymentIntentID) {
   try {
-    // Create a Payment Intent using the saved payment method
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: productAmount, // Amount in cents (e.g., $20.00)
-      currency: 'usd',
-      payment_method: paymentMethodId,
-      customer: userId,
+    const refundresult = await stripe.refunds.create({
+      payment_intent: paymentIntentID,
+      amount: amount,
     });
+    return refundresult;
+  } catch (err) {
+    console.error('Error refunding the payment:', error);
+    throw err;
+  }
+}
 
-    // Confirm the Payment Intent
-    const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
+/**
+ *
+ * @param {string} paymentIntentID - id of the payment
+ * @param {number} newAmount - amount to change for the payment
+ * @return {object} - latest updated paymentIntent
+ */
+async function updatePaymentIntent(paymentIntentID, newAmount) {
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentID);
+console.log(paymentIntent);
+    if (!['succeeded', 'canceled'].includes(paymentIntent.status)) {
+      paymentIntent.amount = newAmount;
 
-    if (confirmedPaymentIntent.status === 'succeeded') {
-      console.log('Payment successful.');
+      const updatedPaymentIntent = await stripe.paymentIntents.update(paymentIntentID, {
+        amount: newAmount,
+      });
+      console.log(updatedPaymentIntent)
+      const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntentID);
+      console.log(confirmedPaymentIntent)
+      console.log('PaymentIntent confirmed:', confirmedPaymentIntent.id);
       return confirmedPaymentIntent;
     } else {
-      console.error('Payment failed.');
-      return 0;
+      console.log('Payment Intent cannot be updated once it is confirmed');
+      return null;
     }
-  } catch (error) {
-    console.error('Error charging the user:', error);
-    throw error;
+  } catch (err) {
+    console.log('Error occured while updating the paymentIntent using stripe: ', err.message);
+    throw err;
   }
-};
-module.exports = {createPaymentIntent, deletePaymentIntent, makeOneTimePayment, useSavedPaymentMethod};
+}
+
+module.exports = {createPaymentIntent, deletePaymentIntent, makeOneTimePayment, refundPayment, updatePaymentIntent};
