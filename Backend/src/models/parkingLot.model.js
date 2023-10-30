@@ -3,7 +3,7 @@ const {addressSchema} = require('./user.model.js');
 const mongoose = require('mongoose');
 
 const parkingLotSchema = new mongoose.Schema({
-  parkingLotId: {
+  parkingLotID: {
     type: String,
     unique: true,
     required: true,

@@ -1,3 +1,4 @@
+const {Timestamp} = require('firebase-admin/firestore');
 /**
  *
  * @param {Object} address - address object
@@ -48,4 +49,49 @@ function verifyBankAccountDetails(bankAccount) {
   return true;
 }
 
-module.exports = {isValidAddress, verifyBillingDetails, verifyBankAccountDetails};
+/**
+ *
+ * @param {Date} date - javascript date object
+ * @return {object} - firestore tiemstamp object
+ */
+function dateToTimestamp(date) {
+  return Timestamp.fromDate(date);
+}
+
+/**
+ *
+ * @param {object} timestamp - firestore timestamp
+ * @return {object} - javascript timestamp object
+ */
+function timestampToDate(timestamp) {
+  return timestamp.toDate();
+}
+
+/**
+ *
+ * @return {object} - firebase timestamp obejct
+ */
+function currentFirestoreTimestamp() {
+  return Timestamp.now();
+}
+
+/**
+ *
+ * @param {string} userMembership - rank type
+ * @param {string} parkingLotRank - rank type
+ * @return {boolean} result
+ */
+function compareRanks(userMembership, parkingLotRank) {
+  // const rankOrder = ['SILVER', 'GOLD', 'PLATINUM']
+  if (userMembership === 'PLATINUM') {
+    return true;
+  } else if (userMembership === 'GOLD' && (parkingLotRank === 'GOLD' || parkingLotRank === 'SILVER')) {
+    return true;
+  } else if (userMembership === 'SILVER' && parkingLotRank === 'SILVER') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+module.exports = {isValidAddress, verifyBillingDetails, verifyBankAccountDetails, dateToTimestamp, timestampToDate, currentFirestoreTimestamp, compareRanks};

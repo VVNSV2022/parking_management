@@ -1,5 +1,61 @@
 const {createPaymentIntent, deletePaymentIntent, makeOneTimePayment, refundPayment, updatePaymentIntent} = require('../thirdParty/StripeAPI');
-const {verifyBillingDetails} = require('../utilities/util');
+const {getPaymentID, getMemberships} = require('../thirdParty/payment.firestore');
+const {verifyBillingDetails, compareRanks, timestampToDate} = require('../utilities/util');
+
+
+/**
+ *
+ * @param {string} paymentID - payment id
+ * @return {object} result
+ */
+async function verifyPaymentID(paymentID) {
+  try {
+    const result = await getPaymentID(paymentID);
+    if (result) {
+      return {message: 'payment is verified successfully', success: true};
+    }
+    return {message: 'payment is failed to verify', success: false};
+  } catch (err) {
+    console.error('Error occred while fetching verifying the paymentID: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {string} userID  - unique id of user
+ * @param {string} regionID - region id
+ * @param {string} parkingLotRank  - parking lot rank
+ * @return {object} result
+ */
+async function checkMembershipStatus(userID, regionID, parkingLotRank) {
+  try {
+    const result = await getMemberships(userID, regionID);
+
+    if (result) {
+      let finalEndDate=new Date();
+      let membershipStatus='SILVER';
+      result.forEach((element) => {
+        if (finalEndDate<timestampToDate(element.endDate)) {
+          finalEndDate = timestampToDate(element.endDate);
+          membershipStatus = element.membershipType;
+        }
+      });
+      if (finalEndDate<=new Date()) {
+        return {message: 'membership status is invalid', success: false};
+      }
+      if (!compareRanks(membershipStatus, parkingLotRank)) {
+        return {message: 'membership status is valid but cannot be used for higher parkingLots than membership status', success: false};
+      }
+      return {message: 'membership status is available for this parking lot', success: true};
+    }
+    return {message: 'there is no membership for the user', success: false};
+  } catch (err) {
+    console.error('Error occred while checking the membership status of user: ', err.message);
+    throw err;
+  }
+}
+
 
 /**
  *
@@ -155,4 +211,4 @@ async function updatePaymentAmount(userID, newAmount, initialAmount, paymentInte
   }
 }
 
-module.exports = {savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount};
+module.exports = {checkMembershipStatus, verifyPaymentID, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount};

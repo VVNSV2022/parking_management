@@ -2,7 +2,7 @@ const result = require('dotenv').config();
 
 const {CustomServer, CustomResponse} = require('./utilities/server.js');
 const firebaseInit = require('./thirdParty/firebaseInit.js');
-const paymentRouter = require('./routes/payments.routes.js');
+
 
 const server = new CustomServer();
 const response = new CustomResponse();
@@ -14,7 +14,12 @@ if (result.error) {
 const port = process.env.PORT;
 firebaseInit();
 
+// error occuring when we place this before firebase initialisation because reservation router is using firebase before it
+const paymentRouter = require('./routes/payments.routes.js');
+const reservationRouter = require('./routes/reservation.routes.js');
+
 server.setRoutes(paymentRouter);
+server.setRoutes(reservationRouter);
 server.get('/', (req, res) => {
   response.setResponse(res, {
     message: 'hello from sairam using the get Method',

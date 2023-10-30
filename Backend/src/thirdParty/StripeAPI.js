@@ -67,7 +67,7 @@ async function makeOneTimePayment(userId, amount, description, savedpaymentMetho
     const paymentIntentInfo = {
       amount: amount, // Amount in cents (e.g., $20.00)
       currency: 'usd',
-      
+
       automatic_payment_methods: {
         enabled: true,
         allow_redirects: 'never',
@@ -159,16 +159,16 @@ async function refundPayment(amount, paymentIntentID) {
 async function updatePaymentIntent(paymentIntentID, newAmount) {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentID);
-console.log(paymentIntent);
+    console.log(paymentIntent);
     if (!['succeeded', 'canceled'].includes(paymentIntent.status)) {
       paymentIntent.amount = newAmount;
 
       const updatedPaymentIntent = await stripe.paymentIntents.update(paymentIntentID, {
         amount: newAmount,
       });
-      console.log(updatedPaymentIntent)
+      console.log(updatedPaymentIntent);
       const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntentID);
-      console.log(confirmedPaymentIntent)
+      console.log(confirmedPaymentIntent);
       console.log('PaymentIntent confirmed:', confirmedPaymentIntent.id);
       return confirmedPaymentIntent;
     } else {

@@ -32,7 +32,7 @@ const paymentSchema = new mongoose.Schema({
   },
   payment_status: {
     type: String,
-    enum: ['successful', 'failed'],
+    enum: ['successful', 'failed', 'pending'],
     required: true,
   },
   user_id: {
@@ -55,10 +55,15 @@ const membershipSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  membershipType: {
+  membershipPeriod: {
     type: String,
     required: true,
     enum: ['WEEKLY', 'MONTHLY', 'QUATERLY'],
+  },
+  membershipType: {
+    type: String,
+    required: true,
+    enum: ['GOLD', 'SILVER', 'PLATINUM'],
   },
   startDate: {
     type: Date,
