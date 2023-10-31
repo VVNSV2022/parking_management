@@ -43,4 +43,28 @@ async function getReservationsByTime(parkingLotID, startTime, endTime) {
   }
 }
 
-module.exports = {addReservation, getReservationsByTime};
+/**
+ *
+ * @param {string} userID - id of the user
+ * @return {object} result
+ */
+async function usersReservations(userID) {
+  try {
+    const reservationRef = db.collection('reservations');
+    const reservationSnapshot = await reservationRef.where('userID', '==', userID).get();
+
+    if (reservationSnapshot.empty) {
+      return [];
+    }
+    const reservationData=[];
+    reservationSnapshot.forEach((doc)=>{
+      reservationData.push(doc.data());
+    });
+    return reservationData;
+  } catch (err) {
+    console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {addReservation, getReservationsByTime, usersReservations};

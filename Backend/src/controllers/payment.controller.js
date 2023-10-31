@@ -1,5 +1,5 @@
 const {createPaymentIntent, deletePaymentIntent, makeOneTimePayment, refundPayment, updatePaymentIntent} = require('../thirdParty/StripeAPI');
-const {getPaymentID, getMemberships} = require('../thirdParty/payment.firestore');
+const {getPaymentID, getPaymentMethodsID, getMemberships, getPaymentMethodsByUser, addPaymentMethod} = require('../thirdParty/payment.firestore');
 const {verifyBillingDetails, compareRanks, timestampToDate} = require('../utilities/util');
 
 
@@ -56,6 +56,24 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
   }
 }
 
+/**
+ *
+ * @param {string} userID  - unique id of the user
+ * @return {object} result
+ */
+async function getUserPaymentMethods(userID) {
+  try {
+    const result = await getPaymentMethodsByUser(userID);
+    if (result) {
+      return {message: 'got the user paymentmethods', data: result, success: true};
+    }
+    return {message: 'no saved paymentmethods', data: [], success: true};
+  } catch (err) {
+    console.error('Error occred while fetching the payment methods of user: ', err.message);
+    throw err;
+  }
+}
+
 
 /**
  *
@@ -75,11 +93,19 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
     }
 
     const result = await createPaymentIntent(userID, paymentType, paymentToken, BillingDetails);
-    console.log(result);
-    if (result) {
+    delete result['livemode'];
+    delete result['object'];
+    result['userID'] = userID;
+    result['active'] = true;
+    // save this data in the firebase
+    const dataSaveResult = await addPaymentMethod(result);
+
+    if (result && dataSaveResult) {
       // card.brand, card.checks, card.exp_onth, card.exp_year, card.funding, card.last4
       // save the details of payment id in the database
       return {message: 'payment method is saved', success: true};
+    } else if (result && !dataSaveResult) {
+      return {message: 'payment method is saved in stripe but not in database', success: false};
     }
     return {message: 'payment method is not saved', success: false};
   } catch (err) {
@@ -90,11 +116,11 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
 
 /**
  *
- * @param {string} userId - unique id
+ * @param {string} userID - unique id
  * @param {string} paymentMethodID - payment method ID
  * @return {object} response
  */
-async function deletePaymentMethod(userId, paymentMethodID) {
+async function deletePaymentMethod(userID, paymentMethodID) {
   try {
     // check if this paymentMethodId is belongs to the user
     // if yes just mark it as deleted in the database
@@ -104,6 +130,14 @@ async function deletePaymentMethod(userId, paymentMethodID) {
     //   console.log(result);
     //   return {message: 'success', success: true};
     // }
+    const result = await getPaymentMethodsID(paymentMethodID);
+    if (result) {
+      if (!(result[0].userID === userID)) {
+        return {message: 'paymentID is not related to you. improper access', success: false};
+      }
+    } else {
+      return {message: 'cannot found the paymentID in the DB', success: false};
+    }
     return {message: 'failed to delete the payment method from the user', success: false};
   } catch (err) {
     throw err;
@@ -211,4 +245,4 @@ async function updatePaymentAmount(userID, newAmount, initialAmount, paymentInte
   }
 }
 
-module.exports = {checkMembershipStatus, verifyPaymentID, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount};
+module.exports = {getUserPaymentMethods, checkMembershipStatus, verifyPaymentID, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount};

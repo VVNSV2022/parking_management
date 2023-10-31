@@ -1,9 +1,26 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
+const {getUserPaymentMethods, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
 
 const paymentRouter = new CustomRoutes();
 const response = new CustomResponse();
 
+paymentRouter.get('/payments/', async (req, res)=>{
+  try {
+    const queryParameters = req.queryParameters;
+    if (!queryParameters.userID) {
+      return response.setResponse(res, {message: 'Missing important fields', success: false}, 400);
+    }
+    const userID = queryParameters.userID;
+    const result = await getUserPaymentMethods(userID);
+    if (result.success) {
+      return response.setResponse(res, {message: result.message, success: true, data: result.data}, 200);
+    }
+    return response.setResponse(res, {message: result.message, success: false}, 400);
+  } catch (err) {
+    console.error('Error occurred while handling the request to get the saved payment methods: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
 
 paymentRouter.post('/payments/create', async (req, res)=>{
   try {
@@ -106,4 +123,5 @@ paymentRouter.post('/payments/updatePaymentAmount', async (req, res)=>{
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });
+
 module.exports = paymentRouter;

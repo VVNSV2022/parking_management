@@ -48,5 +48,68 @@ async function getMemberships(userID, regionID) {
   }
 }
 
+/**
+ *
+ * @param {string} userID
+ * @return {object} result
+ */
+async function getPaymentMethodsByUser(userID) {
+  try {
+    const paymentMethodsRef = db.collection('paymentMethods');
+    const paymentMethodSnapshot = await paymentMethodsRef.where('userID', '==', userID).where('active', '==', true).get();
 
-module.exports = {getPaymentID, getMemberships};
+    if (paymentMethodSnapshot.empty) {
+      return null;
+    }
+    const paymentMethodData=[];
+    paymentMethodSnapshot.forEach((doc)=>{
+      paymentMethodData.push(doc.data());
+    });
+    return paymentMethodData;
+  } catch (err) {
+    console.error('Error occured while getting the payment methods data from firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {string} paymentMethodID
+ * @return {object} result
+ */
+async function getPaymentMethodsID(paymentMethodID) {
+  try {
+    const paymentMethodsRef = db.collection('paymentMethods');
+    const paymentMethodSnapshot = await paymentMethodsRef.where('id', '==', paymentMethodID).where('active', '==', true).get();
+
+    if (paymentMethodSnapshot.empty) {
+      return null;
+    }
+    const paymentMethodData=[];
+    paymentMethodSnapshot.forEach((doc)=>{
+      paymentMethodData.push(doc.data());
+    });
+    return paymentMethodData;
+  } catch (err) {
+    console.error('Error occured while getting the payment methods data from firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {object} stripeData - paymentmethod object
+ * @return {object} result
+ */
+async function addPaymentMethod(stripeData) {
+  try {
+    const paymentMethodRef = db.collection('paymentMethods').doc(stripeData.id);
+    await paymentMethodRef.set(stripeData);
+    return paymentMethodRef;
+  } catch (err) {
+    console.error('Error occured while adding the payment methods data to firestore: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {getPaymentMethodsID, addPaymentMethod, getPaymentID, getMemberships, getPaymentMethodsByUser};

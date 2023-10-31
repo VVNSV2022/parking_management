@@ -83,6 +83,49 @@ const membershipSchema = new mongoose.Schema({
   },
 });
 
+/**
+ * {
+  id: 'pm_1O71HJIML3jMLAce6iugWQSr',
+  object: 'payment_method',
+  billing_details: {
+    address: {
+      city: 'New Brunswick',
+      country: 'US',
+      line1: '41 Phelps Ave',
+      line2: 'Apt B',
+      postal_code: '08904',
+      state: 'New Jersey'
+    },
+    email: 'balusairam26@gmail.com',
+    name: 'sairam',
+    phone: '3530358556'
+  },
+  card: {
+    brand: 'visa',
+    checks: {
+      address_line1_check: null,
+      address_postal_code_check: null,
+      cvc_check: 'unchecked'
+    },
+    country: 'US',
+    exp_month: 10,
+    exp_year: 2024,
+    fingerprint: 'BSDHN7uXkVdKsjfq',
+    funding: 'debit',
+    generated_from: null,
+    last4: '5556',
+    networks: { available: [Array], preferred: null },
+    three_d_secure_usage: { supported: true },
+    wallet: null
+  },
+  created: 1698694657,
+  customer: null,
+  livemode: false,
+  metadata: { user_id: '12345678' },
+  type: 'card'
+}
+ */
+
 const Payment = mongoose.model('Payment', paymentSchema);
 
 const Membership = mongoose.model('Membership', membershipSchema);

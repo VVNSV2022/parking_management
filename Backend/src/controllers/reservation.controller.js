@@ -1,6 +1,6 @@
 const {v4: uuidv4} = require('uuid');
 
-const {addReservation} = require('../thirdParty/reservation.firestore.js');
+const {addReservation, usersReservations} = require('../thirdParty/reservation.firestore.js');
 const {verifyPaymentID, checkMembershipStatus} = require('../controllers/payment.controller.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('../controllers/parkingLot.controller.js');
 const {verifyVehicleID} = require('../controllers/vehicle.controller.js');
@@ -92,5 +92,22 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
   }
 }
 
+/**
+ *
+ * @param {string} userID - id of the user
+ * @return {object} result
+ */
+async function getReservationsByUser(userID) {
+  try {
+    const result = await usersReservations(userID);
+    if (result) {
+      return {message: 'successfully got the reservations data for the user', data: result, success: true};
+    }
+    return {message: 'No reservation to get for the user', data: [], success: true};
+  } catch (err) {
+    console.error('Error occured while getting the reservations: ', err.message);
+    throw err;
+  }
+}
 
-module.exports = {createReservation};
+module.exports = {createReservation, getReservationsByUser};
