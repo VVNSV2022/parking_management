@@ -15,11 +15,47 @@ async function getPaymentID(paymentID) {
     if (paymentIDSnapshot.exists) {
       const paymentIDData = paymentIDSnapshot.data();
       return paymentIDData;
-    } else {
-      return null;
     }
+    return null;
   } catch (err) {
     console.error('Error occured while getting the paymentID from firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {string} paymentID
+ * @param {string} paymentStatus
+ * @param {number} finalAmount
+ */
+async function updatePayment(paymentID, paymentStatus, finalAmount) {
+  try {
+    const paymentIDRef = db.collection('payments').doc(paymentID);
+    await paymentIDRef.set({
+      paymentStatus: paymentStatus,
+      finalAmount: finalAmount,
+    });
+    return paymentIDRef;
+  } catch (err) {
+    console.error('Error occured while updating the paymentID from firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {string} paymentID  - payment id of the user
+ * @param {object} data - payment id data
+ * @return {object} result
+ */
+async function addPayment(paymentID, data) {
+  try {
+    const paymentIDRef = db.collection('payments').doc(paymentID);
+    await paymentIDRef.set(data);
+    return paymentIDRef;
+  } catch (err) {
+    console.error('Error occured while adding the paymentID from firestore: ', err.message);
     throw err;
   }
 }
@@ -35,7 +71,7 @@ async function getMemberships(userID, regionID) {
     const membershipRef = db.collection('memberships');
     const membershipSnapshot = await membershipRef.where('userID', '==', userID).where('regionID', '==', regionID).get();
     if (membershipSnapshot.empty) {
-      return [];
+      return null;
     }
     const membershipData=[];
     membershipSnapshot.forEach((doc)=>{
@@ -112,4 +148,21 @@ async function addPaymentMethod(stripeData) {
   }
 }
 
-module.exports = {getPaymentMethodsID, addPaymentMethod, getPaymentID, getMemberships, getPaymentMethodsByUser};
+/**
+ *
+ * @param {string} paymentmethodID  - paymentmethodid
+ * @param {object} newData - updated data
+ * @return {object} result
+ */
+async function updatePaymentMethod(paymentmethodID, newData) {
+  try {
+    const paymentMethodRef = db.collection('paymentMethods').doc(paymentmethodID);
+    await paymentMethodRef.set(newData, {merge: true});
+    return paymentMethodRef;
+  } catch (err) {
+    console.error('Error occured while adding the payment methods data to firestore: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {getPaymentMethodsID, addPaymentMethod, updatePaymentMethod, getPaymentID, updatePayment, addPayment, getMemberships, getPaymentMethodsByUser};

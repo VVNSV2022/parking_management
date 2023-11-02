@@ -17,12 +17,9 @@ async function getVehicleID(userID, vehicleID) {
       const vehicleIDData = vehicleIDSnapshot.data();
       if (vehicleIDData.userID === userID) {
         return vehicleIDData;
-      } else {
-        return null;
       }
-    } else {
-      return null;
     }
+    return null;
   } catch (err) {
     console.error('Error occured while getting the paymentID from firestore: ', err.message);
     throw err;

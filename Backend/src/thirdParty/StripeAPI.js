@@ -2,6 +2,30 @@ require('dotenv').config();
 
 const stripe = require('stripe')(process.env.SecretKey);
 
+/**
+ *
+ * @param {string} userID
+ * @param {string} name
+ * @param {string} email
+ * @param {string} phone
+ * @return {object} result
+ */
+async function createCustomer(userID, name, email, phone) {
+  try {
+    const customer = await stripe.customers.create({
+      name: name,
+      email: email,
+      phone: phone,
+      metadata: {
+        userID: userID,
+      },
+    });
+    return customer;
+  } catch (err) {
+    console.error('Error occured while creating the customer: ', err.message);
+    throw err;
+  }
+}
 
 /**
  *
@@ -9,9 +33,10 @@ const stripe = require('stripe')(process.env.SecretKey);
  * @param {string} paymentType - type of the payment card or bank account
  * @param {object} paymentToken - details for the type of payment encrypted
  * @param {object} billingDetails -a ddress details
+ * @param {string} customerID - unique customer id
  * @return {object} - paymentmethod
  */
-async function createPaymentIntent(userId, paymentType, paymentToken, billingDetails={}) {
+async function createPaymentMethod(userId, paymentType, paymentToken, billingDetails, customerID=' ') {
   try {
     const paymentInfo = {
       type: paymentType,
@@ -26,9 +51,22 @@ async function createPaymentIntent(userId, paymentType, paymentToken, billingDet
     //   paymentInfo.ach_debit = {token: paymentToken};
     // }
     // Create a Payment Method
+    if (!customerID) {
+      const customer = await createCustomer(userId, billingDetails.name, billingDetails.email, billingDetails.phone);
+      paymentInfo.customer = customer.id;
+    }
     const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
     return paymentMethod;
   } catch (err) {
+    if (err.type === 'StripeCardError') {
+      console.error('Invalid Request Error: ', err.message);
+      return null;
+    } else if (err.type === 'StripeInvalidRequestError') {
+      // Handle invalid request errors
+      console.error('Invalid Request Error:', err.message);
+      // Respond to the client with an appropriate error message
+      return null;
+    }
     console.error('Error occured while creating the payment Intent for the user: ', err.message);
     throw err;
   }
@@ -39,7 +77,7 @@ async function createPaymentIntent(userId, paymentType, paymentToken, billingDet
  * @param {string} paymentMethodId - unique payment intent for the users payment id
  * @return {object} - paymentmethod
  */
-async function deletePaymentIntent(paymentMethodId) {
+async function deletePaymentMethod(paymentMethodId) {
   try {
     const paymentMethod = await stripe.paymentMethods.detach(
         paymentMethodId,
@@ -78,7 +116,7 @@ async function makeOneTimePayment(userId, amount, description, savedpaymentMetho
       },
       use_stripe_sdk: true,
     };
-
+    // we need to add the payment method to a customer to reuse a payment method else gives error
     if (savedpaymentMethodID) {
       paymentIntentInfo.payment_method = savedpaymentMethodID;
     } else if (newPaymentMethodID) {
@@ -181,4 +219,4 @@ async function updatePaymentIntent(paymentIntentID, newAmount) {
   }
 }
 
-module.exports = {createPaymentIntent, deletePaymentIntent, makeOneTimePayment, refundPayment, updatePaymentIntent};
+module.exports = {createCustomer, createPaymentMethod, deletePaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent};

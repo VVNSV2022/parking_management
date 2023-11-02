@@ -22,6 +22,40 @@ async function addReservation(reservationID, data) {
 
 /**
  *
+ * @param {string} reservationID - reservation id
+ * @param {object} updatedData - reservation data
+ * @return {object} - result
+ */
+async function updateDetails(reservationID, updatedData) {
+  try {
+    const docRef = db.collection('reservations').doc(reservationID);
+    await docRef.set(updatedData, {merge: true});
+    return docRef;
+  } catch (err) {
+    console.error('Error occured while updating the data to the firebase firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {string} reservationID - reservation id
+ * @return {object} - result
+ */
+async function deleteDetails(reservationID) {
+  try {
+    const docRef = db.collection('reservations').doc(reservationID);
+    await docRef.set({reservationStatus: 'cancelled'}, {merge: true});
+    return docRef;
+  } catch (err) {
+    console.error('Error occured while updating the data to the firebase firestore: ', err.message);
+    throw err;
+  }
+}
+
+
+/**
+ *
  * @param {string} parkingLotID
  * @param {time} startTime
  * @param {time} endTime
@@ -54,11 +88,14 @@ async function usersReservations(userID) {
     const reservationSnapshot = await reservationRef.where('userID', '==', userID).get();
 
     if (reservationSnapshot.empty) {
-      return [];
+      return null;
     }
     const reservationData=[];
     reservationSnapshot.forEach((doc)=>{
-      reservationData.push(doc.data());
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled') {
+        reservationData.push(docData);
+      }
     });
     return reservationData;
   } catch (err) {
@@ -67,4 +104,31 @@ async function usersReservations(userID) {
   }
 }
 
-module.exports = {addReservation, getReservationsByTime, usersReservations};
+/**
+ *
+ * @param {string} reservationID
+ * @return {result} result
+ */
+async function getReservation(reservationID) {
+  try {
+    const reservationRef = db.collection('reservations');
+    const reservationSnapshot = await reservationRef.where('reservationID', '==', reservationID).get();
+
+    if (reservationSnapshot.empty) {
+      return null;
+    }
+    const reservationData=[];
+    reservationSnapshot.forEach((doc)=>{
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled') {
+        reservationData.push(docData);
+      }
+    });
+    return reservationData;
+  } catch (err) {
+    console.error('Error occured while getting reservatio ndata from the firebase firestore: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, getReservation, usersReservations};

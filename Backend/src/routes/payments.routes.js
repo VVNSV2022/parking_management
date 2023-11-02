@@ -35,11 +35,11 @@ paymentRouter.post('/payments/create', async (req, res)=>{
     // Handle the response from the controller
     if (result.success) {
       // Payment was successful
-      return response.setResponse(res, {message: 'Payment successful'}, 200);
+      return response.setResponse(res, {message: 'Payment Method saved successfully'}, 200);
     } else {
       // Payment failed, provide an error message
       console.log(result);
-      return response.setResponse(res, {message: 'Payment failed'}, 200);
+      return response.setResponse(res, {message: 'Payment method failed to save'}, 200);
     }
   } catch (err) {
     console.error('Error occurred while handling the request to save the payment method: ', err.message);
@@ -47,7 +47,7 @@ paymentRouter.post('/payments/create', async (req, res)=>{
   }
 });
 
-paymentRouter.post('/payments/delete', async (req, res)=>{
+paymentRouter.delete('/payments/delete', async (req, res)=>{
   try {
     const {userID, paymentMethodID} = req.body;
     // Check if all required values are present in the request body
@@ -59,9 +59,7 @@ paymentRouter.post('/payments/delete', async (req, res)=>{
     if (result.success) {
       return response.setResponse(res, {message: 'Payment Delete successful'}, 200);
     } else {
-      // Payment failed, provide an error message
-      console.log(result);
-      return response.setResponse(res, {message: 'Payment Delete failed'}, 200);
+      return response.setResponse(res, {message: result.message, error: true}, 200);
     }
   } catch (err) {
     console.error('Error occurred while handling the request to delete the payment method: ', err.message);

@@ -102,6 +102,7 @@ const userSchema = new Schema({
   permanentAddress: addressSchema,
   licenseNumber: {type: String},
   isdisabled: {type: Boolean, default: false},
+  StripeCustomerId: {type: String},
   userActive: {type: Boolean, default: true},
 });
 

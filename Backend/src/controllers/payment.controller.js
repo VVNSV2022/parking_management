@@ -1,5 +1,5 @@
-const {createPaymentIntent, deletePaymentIntent, makeOneTimePayment, refundPayment, updatePaymentIntent} = require('../thirdParty/StripeAPI');
-const {getPaymentID, getPaymentMethodsID, getMemberships, getPaymentMethodsByUser, addPaymentMethod} = require('../thirdParty/payment.firestore');
+const {createPaymentMethod, deletePaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent} = require('../thirdParty/StripeAPI');
+const {getPaymentID, getPaymentMethodsID, updatePaymentMethod, getMemberships, getPaymentMethodsByUser, addPaymentMethod, updatePayment, addPayment} = require('../thirdParty/payment.firestore');
 const {verifyBillingDetails, compareRanks, timestampToDate} = require('../utilities/util');
 
 
@@ -92,19 +92,20 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
       return {message: 'Billing details is not valid', success: false};
     }
 
-    const result = await createPaymentIntent(userID, paymentType, paymentToken, BillingDetails);
-    delete result['livemode'];
-    delete result['object'];
-    result['userID'] = userID;
-    result['active'] = true;
-    // save this data in the firebase
-    const dataSaveResult = await addPaymentMethod(result);
+    const result = await createPaymentMethod(userID, paymentType, paymentToken, BillingDetails);
+    if (result) {
+      delete result['livemode'];
+      delete result['object'];
+      result['userID'] = userID;
+      result['active'] = true;
+      // save this data in the firebase
+      const dataSaveResult = await addPaymentMethod(result);
 
-    if (result && dataSaveResult) {
+      if (dataSaveResult) {
       // card.brand, card.checks, card.exp_onth, card.exp_year, card.funding, card.last4
       // save the details of payment id in the database
-      return {message: 'payment method is saved', success: true};
-    } else if (result && !dataSaveResult) {
+        return {message: 'payment method is saved', success: true};
+      }
       return {message: 'payment method is saved in stripe but not in database', success: false};
     }
     return {message: 'payment method is not saved', success: false};
@@ -125,7 +126,7 @@ async function deletePaymentMethod(userID, paymentMethodID) {
     // check if this paymentMethodId is belongs to the user
     // if yes just mark it as deleted in the database
     // no then return unauthorised access
-    // const result = await deletePaymentIntent(paymentMethodID);
+    // const result = await deletePaymentMethod(paymentMethodID);
     // if (result) {
     //   console.log(result);
     //   return {message: 'success', success: true};
@@ -135,10 +136,14 @@ async function deletePaymentMethod(userID, paymentMethodID) {
       if (!(result[0].userID === userID)) {
         return {message: 'paymentID is not related to you. improper access', success: false};
       }
-    } else {
-      return {message: 'cannot found the paymentID in the DB', success: false};
+      const deletedResult = await updatePaymentMethod(paymentMethodID, {active: false});
+      if (deletedResult) {
+        return {message: 'successfully deleted the payment method ID', success: true};
+      }
+      return {message: 'failed to delete the payment method from the user', success: false};
     }
-    return {message: 'failed to delete the payment method from the user', success: false};
+
+    return {message: 'cannot find the paymentID in the DB', success: false};
   } catch (err) {
     throw err;
   }
@@ -153,7 +158,7 @@ async function deletePaymentMethod(userID, paymentMethodID) {
  * @param {string} newPaymentMethodID - new payment method ID
  * @param {string} newPaymentMethodType - new payment method type, card, bank account
  */
-async function makePayment(userId, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
+async function makePayment(userID, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
   try {
     // if(savedpaymentMethodID){
     //
@@ -170,10 +175,32 @@ async function makePayment(userId, amount, description, savedpaymentMethodID='',
       return {message: 'description length is not in the range of 3-200', success: false};
     }
     const amountInCents = parseInt(parsedAmount*100);
-    const result = await makeOneTimePayment(userId, amountInCents, description, savedpaymentMethodID, newPaymentMethodID, newPaymentMethodType);
+    const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, newPaymentMethodID, newPaymentMethodType);
     if (result) {
-      console.log(result);
-      return {message: 'payment successfull', data: result, id: result.id, success: true};
+      const paymentData = {
+        userID: userID,
+        reason: 'charge',
+        paymentID: result.id,
+        paymentMoneyInCents: result.amount,
+        recievedMoneyInCents: result.amount_received,
+        paymentMethodID: result.payment_method,
+        payment_method_types: result.payment_method_types,
+        payment_status: result.status,
+        metadata: result.metadata,
+        description: result.description,
+        canceled_at: result.canceled_at,
+        cancellation_reason: result.cancellation_reason,
+        created_at: result.created,
+        currency: result.currency,
+        customer: result.customer,
+        last_payment_error: result.last_payment_error,
+        latest_charge: result.latest_charge,
+      };
+      const addedResult = await addPayment(result.id, paymentData);
+      if (addedResult) {
+        return {message: 'payment successfull', data: result, id: result.id, success: true};
+      }
+      return {message: 'payment made successfully but cannot add it into database', data: result, success: false};
     }
     return {message: 'payment failed', success: false};
   } catch (err) {
@@ -184,11 +211,10 @@ async function makePayment(userId, amount, description, savedpaymentMethodID='',
 
 /**
  *
- * @param {string} userID - unique id of the user
  * @param {string} amount - amount of the payment
  * @param {string} paymentID - payment id of the paid payment
  */
-async function refundPaidPayment(userID, amount, paymentID) {
+async function refundPaidPayment(amount, paymentID) {
   try {
     // check if the userId has paymentID
     // pass the paymentID to function to check that payment is valid for the refund
@@ -198,9 +224,12 @@ async function refundPaidPayment(userID, amount, paymentID) {
       return {message: 'invalid amount type', success: false};
     }
     const amountInCents = parseInt(parsedAmount*100);
-    const result = await refundPayment(amountInCents, paymentID);
+    const result = await refundPayment(amountInCents*0.8, paymentID);
     if (result) {
-      console.log(result);
+      const updatedResult = await updatePayment(paymentID, 'refund', parsedAmount*0.8);
+      if (!updatedResult) {
+        console.log('Payment is updated but the result is not updated in the database ');
+      }
       return {message: 'payment refunded successfully', data: result, success: true};
     }
     return {message: 'payment refund failed', success: false};
