@@ -17,6 +17,8 @@ firebaseInit();
 // error occuring when we place this before firebase initialisation because reservation router is using firebase before it
 const paymentRouter = require('./routes/payments.routes.js');
 const reservationRouter = require('./routes/reservation.routes.js');
+const userRouter = require('./routes/users.routes');
+server.setRoutes(userRouter);
 
 server.setRoutes(paymentRouter);
 server.setRoutes(reservationRouter);
