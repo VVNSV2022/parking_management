@@ -1,25 +1,25 @@
 function handleLicensePlateButtonClick() {
-    const licensePlate = prompt("Enter your License Plate Number:");
+    const licensePlateInput = document.getElementById("licenseInput").value;
 
-    if (licensePlate) {
+    if (licensePlateInput) {
         // Making an API request to check the license plate
         fetch('/api/elevator/scan-license-plate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ licensePlate: licensePlate })
+            body: JSON.stringify({ licensePlate: licensePlateInput })
         })
         .then(response => {
             if (response.status === 200) {
-                // When reservation found, show success message and redirect to Reservations Page
+                // When license plate found, we show success message and redirect to Reservations Page
                 return response.json()
                     .then(data => {
                         alert(data.message);
                         window.location.href = 'home.html';
                     });
             } else if (response.status === 404) {
-                // When no reservation found, show not found message and redirect to notFound.html
+                // When license plate not found, we show not found message and redirect to notFound.html
                 return response.json()
                     .then(data => {
                         alert(data.message);
