@@ -11,7 +11,7 @@ reservationRouter.post('/api/reservation', async (req, res)=>{
     if (!userID|| !startTime|| !endTime|| !parkingLotID|| !price|| !permitType || !vehicleID || !paymentType || !paymentMethod) {// || !paymentID
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
-    const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod, '');
+    const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod);
     if (result.success) {
       return response.setResponse(res, {message: 'Created Reservation Successfully', error: false}, 200);
     }

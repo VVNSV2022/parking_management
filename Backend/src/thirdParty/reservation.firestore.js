@@ -64,13 +64,20 @@ async function deleteDetails(reservationID) {
 async function getReservationsByTime(parkingLotID, startTime, endTime) {
   try {
     const reservationRef = db.collection('reservations');
-    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).get();
-    // and('start_time', '<', endTime).and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
+    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).and('start_time', '<', endTime).get();
+    // .and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
     console.log(reservationSnapshot);
     if (reservationSnapshot.empty) {
       return [];
     }
-    return reservationSnapshot;
+    const reservationData=[];
+    reservationSnapshot.forEach((doc)=>{
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled' && docData.end_time > startTime) {
+        reservationData.push(docData);
+      }
+    });
+    return reservationData;
   } catch (err) {
     console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
     throw err;

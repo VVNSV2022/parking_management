@@ -36,12 +36,15 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
     if (result) {
       let finalEndDate=new Date();
       let membershipStatus='SILVER';
+
       result.forEach((element) => {
-        if (finalEndDate<timestampToDate(element.endDate)) {
+        if (finalEndDate.getTime()<timestampToDate(element.endDate).getTime()) {
           finalEndDate = timestampToDate(element.endDate);
           membershipStatus = element.membershipType;
         }
       });
+
+      // write a code
       if (finalEndDate<=new Date()) {
         return {message: 'membership status is invalid', success: false};
       }
@@ -50,13 +53,75 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
       }
       return {message: 'membership status is available for this parking lot', success: true};
     }
-    return {message: 'there is no membership for the user', success: false};
+    return {message: 'there are no memberships for this user', success: false};
   } catch (err) {
     console.error('Error occred while checking the membership status of user: ', err.message);
     throw err;
   }
 }
 
+/**
+ *
+ * @param {string} parkingLotRank
+ * @param {object} memberships
+ * @return {object} result
+ */
+function pickMembershipID(parkingLotRank, memberships) {
+  const platinumMemberships = [];
+  const goldMemberships = [];
+  const silverMemberships = [];
+
+  const currentTime = new Date();
+  memberships.forEach((membership) => {
+    if (membership.membershipType === 'PLATINUM' && timestampToDate(membership.endTime) > currentTime) {
+      platinumMemberships.push(membership);
+    } else if (membership.membershipType === 'GOLD' && timestampToDate(membership.endTime) > currentTime) {
+      goldMemberships.push(membership);
+    } else if (membership.membershipType === 'SILVER' && timestampToDate(membership.endTime) > currentTime) {
+      silverMemberships.push(membership);
+    }
+  });
+
+  if (parkingLotRank === 'PLATINUM') {
+    if (platinumMemberships.length === 0) {
+      return null;
+    } else if (platinumMemberships.length === 1) {
+      return platinumMemberships[0].membershipID;
+    } else {
+      const maxExpireTime = Math.max.apply(null, platinumMemberships.map((membership) => timestampToDate(membership.endTime).getTime()));
+      const filteredMemberships = platinumMemberships.filter((membership) => new Date(membership.expireTime).getTime() === maxExpireTime.getTime());
+      return filteredMemberships[0].membershipID;
+    }
+  } else if (parkingLotRank === 'GOLD') {
+    if (platinumMemberships.length > 0) {
+      return pickMembershipID('platinum', memberships);
+    } else if (goldMemberships.length === 0) {
+      return null;
+    } else if (goldMemberships.length === 1) {
+      return goldMemberships[0].membershipID;
+    } else {
+      const maxExpireTime = new Date(Math.max.apply(null, goldMemberships.map((membership) => new Date(membership.expireTime))));
+      const filteredMemberships = goldMemberships.filter((membership) => new Date(membership.expireTime).getTime() === maxExpireTime.getTime());
+      return filteredMemberships[0].membershipID;
+    }
+  } else if (parkingLotRank === 'SILVER') {
+    if (platinumMemberships.length > 0) {
+      return pickMembershipID('platinum', memberships);
+    } else if (goldMemberships.length > 0) {
+      return pickMembershipID('gold', memberships);
+    } else if (silverMemberships.length === 0) {
+      return null;
+    } else if (silverMemberships.length === 1) {
+      return silverMemberships[0].membershipID;
+    } else {
+      const maxExpireTime = new Date(Math.max.apply(null, silverMemberships.map((membership) => new Date(membership.expireTime))));
+      const filteredMemberships = silverMemberships.filter((membership) => new Date(membership.expireTime).getTime() === maxExpireTime.getTime());
+      return filteredMemberships[0].membershipID;
+    }
+  } else {
+    return null;
+  }
+}
 /**
  *
  * @param {string} userID  - unique id of the user
@@ -168,10 +233,6 @@ async function deletePM(userID, paymentMethodID) {
  */
 async function makePayment(userID, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
   try {
-    // if(savedpaymentMethodID){
-    //
-    // check if the paymentMethod ID exists in the users
-    // }
     if (!savedpaymentMethodID && newPaymentMethodID && !['card'].includes(newPaymentMethodType)) {
       return {message: 'invalid fields', success: false};
     }
@@ -203,6 +264,7 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
     const amountInCents = parseInt(parsedAmount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
+    console.log(result)
     if (result) {
       const paymentData = {
         userID: userID,
