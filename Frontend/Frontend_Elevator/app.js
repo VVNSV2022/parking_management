@@ -37,6 +37,6 @@ function handleLicensePlateButtonClick() {
 
 // Calling the rendering functions when the page loads
 window.onload = function () {
-    const licensePlateButton = document.getElementById("licensePlateButton");
-    licensePlateButton.addEventListener("click", handleLicensePlateButtonClick);
+    const licenseSubmitButton = document.getElementById("licenseSubmitButton");
+    licenseSubmitButton.addEventListener("click", handleLicensePlateButtonClick);
 };
