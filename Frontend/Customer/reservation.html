@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/resources/styles/reservation.css">
+</head>
+<body>
+    <header>
+        <!-- INCLUDE_NAV -->
+    </header>
+    <main>
+            <h1>Reservations</h1>
+            <input type="text" id="search-input" placeholder="Search .....">
+                <table id="reservations-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)" >Date</th>
+                            <th onclick="sortTable(1)">Reservation Start Time</th>
+                            <th onclick="sortTable(2)">Reservation End Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+                <!-- The Modal -->
+                <div id="myModal" class="modal">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Reservation Details:</h2>
+                    <div id="modalBody"></div>
+                    </div>
+                
+                </div>
+    </main>
+    <script src="/resources/scripts/main.js"></script>
+</body>
+</html>
