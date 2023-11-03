@@ -66,10 +66,6 @@ async function getReservationsByTime(parkingLotID, startTime, endTime) {
     const reservationRef = db.collection('reservations');
     const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).get();
     // .and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
-=======
-    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).get();
-    // and('start_time', '<', endTime).and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
->>>>>>> 9e7eb84 (Customer subgroup commit)
     console.log(reservationSnapshot);
     if (reservationSnapshot.empty) {
       return [];

@@ -1,9 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-<<<<<<< HEAD
 const {getUserPaymentMethods, savePaymentMethod, deletePM, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
-=======
-const {getUserPaymentMethods, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
->>>>>>> 9e7eb84 (Customer subgroup commit)
 
 const paymentRouter = new CustomRoutes();
 const response = new CustomResponse();
@@ -39,11 +35,7 @@ paymentRouter.post('/payments/create', async (req, res)=>{
     // Handle the response from the controller
     if (result.success) {
       // Payment was successful
-<<<<<<< HEAD
       return response.setResponse(res, {message: 'Payment Method saved successfully', data: result.data}, 200);
-=======
-      return response.setResponse(res, {message: 'Payment Method saved successfully'}, 200);
->>>>>>> 9e7eb84 (Customer subgroup commit)
     } else {
       // Payment failed, provide an error message
       console.log(result);
@@ -63,11 +55,7 @@ paymentRouter.delete('/payments/delete', async (req, res)=>{
       return response.setResponse(res, {message: 'Missing required fields', error: true}, 400);
     }
 
-<<<<<<< HEAD
     const result = await deletePM(userID, paymentMethodID);
-=======
-    const result = await deletePaymentMethod(userID, paymentMethodID);
->>>>>>> 9e7eb84 (Customer subgroup commit)
     if (result.success) {
       return response.setResponse(res, {message: 'Payment Delete successful'}, 200);
     } else {
@@ -100,19 +88,11 @@ paymentRouter.post('/payments/makePayment', async (req, res)=>{
 
 paymentRouter.post('/payments/refund', async (req, res)=>{
   try {
-<<<<<<< HEAD
     const {userID, paymentID} = req.body;
     if (!userID || !paymentID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
     const result = await refundPaidPayment(userID, paymentID);
-=======
-    const {userID, paymentId, amount} = req.body;
-    if (!userID || !paymentId || !amount) {
-      return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
-    }
-    const result = await refundPaidPayment(userID, amount, paymentId);
->>>>>>> 9e7eb84 (Customer subgroup commit)
 
     if (result.success) {
       return response.setResponse(res, {message: 'payment refunded Successfully', paymentId: result.data.id, success: true}, 200);
@@ -124,7 +104,6 @@ paymentRouter.post('/payments/refund', async (req, res)=>{
   }
 });
 
-<<<<<<< HEAD
 paymentRouter.put('/payments/updatePaymentAmount', async (req, res)=>{
   try {
     const {userID, paymentIntentID, newAmount} = req.body;
@@ -132,15 +111,6 @@ paymentRouter.put('/payments/updatePaymentAmount', async (req, res)=>{
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
     const result = await updatePaymentAmount(userID, newAmount, paymentIntentID);
-=======
-paymentRouter.post('/payments/updatePaymentAmount', async (req, res)=>{
-  try {
-    const {userID, paymentIntentID, newAmount, originalAmount} = req.body;
-    if (!userID || !paymentIntentID || !newAmount || !originalAmount) {
-      return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
-    }
-    const result = await updatePaymentAmount(userID, newAmount, originalAmount, paymentIntentID);
->>>>>>> 9e7eb84 (Customer subgroup commit)
 
     if (result.success) {
       return response.setResponse(res, {message: 'new Amount updated to payment Intent Successfully', paymentId: result.data.id, success: true}, 200);

@@ -26,25 +26,12 @@ async function getPaymentID(paymentID) {
 /**
  *
  * @param {string} paymentID
-<<<<<<< HEAD
  * @param {object} data
  */
 async function updatePayment(paymentID, data) {
   try {
     const paymentIDRef = db.collection('payments').doc(paymentID);
     await paymentIDRef.set(data, {merge: true});
-=======
- * @param {string} paymentStatus
- * @param {number} finalAmount
- */
-async function updatePayment(paymentID, paymentStatus, finalAmount) {
-  try {
-    const paymentIDRef = db.collection('payments').doc(paymentID);
-    await paymentIDRef.set({
-      paymentStatus: paymentStatus,
-      finalAmount: finalAmount,
-    });
->>>>>>> 9e7eb84 (Customer subgroup commit)
     return paymentIDRef;
   } catch (err) {
     console.error('Error occured while updating the paymentID from firestore: ', err.message);
@@ -166,11 +153,7 @@ async function addPaymentMethod(stripeData) {
 async function updatePaymentMethod(paymentmethodID, newData) {
   try {
     const paymentMethodRef = db.collection('paymentMethods').doc(paymentmethodID);
-<<<<<<< HEAD
     await paymentMethodRef.update(newData);
-=======
-    await paymentMethodRef.set(newData, {merge: true});
->>>>>>> 9e7eb84 (Customer subgroup commit)
     return paymentMethodRef;
   } catch (err) {
     console.error('Error occured while adding the payment methods data to firestore: ', err.message);

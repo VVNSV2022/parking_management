@@ -1,10 +1,7 @@
 const {createPaymentMethod, deletePaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent} = require('../thirdParty/StripeAPI');
 const {getPaymentID, getPaymentMethodsID, updatePaymentMethod, getMemberships, getPaymentMethodsByUser, addPaymentMethod, updatePayment, addPayment} = require('../thirdParty/payment.firestore');
 const {verifyBillingDetails, compareRanks, timestampToDate} = require('../utilities/util');
-<<<<<<< HEAD
 const {getUser} = require('./users.controller');
-=======
->>>>>>> 9e7eb84 (Customer subgroup commit)
 
 
 /**
@@ -39,23 +36,15 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
     if (result) {
       let finalEndDate=new Date();
       let membershipStatus='SILVER';
-<<<<<<< HEAD
 
       result.forEach((element) => {
         if (finalEndDate.getTime()<timestampToDate(element.endDate).getTime()) {
-=======
-      result.forEach((element) => {
-        if (finalEndDate<timestampToDate(element.endDate)) {
->>>>>>> 9e7eb84 (Customer subgroup commit)
           finalEndDate = timestampToDate(element.endDate);
           membershipStatus = element.membershipType;
         }
       });
-<<<<<<< HEAD
 
       // write a code
-=======
->>>>>>> 9e7eb84 (Customer subgroup commit)
       if (finalEndDate<=new Date()) {
         return {message: 'membership status is invalid', success: false};
       }
@@ -64,11 +53,7 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
       }
       return {message: 'membership status is available for this parking lot', success: true};
     }
-<<<<<<< HEAD
     return {message: 'there are no memberships for this user', success: false};
-=======
-    return {message: 'there is no membership for the user', success: false};
->>>>>>> 9e7eb84 (Customer subgroup commit)
   } catch (err) {
     console.error('Error occred while checking the membership status of user: ', err.message);
     throw err;
@@ -77,7 +62,6 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
 
 /**
  *
-<<<<<<< HEAD
  * @param {string} parkingLotRank
  * @param {object} memberships
  * @return {object} result
@@ -140,8 +124,6 @@ function pickMembershipID(parkingLotRank, memberships) {
 }
 /**
  *
-=======
->>>>>>> 9e7eb84 (Customer subgroup commit)
  * @param {string} userID  - unique id of the user
  * @return {object} result
  */
@@ -175,16 +157,11 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
     if (!verifyBillingDetails(BillingDetails)) {
       return {message: 'Billing details is not valid', success: false};
     }
-<<<<<<< HEAD
     const userResult = await getUser(userID, '');
     if (!userResult) {
       return {message: 'user does not exists in our app', success: false};
     }
     const result = await createPaymentMethod(userID, paymentType, paymentToken, BillingDetails, userResult.StripeCustomerID);
-=======
-
-    const result = await createPaymentMethod(userID, paymentType, paymentToken, BillingDetails);
->>>>>>> 9e7eb84 (Customer subgroup commit)
     if (result) {
       delete result['livemode'];
       delete result['object'];
@@ -196,11 +173,7 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
       if (dataSaveResult) {
       // card.brand, card.checks, card.exp_onth, card.exp_year, card.funding, card.last4
       // save the details of payment id in the database
-<<<<<<< HEAD
         return {message: 'payment method is saved', success: true, data: result};
-=======
-        return {message: 'payment method is saved', success: true};
->>>>>>> 9e7eb84 (Customer subgroup commit)
       }
       return {message: 'payment method is saved in stripe but not in database', success: false};
     }
@@ -292,9 +265,6 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
     const amountInCents = parseInt(parsedAmount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
-    console.log(result)
-    const amountInCents = parseInt(parsedAmount*100);
-    const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, newPaymentMethodID, newPaymentMethodType);
     if (result) {
       const paymentData = {
         userID: userID,

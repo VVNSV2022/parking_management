@@ -66,16 +66,8 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
         return {message: membershipResult.message, success: false};
       }
     } else {
-<<<<<<< HEAD
-<<<<<<< HEAD
       
       let savePaymentMethodID=' '; let newPaymentMethodID=' '; let newPaymentMethodType='';
-=======
-      let savePaymentMethodID; let newPaymentMethodID; let newPaymentMethodType;
->>>>>>> 9e7eb84 (Customer subgroup commit)
-=======
-      let savePaymentMethodID=''; let newPaymentMethodID=''; let newPaymentMethodType='';
->>>>>>> 364001c (saving my work)
       if (paymentMethod === 'saved') {
         savePaymentMethodID = paymentID;
       } else if (paymentMethod === 'new') {
@@ -85,15 +77,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       const result = await makePayment(userID, price, 'making payment for the reservation', savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
       paymentNumber = result.id;
       if (!result.success) {
-<<<<<<< HEAD
-<<<<<<< HEAD
         return {message: 'Invalid payment', success: false};
-=======
-        return {message: 'Invalid payment ID', success: false};
->>>>>>> 9e7eb84 (Customer subgroup commit)
-=======
-        return {message: result.message, success: false};
->>>>>>> 364001c (saving my work)
       }
     }
     // if it comes here then payment is verified
@@ -111,15 +95,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       parkingLotID: parkingLotID,
       price: parsedPrice,
       permitType: permitType,
-<<<<<<< HEAD
-<<<<<<< HEAD
-      paymentID: [membershipID? membershipID: paymentID],
-=======
-      paymentID: [paymentID],
->>>>>>> 9e7eb84 (Customer subgroup commit)
-=======
       paymentID: [membershipID? membershipID: paymentNumber],
->>>>>>> 364001c (saving my work)
       vehicleID: vehicleID,
       parkingSpot: parkingSpotResult.parkingSpot,
       reservationCreatedTime: currentFirestoreTimestamp(),
