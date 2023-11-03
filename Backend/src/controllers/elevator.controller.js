@@ -1,5 +1,4 @@
-
-const {getVehicleReservation, getVehicleIDByLicensePlate} = require('../thirdParty/elevator.firestore');
+const {getVehicleReservation, getVehicleIDByLicensePlate, getparkingIDbyReservation} = require('../thirdParty/elevator.firestore');
 
 /**
  * Get the vehicle ID for the respective license plate.
@@ -35,14 +34,39 @@ async function findReservation(vehicleID) {
   try {
     const reservations = await getVehicleReservation({ vehicleId: vehicleID });
 
-    return reservations.length > 0; // Return true if reservations are found, false if not
+    return reservations; // Return true if reservations are found, false if not
   } catch (err) {
     console.error('Error occurred while checking reservations: ', err.message);
     throw err;
   }
 }
 
+
+/**
+ * Check if there is a parking id for the reservationID.
+ *
+ * @param {string} reservationID - The reservation ID to check for parkingLotid.
+ * @return {Promise} A promise that resolves to true if a parkingLotid is found, false otherwise.
+ * @throws {Error} If an error occurs while checking parkingLotIds.
+ */
+async function parkingIdforReservation(reservationID){
+    try {
+        const parkingLotID = await getparkingIDbyReservation({ reservationID });
+        if (!parkingLotID) {
+          return null;
+        }
+    
+        return parkingLotID; // Return the parkingLotID
+      } catch (err) {
+        console.error('Error occurred while getting the vehicle ID: ', err.message);
+        throw err;
+      }
+    }
+  
+
+
 module.exports = {
   vehicleForLicensePlate,
   findReservation,
+  parkingIdforReservation
 };
