@@ -29,7 +29,11 @@ async function addReservation(reservationID, data) {
 async function updateDetails(reservationID, updatedData) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
+<<<<<<< HEAD
     await docRef.update(updatedData);
+=======
+    await docRef.set(updatedData, {merge: true});
+>>>>>>> 9e7eb84 (Customer subgroup commit)
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -45,7 +49,11 @@ async function updateDetails(reservationID, updatedData) {
 async function deleteDetails(reservationID) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
+<<<<<<< HEAD
     await docRef.update({reservationStatus: 'cancelled'});
+=======
+    await docRef.set({reservationStatus: 'cancelled'}, {merge: true});
+>>>>>>> 9e7eb84 (Customer subgroup commit)
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -64,12 +72,18 @@ async function deleteDetails(reservationID) {
 async function getReservationsByTime(parkingLotID, startTime, endTime) {
   try {
     const reservationRef = db.collection('reservations');
+<<<<<<< HEAD
     const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).and('start_time', '<', endTime).get();
     // .and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
+=======
+    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).get();
+    // and('start_time', '<', endTime).and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
+>>>>>>> 9e7eb84 (Customer subgroup commit)
     console.log(reservationSnapshot);
     if (reservationSnapshot.empty) {
       return [];
     }
+<<<<<<< HEAD
     const reservationData=[];
     reservationSnapshot.forEach((doc)=>{
       const docData = doc.data();
@@ -78,6 +92,9 @@ async function getReservationsByTime(parkingLotID, startTime, endTime) {
       }
     });
     return reservationData;
+=======
+    return reservationSnapshot;
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   } catch (err) {
     console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
     throw err;

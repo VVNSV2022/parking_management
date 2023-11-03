@@ -38,7 +38,11 @@ async function addReservation(reservationId, data) {
 
 async function getParkingLotCount(){
   try {
+<<<<<<< HEAD
     const docRef = await db.collection('reservations').
+=======
+    const docRef = await db.collection('reservations');
+>>>>>>> 9e7eb84 (Customer subgroup commit)
     return docRef;
   } catch (err) {
     console.error('Error occured while writing to the firebase firestore: ', err.message);

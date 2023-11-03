@@ -121,7 +121,11 @@ const membershipSchema = new mongoose.Schema({
   created: 1698694657,
   customer: null,
   livemode: false,
+<<<<<<< HEAD
   metadata: { userID: '12345678' },
+=======
+  metadata: { user_id: '12345678' },
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   type: 'card'
 }
  */

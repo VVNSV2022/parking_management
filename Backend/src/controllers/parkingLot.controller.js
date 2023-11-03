@@ -1,4 +1,4 @@
-const {getParkingLotID} = require('../thirdParty/parkingLot.firestore');
+const {getParkingLotID,getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
 const {getReservationsByTime} = require('../thirdParty/reservation.firestore');
 
 /**
@@ -17,6 +17,27 @@ async function verifyParkingLotID(parkingLotID) {
   } catch (err) {
     console.error('Error occured while verifying the parking lotID: ', err.message);
     throw err;
+  }
+}
+
+/**
+ * 
+ * @param {string} regionId - The ID of the region to fetch data for.
+ * @return {object} - An object containing a list of regions with region IDs and parking lots under each region.
+ */
+async function getRegionsAndParkingLots(regionId) {
+  try {
+    const parkingLots = await getParkingLotsInRegion(regionId);
+    const regionData = {
+      regionId: regionId,  
+    };
+    return {
+      region: regionData,
+      parkingLots: parkingLots,
+    };
+  } catch (error) {
+    console.error('Error occurred while fetching regions and parking lots: ', error.message);
+    throw error;
   }
 }
 
@@ -53,4 +74,4 @@ async function verifyAndBookSlot(parkingLotID, numberofParkingSpots, startTime, 
   }
 }
 
-module.exports = {verifyParkingLotID, verifyAndBookSlot};
+module.exports = {verifyParkingLotID, verifyAndBookSlot,getRegionsAndParkingLots};

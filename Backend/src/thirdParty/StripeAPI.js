@@ -1,7 +1,10 @@
 require('dotenv').config();
 
 const stripe = require('stripe')(process.env.SecretKey);
+<<<<<<< HEAD
 const {updateUserDetails} = require('./user.firestore');
+=======
+>>>>>>> 9e7eb84 (Customer subgroup commit)
 
 /**
  *
@@ -21,6 +24,7 @@ async function createCustomer(userID, name, email, phone) {
         userID: userID,
       },
     });
+<<<<<<< HEAD
     // save the customer id in the database
     const customerID = customer.id;
     const result = await updateUserDetails(userID, {StripeCustomerID: customerID});
@@ -29,6 +33,9 @@ async function createCustomer(userID, name, email, phone) {
       return customerID;
     }
     return null;
+=======
+    return customer;
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   } catch (err) {
     console.error('Error occured while creating the customer: ', err.message);
     throw err;
@@ -37,20 +44,32 @@ async function createCustomer(userID, name, email, phone) {
 
 /**
  *
+<<<<<<< HEAD
  * @param {string} userID - unique user id
+=======
+ * @param {string} userId - unique user id
+>>>>>>> 9e7eb84 (Customer subgroup commit)
  * @param {string} paymentType - type of the payment card or bank account
  * @param {object} paymentToken - details for the type of payment encrypted
  * @param {object} billingDetails -a ddress details
  * @param {string} customerID - unique customer id
  * @return {object} - paymentmethod
  */
+<<<<<<< HEAD
 async function createPaymentMethod(userID, paymentType, paymentToken, billingDetails, customerID=' ') {
+=======
+async function createPaymentMethod(userId, paymentType, paymentToken, billingDetails, customerID=' ') {
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   try {
     const paymentInfo = {
       type: paymentType,
       billing_details: billingDetails,
       metadata: {
+<<<<<<< HEAD
         userID: userID,
+=======
+        user_id: userId,
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       },
     };
     if (paymentType=='card') {
@@ -59,6 +78,7 @@ async function createPaymentMethod(userID, paymentType, paymentToken, billingDet
     //   paymentInfo.ach_debit = {token: paymentToken};
     // }
     // Create a Payment Method
+<<<<<<< HEAD
     const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
     // customerID is created
     let stripeCustomerID = customerID;
@@ -72,6 +92,14 @@ async function createPaymentMethod(userID, paymentType, paymentToken, billingDet
         {customer: stripeCustomerID},
     );
     return attachedPaymentMethod;
+=======
+    if (!customerID) {
+      const customer = await createCustomer(userId, billingDetails.name, billingDetails.email, billingDetails.phone);
+      paymentInfo.customer = customer.id;
+    }
+    const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
+    return paymentMethod;
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   } catch (err) {
     if (err.type === 'StripeCardError') {
       console.error('Invalid Request Error: ', err.message);
@@ -89,6 +117,7 @@ async function createPaymentMethod(userID, paymentType, paymentToken, billingDet
 
 /**
  *
+<<<<<<< HEAD
  * @param {string} paymentMethodID - unique payment intent for the users payment id
  * @param {string} stripeCustomerID - unique customer id
  * @return {object} - paymentmethod
@@ -113,11 +142,38 @@ async function deletePaymentMethod(paymentMethodID, stripeCustomerID) {
  * @param {string} description - description of the payment
  * @param {*} savedpaymentMethodID - saved payment method ID
  * @param {string} customerID - id of the customer
+=======
+ * @param {string} paymentMethodId - unique payment intent for the users payment id
+ * @return {object} - paymentmethod
+ */
+// async function deletePaymentMethod(paymentMethodId) {
+//   try {
+//     const paymentMethod = await stripe.paymentMethods.detach(
+//         paymentMethodId,
+//     );
+//     return paymentMethod;
+//   } catch (err) {
+//     console.error('Error occured while deleting the payment Intent for the user: ', err.message);
+//     throw err;
+//   }
+// }
+
+/**
+ *
+*  @param {string} userId - unique id of the user
+ * @param {Number} amount - money
+ * @param {string} description - description of the payment
+ * @param {*} savedpaymentMethodID - saved payment method ID
+>>>>>>> 9e7eb84 (Customer subgroup commit)
  * @param {*} newPaymentMethodID - new payment method ID
  * @param {*} newPaymentMethodType - new payment method type
  * @return {object} - result
  */
+<<<<<<< HEAD
 async function makeOneTimePayment(userID, amount, description, savedpaymentMethodID='', customerID='', newPaymentMethodID='', newPaymentMethodType='card') {
+=======
+async function makeOneTimePayment(userId, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
+>>>>>>> 9e7eb84 (Customer subgroup commit)
 // only card is accepted here
   try {
     const paymentIntentInfo = {
@@ -130,13 +186,18 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
       },
       description: description,
       metadata: {
+<<<<<<< HEAD
         userID: userID,
+=======
+        userId: userId,
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       },
       use_stripe_sdk: true,
     };
     // we need to add the payment method to a customer to reuse a payment method else gives error
     if (savedpaymentMethodID) {
       paymentIntentInfo.payment_method = savedpaymentMethodID;
+<<<<<<< HEAD
       paymentIntentInfo.customer = customerID;
     } else if (newPaymentMethodID) {
       const paymentInfo = {
@@ -154,6 +215,18 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
 
     const paymentIntent = await stripe.paymentIntents.create(paymentIntentInfo);
 
+=======
+    } else if (newPaymentMethodID) {
+      paymentIntentInfo.payment_method_types = newPaymentMethodType;
+      paymentIntentInfo.payment_method_data = newPaymentMethodID;
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentInfo);
+
+    // Confirm the Payment Intent
+    // const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
+
+>>>>>>> 9e7eb84 (Customer subgroup commit)
     console.log('One-time Payment:', paymentIntent);
     return paymentIntent;
   } catch (error) {
@@ -162,6 +235,40 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
   }
 };
 
+<<<<<<< HEAD
+=======
+/**
+ *
+ * @param {string} userId - unique id of the user
+ * @param {number} productAmount - amount
+ * @param {string} paymentMethodId - saved payment id
+ * @return {object} - payment Intent
+ */
+// async function useSavedPaymentMethod(userId, productAmount, paymentMethodId) {
+//   try {
+//     // Create a Payment Intent using the saved payment method
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: productAmount, // Amount in cents (e.g., $20.00)
+//       currency: 'usd',
+//       payment_method: paymentMethodId,
+//     });
+
+//     // Confirm the Payment Intent
+//     const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
+
+//     if (confirmedPaymentIntent.status === 'succeeded') {
+//       console.log('Payment successful.');
+//       return confirmedPaymentIntent;
+//     } else {
+//       console.error('Payment failed.');
+//       return 0;
+//     }
+//   } catch (error) {
+//     console.error('Error charging the user:', error);
+//     throw error;
+//   }
+// };
+>>>>>>> 9e7eb84 (Customer subgroup commit)
 
 /**
  *
@@ -177,6 +284,7 @@ async function refundPayment(amount, paymentIntentID) {
     });
     return refundresult;
   } catch (err) {
+<<<<<<< HEAD
     if (err.type === 'StripePermissionError') {
       console.error('Attempting to cancel PaymentIntent...');
       try {
@@ -189,6 +297,10 @@ async function refundPayment(amount, paymentIntentID) {
       console.error('Error refunding the payment:', err.message);
       throw err;
     }
+=======
+    console.error('Error refunding the payment:', error);
+    throw err;
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   }
 }
 
@@ -201,6 +313,7 @@ async function refundPayment(amount, paymentIntentID) {
 async function updatePaymentIntent(paymentIntentID, newAmount) {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentID);
+<<<<<<< HEAD
 
     if (!['succeeded', 'canceled'].includes(paymentIntent.status)) {
       paymentIntent.amount = newAmount;
@@ -211,6 +324,18 @@ async function updatePaymentIntent(paymentIntentID, newAmount) {
 
       const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntentID);
 
+=======
+    console.log(paymentIntent);
+    if (!['succeeded', 'canceled'].includes(paymentIntent.status)) {
+      paymentIntent.amount = newAmount;
+
+      const updatedPaymentIntent = await stripe.paymentIntents.update(paymentIntentID, {
+        amount: newAmount,
+      });
+      console.log(updatedPaymentIntent);
+      const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntentID);
+      console.log(confirmedPaymentIntent);
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       console.log('PaymentIntent confirmed:', confirmedPaymentIntent.id);
       return confirmedPaymentIntent;
     } else {
@@ -223,5 +348,10 @@ async function updatePaymentIntent(paymentIntentID, newAmount) {
   }
 }
 
+<<<<<<< HEAD
 
 module.exports = {createCustomer, createPaymentMethod, deletePaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent};
+=======
+module.exports = {createCustomer, createPaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent};
+// module.exports = {createCustomer, createPaymentMethod, deletePaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent};
+>>>>>>> 9e7eb84 (Customer subgroup commit)

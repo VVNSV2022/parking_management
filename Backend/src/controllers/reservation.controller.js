@@ -1,16 +1,23 @@
 const {v4: uuidv4} = require('uuid');
 
 const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails} = require('../thirdParty/reservation.firestore.js');
+<<<<<<< HEAD
 const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
 const {verifyVehicleID} = require('./vehicle.controller.js');
 const {getUser} = require('./users.controller');
 
+=======
+const {makePayment, checkMembershipStatus, refundPaidPayment} = require('../controllers/payment.controller.js');
+const {verifyParkingLotID, verifyAndBookSlot} = require('../controllers/parkingLot.controller.js');
+const {verifyVehicleID} = require('../controllers/vehicle.controller.js');
+>>>>>>> 9e7eb84 (Customer subgroup commit)
 const {currentFirestoreTimestamp} = require('../utilities/util.js');
 
 
 /**
  *
+<<<<<<< HEAD
  * @param {*} userID
  * @param {*} startTime
  * @param {*} endTime
@@ -25,6 +32,20 @@ const {currentFirestoreTimestamp} = require('../utilities/util.js');
  * @return {object} result
  */
 async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new') {
+=======
+ * @param {string} userID
+ * @param {string} startTime
+ * @param {string} endTime
+ * @param {string} parkingLotID
+ * @param {string} price
+ * @param {string} permitType
+ * @param {string} vehicleID
+ * @param {string} paymentID
+ * @param {string} membershipID
+ * @return {object} result
+ */
+async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new', membershipID='') {
+>>>>>>> 9e7eb84 (Customer subgroup commit)
   try {
     // price verify
     // check the membership ID
@@ -53,6 +74,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
     if (!vehicleResult.success) {
       return {message: 'Invalid Vehicle ID', success: false};
     }
+<<<<<<< HEAD
     const userResult = await getUser(userID, '');
     if (!userResult) {
       return {message: 'user does not exists in our app', success: false};
@@ -60,13 +82,22 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
 
     // either membersip ID or paymentID
     if (permitType === 'membership') {
+=======
+
+    // either membersip ID or paymentID
+    if (permitType === 'membership' && membershipID) {
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       const membershipResult = await checkMembershipStatus(userID, parkingLotResult.regionID, parkingLotResult.parkingLotRank);
       if (!membershipResult.success) {
         return {message: membershipResult.message, success: false};
       }
     } else {
+<<<<<<< HEAD
       
       let savePaymentMethodID=' '; let newPaymentMethodID=' '; let newPaymentMethodType='';
+=======
+      let savePaymentMethodID; let newPaymentMethodID; let newPaymentMethodType;
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       if (paymentMethod === 'saved') {
         savePaymentMethodID = paymentID;
       } else if (paymentMethod === 'new') {
@@ -75,7 +106,11 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       }
       const result = await makePayment(userID, price, 'making payment for the reservation', savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
       if (!result.success) {
+<<<<<<< HEAD
         return {message: 'Invalid payment', success: false};
+=======
+        return {message: 'Invalid payment ID', success: false};
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       }
     }
 
@@ -93,7 +128,11 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       parkingLotID: parkingLotID,
       price: parsedPrice,
       permitType: permitType,
+<<<<<<< HEAD
       paymentID: [membershipID? membershipID: paymentID],
+=======
+      paymentID: [paymentID],
+>>>>>>> 9e7eb84 (Customer subgroup commit)
       vehicleID: vehicleID,
       parkingSpot: parkingSpotResult.parkingSpot,
       reservationCreatedTime: currentFirestoreTimestamp(),
