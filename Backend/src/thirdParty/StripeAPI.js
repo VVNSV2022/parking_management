@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const stripe = require('stripe')(process.env.SecretKey);
+const {updateUserDetails} = require('./user.firestore');
 
 /**
  *
@@ -20,7 +21,14 @@ async function createCustomer(userID, name, email, phone) {
         userID: userID,
       },
     });
-    return customer;
+    // save the customer id in the database
+    const customerID = customer.id;
+    const result = await updateUserDetails(userID, {StripeCustomerID: customerID});
+    if (result) {
+      console.log('Customer created successfully in the stripe API');
+      return customerID;
+    }
+    return null;
   } catch (err) {
     console.error('Error occured while creating the customer: ', err.message);
     throw err;
@@ -29,20 +37,20 @@ async function createCustomer(userID, name, email, phone) {
 
 /**
  *
- * @param {string} userId - unique user id
+ * @param {string} userID - unique user id
  * @param {string} paymentType - type of the payment card or bank account
  * @param {object} paymentToken - details for the type of payment encrypted
  * @param {object} billingDetails -a ddress details
  * @param {string} customerID - unique customer id
  * @return {object} - paymentmethod
  */
-async function createPaymentMethod(userId, paymentType, paymentToken, billingDetails, customerID=' ') {
+async function createPaymentMethod(userID, paymentType, paymentToken, billingDetails, customerID=' ') {
   try {
     const paymentInfo = {
       type: paymentType,
       billing_details: billingDetails,
       metadata: {
-        user_id: userId,
+        userID: userID,
       },
     };
     if (paymentType=='card') {
@@ -51,12 +59,19 @@ async function createPaymentMethod(userId, paymentType, paymentToken, billingDet
     //   paymentInfo.ach_debit = {token: paymentToken};
     // }
     // Create a Payment Method
-    if (!customerID) {
-      const customer = await createCustomer(userId, billingDetails.name, billingDetails.email, billingDetails.phone);
-      paymentInfo.customer = customer.id;
-    }
     const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
-    return paymentMethod;
+    // customerID is created
+    let stripeCustomerID = customerID;
+    if (!customerID) {
+      const customer = await createCustomer(userID, billingDetails.name, billingDetails.email, billingDetails.phone);
+      stripeCustomerID = customer;
+    }
+    // Attach the Payment Method to the Customer
+    const attachedPaymentMethod = await stripe.paymentMethods.attach(
+        paymentMethod.id,
+        {customer: stripeCustomerID},
+    );
+    return attachedPaymentMethod;
   } catch (err) {
     if (err.type === 'StripeCardError') {
       console.error('Invalid Request Error: ', err.message);
@@ -74,13 +89,15 @@ async function createPaymentMethod(userId, paymentType, paymentToken, billingDet
 
 /**
  *
- * @param {string} paymentMethodId - unique payment intent for the users payment id
+ * @param {string} paymentMethodID - unique payment intent for the users payment id
+ * @param {string} stripeCustomerID - unique customer id
  * @return {object} - paymentmethod
  */
-async function deletePaymentMethod(paymentMethodId) {
+async function deletePaymentMethod(paymentMethodID, stripeCustomerID) {
   try {
     const paymentMethod = await stripe.paymentMethods.detach(
-        paymentMethodId,
+        paymentMethodID,
+        {customer: stripeCustomerID},
     );
     return paymentMethod;
   } catch (err) {
@@ -91,15 +108,16 @@ async function deletePaymentMethod(paymentMethodId) {
 
 /**
  *
-*  @param {string} userId - unique id of the user
+*  @param {string} userID - unique id of the user
  * @param {Number} amount - money
  * @param {string} description - description of the payment
  * @param {*} savedpaymentMethodID - saved payment method ID
+ * @param {string} customerID - id of the customer
  * @param {*} newPaymentMethodID - new payment method ID
  * @param {*} newPaymentMethodType - new payment method type
  * @return {object} - result
  */
-async function makeOneTimePayment(userId, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
+async function makeOneTimePayment(userID, amount, description, savedpaymentMethodID='', customerID='', newPaymentMethodID='', newPaymentMethodType='card') {
 // only card is accepted here
   try {
     const paymentIntentInfo = {
@@ -112,22 +130,29 @@ async function makeOneTimePayment(userId, amount, description, savedpaymentMetho
       },
       description: description,
       metadata: {
-        userId: userId,
+        userID: userID,
       },
       use_stripe_sdk: true,
     };
     // we need to add the payment method to a customer to reuse a payment method else gives error
     if (savedpaymentMethodID) {
       paymentIntentInfo.payment_method = savedpaymentMethodID;
+      paymentIntentInfo.customer = customerID;
     } else if (newPaymentMethodID) {
-      paymentIntentInfo.payment_method_types = newPaymentMethodType;
-      paymentIntentInfo.payment_method_data = newPaymentMethodID;
+      const paymentInfo = {
+        type: newPaymentMethodType,
+        metadata: {
+          userID: userID,
+        },
+        card: {token: newPaymentMethodID},
+      };
+      const newPaymentMethodResult = await stripe.paymentMethods.create(paymentInfo);
+
+      paymentIntentInfo.payment_method = newPaymentMethodResult.id;
     }
+    // write a code to create a payment Intent using the credit card token
 
     const paymentIntent = await stripe.paymentIntents.create(paymentIntentInfo);
-
-    // Confirm the Payment Intent
-    // const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
 
     console.log('One-time Payment:', paymentIntent);
     return paymentIntent;
@@ -137,37 +162,6 @@ async function makeOneTimePayment(userId, amount, description, savedpaymentMetho
   }
 };
 
-/**
- *
- * @param {string} userId - unique id of the user
- * @param {number} productAmount - amount
- * @param {string} paymentMethodId - saved payment id
- * @return {object} - payment Intent
- */
-// async function useSavedPaymentMethod(userId, productAmount, paymentMethodId) {
-//   try {
-//     // Create a Payment Intent using the saved payment method
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount: productAmount, // Amount in cents (e.g., $20.00)
-//       currency: 'usd',
-//       payment_method: paymentMethodId,
-//     });
-
-//     // Confirm the Payment Intent
-//     const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
-
-//     if (confirmedPaymentIntent.status === 'succeeded') {
-//       console.log('Payment successful.');
-//       return confirmedPaymentIntent;
-//     } else {
-//       console.error('Payment failed.');
-//       return 0;
-//     }
-//   } catch (error) {
-//     console.error('Error charging the user:', error);
-//     throw error;
-//   }
-// };
 
 /**
  *
@@ -183,8 +177,18 @@ async function refundPayment(amount, paymentIntentID) {
     });
     return refundresult;
   } catch (err) {
-    console.error('Error refunding the payment:', error);
-    throw err;
+    if (err.type === 'StripePermissionError') {
+      console.error('Attempting to cancel PaymentIntent...');
+      try {
+        const canceledPaymentIntent = await stripe.paymentIntents.cancel(paymentIntentId);
+        console.log('PaymentIntent canceled:', canceledPaymentIntent);
+        return canceledPaymentIntent;
+      } catch (cancellationError) {
+        console.error('Error canceling PaymentIntent:', cancellationError.message);
+      }
+      console.error('Error refunding the payment:', err.message);
+      throw err;
+    }
   }
 }
 
@@ -197,16 +201,16 @@ async function refundPayment(amount, paymentIntentID) {
 async function updatePaymentIntent(paymentIntentID, newAmount) {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentID);
-    console.log(paymentIntent);
+
     if (!['succeeded', 'canceled'].includes(paymentIntent.status)) {
       paymentIntent.amount = newAmount;
-
-      const updatedPaymentIntent = await stripe.paymentIntents.update(paymentIntentID, {
+      // updated payment intent
+      await stripe.paymentIntents.update(paymentIntentID, {
         amount: newAmount,
       });
-      console.log(updatedPaymentIntent);
+
       const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntentID);
-      console.log(confirmedPaymentIntent);
+
       console.log('PaymentIntent confirmed:', confirmedPaymentIntent.id);
       return confirmedPaymentIntent;
     } else {
@@ -218,5 +222,6 @@ async function updatePaymentIntent(paymentIntentID, newAmount) {
     throw err;
   }
 }
+
 
 module.exports = {createCustomer, createPaymentMethod, deletePaymentMethod, makeOneTimePayment, refundPayment, updatePaymentIntent};

@@ -1,5 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {getUserPaymentMethods, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
+const {getUserPaymentMethods, savePaymentMethod, deletePM, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
 
 const paymentRouter = new CustomRoutes();
 const response = new CustomResponse();
@@ -35,7 +35,7 @@ paymentRouter.post('/payments/create', async (req, res)=>{
     // Handle the response from the controller
     if (result.success) {
       // Payment was successful
-      return response.setResponse(res, {message: 'Payment Method saved successfully'}, 200);
+      return response.setResponse(res, {message: 'Payment Method saved successfully', data: result.data}, 200);
     } else {
       // Payment failed, provide an error message
       console.log(result);
@@ -55,7 +55,7 @@ paymentRouter.delete('/payments/delete', async (req, res)=>{
       return response.setResponse(res, {message: 'Missing required fields', error: true}, 400);
     }
 
-    const result = await deletePaymentMethod(userID, paymentMethodID);
+    const result = await deletePM(userID, paymentMethodID);
     if (result.success) {
       return response.setResponse(res, {message: 'Payment Delete successful'}, 200);
     } else {
@@ -88,11 +88,11 @@ paymentRouter.post('/payments/makePayment', async (req, res)=>{
 
 paymentRouter.post('/payments/refund', async (req, res)=>{
   try {
-    const {userID, paymentId, amount} = req.body;
-    if (!userID || !paymentId || !amount) {
+    const {userID, paymentID} = req.body;
+    if (!userID || !paymentID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
-    const result = await refundPaidPayment(userID, amount, paymentId);
+    const result = await refundPaidPayment(userID, paymentID);
 
     if (result.success) {
       return response.setResponse(res, {message: 'payment refunded Successfully', paymentId: result.data.id, success: true}, 200);
@@ -104,13 +104,13 @@ paymentRouter.post('/payments/refund', async (req, res)=>{
   }
 });
 
-paymentRouter.post('/payments/updatePaymentAmount', async (req, res)=>{
+paymentRouter.put('/payments/updatePaymentAmount', async (req, res)=>{
   try {
-    const {userID, paymentIntentID, newAmount, originalAmount} = req.body;
-    if (!userID || !paymentIntentID || !newAmount || !originalAmount) {
+    const {userID, paymentIntentID, newAmount} = req.body;
+    if (!userID || !paymentIntentID || !newAmount) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
-    const result = await updatePaymentAmount(userID, newAmount, originalAmount, paymentIntentID);
+    const result = await updatePaymentAmount(userID, newAmount, paymentIntentID);
 
     if (result.success) {
       return response.setResponse(res, {message: 'new Amount updated to payment Intent Successfully', paymentId: result.data.id, success: true}, 200);

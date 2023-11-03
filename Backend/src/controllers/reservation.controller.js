@@ -1,26 +1,30 @@
 const {v4: uuidv4} = require('uuid');
 
 const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails} = require('../thirdParty/reservation.firestore.js');
-const {makePayment, checkMembershipStatus, refundPaidPayment} = require('../controllers/payment.controller.js');
-const {verifyParkingLotID, verifyAndBookSlot} = require('../controllers/parkingLot.controller.js');
-const {verifyVehicleID} = require('../controllers/vehicle.controller.js');
+const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
+const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
+const {verifyVehicleID} = require('./vehicle.controller.js');
+const {getUser} = require('./users.controller');
+
 const {currentFirestoreTimestamp} = require('../utilities/util.js');
 
 
 /**
  *
- * @param {string} userID
- * @param {string} startTime
- * @param {string} endTime
- * @param {string} parkingLotID
- * @param {string} price
- * @param {string} permitType
- * @param {string} vehicleID
- * @param {string} paymentID
- * @param {string} membershipID
+ * @param {*} userID
+ * @param {*} startTime
+ * @param {*} endTime
+ * @param {*} parkingLotID
+ * @param {*} price
+ * @param {*} permitType
+ * @param {*} vehicleID
+ * @param {*} paymentID
+ * @param {*} paymentType
+ * @param {*} paymentMethod
+ * @param {*} membershipID
  * @return {object} result
  */
-async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new', membershipID='') {
+async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new') {
   try {
     // price verify
     // check the membership ID
@@ -49,15 +53,20 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
     if (!vehicleResult.success) {
       return {message: 'Invalid Vehicle ID', success: false};
     }
+    const userResult = await getUser(userID, '');
+    if (!userResult) {
+      return {message: 'user does not exists in our app', success: false};
+    }
 
     // either membersip ID or paymentID
-    if (permitType === 'membership' && membershipID) {
+    if (permitType === 'membership') {
       const membershipResult = await checkMembershipStatus(userID, parkingLotResult.regionID, parkingLotResult.parkingLotRank);
       if (!membershipResult.success) {
         return {message: membershipResult.message, success: false};
       }
     } else {
-      let savePaymentMethodID; let newPaymentMethodID; let newPaymentMethodType;
+      
+      let savePaymentMethodID=' '; let newPaymentMethodID=' '; let newPaymentMethodType='';
       if (paymentMethod === 'saved') {
         savePaymentMethodID = paymentID;
       } else if (paymentMethod === 'new') {
@@ -66,7 +75,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       }
       const result = await makePayment(userID, price, 'making payment for the reservation', savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
       if (!result.success) {
-        return {message: 'Invalid payment ID', success: false};
+        return {message: 'Invalid payment', success: false};
       }
     }
 
@@ -84,7 +93,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       parkingLotID: parkingLotID,
       price: parsedPrice,
       permitType: permitType,
-      paymentID: [paymentID],
+      paymentID: [membershipID? membershipID: paymentID],
       vehicleID: vehicleID,
       parkingSpot: parkingSpotResult.parkingSpot,
       reservationCreatedTime: currentFirestoreTimestamp(),

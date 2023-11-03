@@ -45,14 +45,6 @@ const parkingLotSchema = new mongoose.Schema({
     manager_email: String,
     manager_phone: String,
   },
-});
-
-const parkingLotPricingSchema = new mongoose.Schema({
-  parking_lot_id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   hourly_rate: {
     type: Number,
     required: true,

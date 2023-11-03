@@ -29,7 +29,7 @@ async function addReservation(reservationID, data) {
 async function updateDetails(reservationID, updatedData) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
-    await docRef.set(updatedData, {merge: true});
+    await docRef.update(updatedData);
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -45,7 +45,7 @@ async function updateDetails(reservationID, updatedData) {
 async function deleteDetails(reservationID) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
-    await docRef.set({reservationStatus: 'cancelled'}, {merge: true});
+    await docRef.update({reservationStatus: 'cancelled'});
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -64,13 +64,20 @@ async function deleteDetails(reservationID) {
 async function getReservationsByTime(parkingLotID, startTime, endTime) {
   try {
     const reservationRef = db.collection('reservations');
-    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).get();
-    // and('start_time', '<', endTime).and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
+    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).and('start_time', '<', endTime).get();
+    // .and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
     console.log(reservationSnapshot);
     if (reservationSnapshot.empty) {
       return [];
     }
-    return reservationSnapshot;
+    const reservationData=[];
+    reservationSnapshot.forEach((doc)=>{
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled' && docData.end_time > startTime) {
+        reservationData.push(docData);
+      }
+    });
+    return reservationData;
   } catch (err) {
     console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
     throw err;
