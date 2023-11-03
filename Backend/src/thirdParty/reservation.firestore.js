@@ -138,4 +138,29 @@ async function getReservation(reservationID) {
   }
 }
 
-module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, getReservation, usersReservations};
+async function getAllReservations() {
+  try {
+    const reservationRef = db.collection('reservations');
+    const reservationSnapshot = await reservationRef.get();
+
+    if (reservationSnapshot.empty) {
+      return null;
+    }
+
+    const reservationData = [];
+
+    reservationSnapshot.forEach((doc) => {
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled') {
+        reservationData.push(docData);
+      }
+    });
+
+    return reservationData;
+  } catch (err) {
+    console.error('Error occurred while getting reservation data from the Firebase Firestore: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, getReservation, usersReservations,getAllReservations};
