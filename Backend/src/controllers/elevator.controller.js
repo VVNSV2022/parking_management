@@ -1,5 +1,4 @@
 const {getVehicleReservation, getVehicleIDByLicensePlate, getparkingIDbyReservation} = require('../thirdParty/elevator.firestore');
-
 /**
  * Get the vehicle ID for the respective license plate.
  *
@@ -34,7 +33,7 @@ async function findReservation(vehicleID) {
   try {
     const reservations = await getVehicleReservation({vehicleId: vehicleID});
 
-    return reservations; // Return true if reservations are found, false if not
+    return reservations; // Reservations with that vehicleID
   } catch (err) {
     console.error('Error occurred while checking reservations: ', err.message);
     throw err;

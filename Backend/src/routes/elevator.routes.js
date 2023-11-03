@@ -1,5 +1,7 @@
 const { CustomRoutes, CustomResponse } = require('../utilities/server');
-const { vehicleForLicensePlate, findReservation } = require('../controllers/elevator.controller')
+const { vehicleForLicensePlate, findReservation, parkingIdforReservation } = require('../controllers/elevator.controller')
+const { getLayoutbyParkingId } = require('../thirdParty/parkingLayout.firestore');
+
 const url = require('url');
 
 const elevatorRouter = new CustomRoutes();
@@ -20,9 +22,11 @@ elevatorRouter.post('/api/elevator/scan-license-plate', async (req, res) => {
     }
 
     const reservations = await findReservation(vehicleID)
-
-    if (reservations) {
-      return response.setResponse(res, { message: 'Check-in successfully initiated for the reservation.' }, 200);
+    const parkingLotid = await parkingIdforReservation(reservations)
+    const layoutType = await getLayoutbyParkingId(parkingLotid)
+    
+    if (reservations.length>0 && layoutType == 'Elevator' ) {
+      return response.setResponse(res, { message: 'Check-in successfully initiated for the reservation with parking id:', "parkingLotID":parkingLotid }, 200);
     } else {
       return response.setResponse(res, {message: 'No reservation found for the provided license plate number.'}, 404);
     }
