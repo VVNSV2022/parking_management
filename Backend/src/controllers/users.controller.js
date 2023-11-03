@@ -1,4 +1,4 @@
-const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser} = require('../thirdParty/usersAPI');
+const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser} = require('../thirdParty/user.firestore');
 
 async function registerUser(email, password) {
   try {

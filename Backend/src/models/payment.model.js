@@ -121,7 +121,7 @@ const membershipSchema = new mongoose.Schema({
   created: 1698694657,
   customer: null,
   livemode: false,
-  metadata: { user_id: '12345678' },
+  metadata: { userID: '12345678' },
   type: 'card'
 }
  */

@@ -26,16 +26,12 @@ async function getPaymentID(paymentID) {
 /**
  *
  * @param {string} paymentID
- * @param {string} paymentStatus
- * @param {number} finalAmount
+ * @param {object} data
  */
-async function updatePayment(paymentID, paymentStatus, finalAmount) {
+async function updatePayment(paymentID, data) {
   try {
     const paymentIDRef = db.collection('payments').doc(paymentID);
-    await paymentIDRef.set({
-      paymentStatus: paymentStatus,
-      finalAmount: finalAmount,
-    });
+    await paymentIDRef.set(data, {merge: true});
     return paymentIDRef;
   } catch (err) {
     console.error('Error occured while updating the paymentID from firestore: ', err.message);
@@ -157,7 +153,7 @@ async function addPaymentMethod(stripeData) {
 async function updatePaymentMethod(paymentmethodID, newData) {
   try {
     const paymentMethodRef = db.collection('paymentMethods').doc(paymentmethodID);
-    await paymentMethodRef.set(newData, {merge: true});
+    await paymentMethodRef.update(newData);
     return paymentMethodRef;
   } catch (err) {
     console.error('Error occured while adding the payment methods data to firestore: ', err.message);

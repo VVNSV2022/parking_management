@@ -29,7 +29,7 @@ async function addReservation(reservationID, data) {
 async function updateDetails(reservationID, updatedData) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
-    await docRef.set(updatedData, {merge: true});
+    await docRef.update(updatedData);
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -45,7 +45,7 @@ async function updateDetails(reservationID, updatedData) {
 async function deleteDetails(reservationID) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
-    await docRef.set({reservationStatus: 'cancelled'}, {merge: true});
+    await docRef.update({reservationStatus: 'cancelled'});
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);

@@ -9,15 +9,17 @@ const {currentFirestoreTimestamp} = require('../utilities/util.js');
 
 /**
  *
- * @param {string} userID
- * @param {string} startTime
- * @param {string} endTime
- * @param {string} parkingLotID
- * @param {string} price
- * @param {string} permitType
- * @param {string} vehicleID
- * @param {string} paymentID
- * @param {string} membershipID
+ * @param {*} userID
+ * @param {*} startTime
+ * @param {*} endTime
+ * @param {*} parkingLotID
+ * @param {*} price
+ * @param {*} permitType
+ * @param {*} vehicleID
+ * @param {*} paymentID
+ * @param {*} paymentType
+ * @param {*} paymentMethod
+ * @param {*} membershipID
  * @return {object} result
  */
 async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new', membershipID='') {

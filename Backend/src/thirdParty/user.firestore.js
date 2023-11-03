@@ -239,10 +239,20 @@ async function removeUser(userId) {
   }
 }
 
+async function updateUserDetails(userId, data) {
+  try {
+    const userRef = db.collection('users').doc(userId);
+    await userRef.update(data);
+    return userRef;
+  } catch (err) {
+    throw err;
+  }
+}
 module.exports = {
   createUserWithEmailPassword,
   signInUser,
   signOutUser,
   removeUser,
   fetchUser,
+  updateUserDetails,
 };
