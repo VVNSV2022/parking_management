@@ -18,12 +18,19 @@ firebaseInit();
 const paymentRouter = require('./routes/payments.routes.js');
 const reservationRouter = require('./routes/reservation.routes.js');
 const userRouter = require('./routes/users.routes');
-const elevatorRouter = require('./routes/elevator.routes.js') // for elevator terminal
-server.setRoutes(userRouter);
+const parkingLotRouter = require('./routes/parkingLot.routes.js');
+const elevatorRouter = require('./routes/elevator.routes.js'); // for elevator terminal
+const commonRouter = require('./routes/common.routes.js');
+const billDetailsRouter = require('./routes/billDetails.routes.js');
 
+server.setRoutes(userRouter);
 server.setRoutes(paymentRouter);
 server.setRoutes(reservationRouter);
 server.setRoutes(elevatorRouter);
+server.setRoutes(parkingLotRouter);
+server.setRoutes(billDetailsRouter);
+
+server.setRoutes(commonRouter);
 server.get('/', (req, res) => {
   response.setResponse(res, {
     message: 'hello from sairam using the get Method',

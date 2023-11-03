@@ -10,18 +10,18 @@ const {getVehicleReservation, getVehicleIDByLicensePlate, getparkingIDbyReservat
 
 
 async function vehicleForLicensePlate(licensePlateNumber) {
-    try {
-      const vehicle = await getVehicleIDByLicensePlate({ licensePlateNumber });
-      if (!vehicle) {
-        return null;
-      }
-  
-      return vehicle; // Return the vehicle ID
-    } catch (err) {
-      console.error('Error occurred while getting the vehicle ID: ', err.message);
-      throw err;
+  try {
+    const vehicle = await getVehicleIDByLicensePlate({licensePlateNumber});
+    if (!vehicle) {
+      return null;
     }
+
+    return vehicle; // Return the vehicle ID
+  } catch (err) {
+    console.error('Error occurred while getting the vehicle ID: ', err.message);
+    throw err;
   }
+}
 
 /**
  * Check if there is a reservation for the vehicle ID.
@@ -32,7 +32,7 @@ async function vehicleForLicensePlate(licensePlateNumber) {
  */
 async function findReservation(vehicleID) {
   try {
-    const reservations = await getVehicleReservation({ vehicleId: vehicleID });
+    const reservations = await getVehicleReservation({vehicleId: vehicleID});
 
     return reservations; // Return true if reservations are found, false if not
   } catch (err) {

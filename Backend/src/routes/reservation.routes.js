@@ -1,6 +1,7 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation} = require('../controllers/reservation.controller');
-
+const {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll} = require('../controllers/reservation.controller');
+const path = require('path');
+const fs = require('fs');
 const reservationRouter = new CustomRoutes();
 const response = new CustomResponse();
 
@@ -13,7 +14,7 @@ reservationRouter.post('/api/reservation', async (req, res)=>{
     }
     const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod);
     if (result.success) {
-      return response.setResponse(res, {message: 'Created Reservation Successfully', error: false}, 200);
+      return response.setResponse(res, {message: 'Created Reservation Successfully', data: result.data, error: false}, 200);
     }
     return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (err) {
@@ -103,5 +104,46 @@ reservationRouter.get('/api/reservations', async (req, res)=>{
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });
+
+
+reservationRouter.get('/api/allreservations', async (req, res)=>{
+  try {
+    const result = await getReservationsAll();
+    if (result.success) {
+      return response.setResponse(res, {message: result.message, success: true, data: result.data}, 200);
+    }
+    return response.setResponse(res, {message: result.message, error: true}, 400);
+  } catch (err) {
+    console.error('Error occurred while handling the request to get reservation: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
+reservationRouter.get('/reservation.html', async (req, res) => {
+  const reservationpath = path.join(__dirname, '../../../frontend/Customer/',req.url);
+  console.log("reservationpath",reservationpath);
+  fs.readFile(reservationpath, (err, data) => {
+    if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found');
+    } else {
+        res.writeHead(200);
+        res.end(data);
+    }});
+});
+
+reservationRouter.get('/manager/reservation.html', async (req, res) => {
+  const reservationpath = path.join(__dirname, '../../../frontend/',req.url);
+  console.log("reservationpath",reservationpath);
+  fs.readFile(reservationpath, (err, data) => {
+    if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found');
+    } else {
+        res.writeHead(200);
+        res.end(data);
+    }});
+});
+
 
 module.exports = reservationRouter;

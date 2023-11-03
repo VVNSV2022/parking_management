@@ -248,6 +248,42 @@ async function updateUserDetails(userId, data) {
     throw err;
   }
 }
+async function getCustomerdetails(userId) {
+  try {
+    if (userId) {
+      const docRef = db.collection('users').doc(userId);
+      const doc = await docRef.get();
+
+      if (doc.exists) {
+        return {...doc.data()};
+      } else {
+        return null;
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+}
+
+async function getmembershiptype(userID) {
+  try {
+    const membershipRef = db.collection('memberships');
+    const querySnapshot = await membershipRef.where('userID', '==', userID).get();
+    if (!querySnapshot.empty) {
+      const membershipDoc = querySnapshot.docs[0];
+      const membershipType = membershipDoc.get('membershipType');
+      console.log(membershipType);
+      return membershipType;
+    } else {
+      throw new Error('No membership found with the given userID.');
+    }
+  } catch (error) {
+    console.error('Error fetching membership:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   createUserWithEmailPassword,
   signInUser,
@@ -255,4 +291,6 @@ module.exports = {
   removeUser,
   fetchUser,
   updateUserDetails,
+  getCustomerdetails,
+  getmembershiptype,
 };

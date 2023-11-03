@@ -1,6 +1,6 @@
 const {v4: uuidv4} = require('uuid');
 
-const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails} = require('../thirdParty/reservation.firestore.js');
+const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails,getAllReservations} = require('../thirdParty/reservation.firestore.js');
 const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
 const {verifyVehicleID} = require('./vehicle.controller.js');
@@ -21,7 +21,6 @@ const {currentFirestoreTimestamp} = require('../utilities/util.js');
  * @param {*} paymentID
  * @param {*} paymentType
  * @param {*} paymentMethod
- * @param {*} membershipID
  * @return {object} result
  */
 async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new') {
@@ -58,7 +57,9 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       return {message: 'user does not exists in our app', success: false};
     }
 
-    // either membersip ID or paymentID
+    // if it comes here every detail sent is valid except the payment
+    const membershipID = '';
+    let paymentNumber = '';
     if (permitType === 'membership') {
       const membershipResult = await checkMembershipStatus(userID, parkingLotResult.regionID, parkingLotResult.parkingLotRank);
       if (!membershipResult.success) {
@@ -74,16 +75,17 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
         newPaymentMethodType = paymentType;
       }
       const result = await makePayment(userID, price, 'making payment for the reservation', savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
+      paymentNumber = result.id;
       if (!result.success) {
         return {message: 'Invalid payment', success: false};
       }
     }
-
+    // if it comes here then payment is verified
     const parkingSpotResult = await verifyAndBookSlot(parkingLotID, parkingLotResult.numberOfParkingSpots, startTime, endTime);
     if (!parkingSpotResult.success) {
       return {message: parkingSpotResult.message, success: false};
     }
-
+    // if it comes here then parking spot is booked
     const reservationID = uuidv4();
     const reservationData = {
       reservationID: reservationID,
@@ -93,16 +95,17 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       parkingLotID: parkingLotID,
       price: parsedPrice,
       permitType: permitType,
-      paymentID: [membershipID? membershipID: paymentID],
+      paymentID: [membershipID? membershipID: paymentNumber],
       vehicleID: vehicleID,
       parkingSpot: parkingSpotResult.parkingSpot,
       reservationCreatedTime: currentFirestoreTimestamp(),
       reservationStatus: 'inactive',
       paymentStatus: 'incomplete',
     };
+    // adding the reservation into the database
     const result = await addReservation(reservationID, reservationData);
     if (result) {
-      return {message: 'Successfully made the reservation', success: true, data: result.id};
+      return {message: 'Successfully made the reservation', data: result, success: true, data: result.id};
     }
     return {message: 'Failed to make the reservation', success: false};
   } catch (err) {
@@ -241,4 +244,18 @@ async function getReservationsByID(reserationID) {
   }
 }
 
-module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation};
+async function getReservationsAll() {
+  // we need to get the vehicle info and payment info for that
+  try {
+    const result = await getAllReservations();
+    if (result) {
+      return {message: 'successfully got the reservation data for the user', data: result, success: true};
+    }
+    return {message: 'No reservation detail to get', data: [], success: true};
+  } catch (err) {
+    console.error('Error occured while getting the reservations: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation,getReservationsAll};

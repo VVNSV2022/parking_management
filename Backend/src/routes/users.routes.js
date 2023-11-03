@@ -1,5 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {registerUser, loginUser, logoutUser, getUser} = require('../controllers/users.controller');
+const {registerUser, loginUser, logoutUser, getUser, getAccountDetailsByCustomerId} = require('../controllers/users.controller');
 const url = require('url');
 
 const userRouter = new CustomRoutes();
@@ -118,6 +118,25 @@ userRouter.get('/user', async (req, res) => {
     }
   } catch (err) {
     console.error('Error occurred while trying to retrieve user:', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
+userRouter.get('/api/customer', async (req, res) => {
+  try {
+    const userID = req.queryParameters.userID;
+    if (!userID) {
+      return response.setResponse(res, {message: 'User ID is required in the query parameters', error: true}, 400);
+    }
+    const userAccountDetails = await getAccountDetailsByCustomerId(userID);
+    if (userAccountDetails) {
+      return response.setResponse(res, userAccountDetails, 200);
+    } else {
+      console.error('No user found with the given customerId.');
+      return response.setResponse(res, {message: 'User account details not found'}, 404);
+    }
+  } catch (err) {
+    console.error('Error occurred while trying to fetch customer account details:', err.message);
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });

@@ -29,7 +29,7 @@ async function addReservation(reservationID, data) {
 async function updateDetails(reservationID, updatedData) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
-    await docRef.update(updatedData);
+    await docRef.set(updatedData, {merge: true});
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -45,7 +45,7 @@ async function updateDetails(reservationID, updatedData) {
 async function deleteDetails(reservationID) {
   try {
     const docRef = db.collection('reservations').doc(reservationID);
-    await docRef.update({reservationStatus: 'cancelled'});
+    await docRef.set({reservationStatus: 'cancelled'}, {merge: true});
     return docRef;
   } catch (err) {
     console.error('Error occured while updating the data to the firebase firestore: ', err.message);
@@ -64,7 +64,7 @@ async function deleteDetails(reservationID) {
 async function getReservationsByTime(parkingLotID, startTime, endTime) {
   try {
     const reservationRef = db.collection('reservations');
-    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).and('start_time', '<', endTime).get();
+    const reservationSnapshot = await reservationRef.where('parkingLotID', '==', parkingLotID).get();
     // .and('end_time', '>', startTime).and('reservationStatus', '!=', 'cancelled').get();
     console.log(reservationSnapshot);
     if (reservationSnapshot.empty) {
@@ -73,11 +73,78 @@ async function getReservationsByTime(parkingLotID, startTime, endTime) {
     const reservationData=[];
     reservationSnapshot.forEach((doc)=>{
       const docData = doc.data();
-      if (docData.reservationStatus != 'cancelled' && docData.end_time > startTime) {
+      console.log(docData);
+      console.log(docData.startTime.toDate(), startTime, docData.endTime.toDate(), endTime);
+      if (docData.reservationStatus != 'cancelled' && docData.endTime.toDate() >= startTime && docData.startTime.toDate() <= endTime) {
         reservationData.push(docData);
       }
     });
+    console.log(reservationData);
     return reservationData;
+  } catch (err) {
+    console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ *
+ * @param {*} userID
+ * @param {*} startTime
+ * @param {*} endTime
+ * @param {*} maxReservations
+ * @return {object} result
+ */
+async function hasMaxReservations(userID, startTime, endTime, maxReservations) {
+  try {
+    const reservationRef = db.collection('reservations');
+    const reservationSnapshot = await reservationRef.where('userID', '==', userID).get();
+    if (reservationSnapshot.empty) {
+      return null;
+    }
+    const reservationData=[];
+    reservationSnapshot.forEach((doc)=>{
+      const docData = doc.data();
+      console.log(docData.startTime.toDate(), startTime, docData.endTime.toDate(), endTime);
+      if (docData.reservationStatus != 'cancelled' && docData.endTime.toDate() < endTime && docData.startTime.toDate() >= startTime) {
+        reservationData.push(docData);
+      }
+    });
+    if (reservationData.length > maxReservations) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
+    throw err;
+  }
+}
+
+/**
+ * Check if user has already booked a reservation in the given time interval
+ * @param {string} userID
+ * @param {string} parkingLotID
+ * @param {Date} startTime
+ * @param {Date} endTime
+ * @return {boolean} true if user has already booked a reservation, false otherwise
+ */
+async function hasReservation(userID, parkingLotID, startTime, endTime) {
+  try {
+    const reservationsRef = db.collection('reservations');
+    const reservationsSnapshot = await reservationsRef.where('userID', '==', userID).get();
+    if (reservationsSnapshot.empty) {
+      return false;
+    }
+    const reservationData=[];
+    reservationsSnapshot.forEach((doc)=>{
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled' && docData.end_time > startTime && docData.start_time < endTime) {
+        reservationData.push(docData);
+        return true;
+      }
+    },
+    );
+    return false;
   } catch (err) {
     console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
     throw err;
@@ -138,4 +205,33 @@ async function getReservation(reservationID) {
   }
 }
 
-module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, getReservation, usersReservations};
+/**
+ *
+ * @return {result} result
+ */
+async function getAllReservations() {
+  try {
+    const reservationRef = db.collection('reservations');
+    const reservationSnapshot = await reservationRef.get();
+
+    if (reservationSnapshot.empty) {
+      return null;
+    }
+
+    const reservationData = [];
+
+    reservationSnapshot.forEach((doc) => {
+      const docData = doc.data();
+      if (docData.reservationStatus != 'cancelled') {
+        reservationData.push(docData);
+      }
+    });
+
+    return reservationData;
+  } catch (err) {
+    console.error('Error occurred while getting reservation data from the Firebase Firestore: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations,getAllReservations};
