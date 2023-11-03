@@ -18,10 +18,12 @@ firebaseInit();
 const paymentRouter = require('./routes/payments.routes.js');
 const reservationRouter = require('./routes/reservation.routes.js');
 const userRouter = require('./routes/users.routes');
+const elevatorRouter = require('./routes/elevator.routes.js') // for elevator terminal
 server.setRoutes(userRouter);
 
 server.setRoutes(paymentRouter);
 server.setRoutes(reservationRouter);
+server.setRoutes(elevatorRouter);
 server.get('/', (req, res) => {
   response.setResponse(res, {
     message: 'hello from sairam using the get Method',
