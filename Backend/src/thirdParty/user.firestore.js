@@ -248,7 +248,7 @@ async function updateUserDetails(userId, data) {
     throw err;
   }
 }
-async function getCustomerdetails (userId){
+async function getCustomerdetails(userId) {
   try {
     if (userId) {
       const docRef = db.collection('users').doc(userId);

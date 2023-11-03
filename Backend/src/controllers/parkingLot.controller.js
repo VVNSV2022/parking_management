@@ -1,4 +1,4 @@
-const {getParkingLotID,getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
+const {getParkingLotID, getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
 const {getReservationsByTime} = require('../thirdParty/reservation.firestore');
 
 /**
@@ -21,7 +21,7 @@ async function verifyParkingLotID(parkingLotID) {
 }
 
 /**
- * 
+ *
  * @param {string} regionId - The ID of the region to fetch data for.
  * @return {object} - An object containing a list of regions with region IDs and parking lots under each region.
  */
@@ -29,7 +29,7 @@ async function getRegionsAndParkingLots(regionId) {
   try {
     const parkingLots = await getParkingLotsInRegion(regionId);
     const regionData = {
-      regionId: regionId,  
+      regionId: regionId,
     };
     return {
       region: regionData,
@@ -51,14 +51,15 @@ async function getRegionsAndParkingLots(regionId) {
  */
 async function verifyAndBookSlot(parkingLotID, numberofParkingSpots, startTime, endTime) {
   try {
+    // check if user has already booked a slot in the given time
+    // check if user has more than 4 reservations for day
     const result = await getReservationsByTime(parkingLotID, startTime, endTime);
     if (result) {
       if (result.size >= numberofParkingSpots) {
         return {message: 'parking lot is fully booked', success: false};
       }
       const reservedSpotNumbers = new Set();
-      result.forEach((doc)=>{
-        const reservationData = doc.data();
+      result.forEach((reservationData)=>{
         reservedSpotNumbers.add(reservationData.parking_spot);
       });
       let availableSpotNumber;
@@ -74,4 +75,4 @@ async function verifyAndBookSlot(parkingLotID, numberofParkingSpots, startTime, 
   }
 }
 
-module.exports = {verifyParkingLotID, verifyAndBookSlot,getRegionsAndParkingLots};
+module.exports = {verifyParkingLotID, verifyAndBookSlot, getRegionsAndParkingLots};

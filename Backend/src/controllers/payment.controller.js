@@ -217,7 +217,6 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
  * @param {string} paymentMethodID - payment method ID
  * @return {object} response
  */
-<<<<<<< HEAD
 async function deletePM(userID, paymentMethodID) {
   try {
     // check if this paymentMethodId is belongs to the user
@@ -253,39 +252,6 @@ async function deletePM(userID, paymentMethodID) {
 /**
  *
  * @param {string} userID - unique id of the user
-=======
-// async function deletePaymentMethod(userID, paymentMethodID) {
-//   try {
-//     // check if this paymentMethodId is belongs to the user
-//     // if yes just mark it as deleted in the database
-//     // no then return unauthorised access
-//     // const result = await deletePaymentMethod(paymentMethodID);
-//     // if (result) {
-//     //   console.log(result);
-//     //   return {message: 'success', success: true};
-//     // }
-//     const result = await getPaymentMethodsID(paymentMethodID);
-//     if (result) {
-//       if (!(result[0].userID === userID)) {
-//         return {message: 'paymentID is not related to you. improper access', success: false};
-//       }
-//       const deletedResult = await updatePaymentMethod(paymentMethodID, {active: false});
-//       if (deletedResult) {
-//         return {message: 'successfully deleted the payment method ID', success: true};
-//       }
-//       return {message: 'failed to delete the payment method from the user', success: false};
-//     }
-
-//     return {message: 'cannot find the paymentID in the DB', success: false};
-//   } catch (err) {
-//     throw err;
-//   }
-// }
-
-/**
- *
- * @param {string} userId - unique id of the user
->>>>>>> 9e7eb84 (Customer subgroup commit)
  * @param {string} amount - unique id of the user
  * @param {string} description - description of the payment
  * @param {string} savedpaymentMethodID - saved payment method ID
@@ -294,13 +260,6 @@ async function deletePM(userID, paymentMethodID) {
  */
 async function makePayment(userID, amount, description, savedpaymentMethodID='', newPaymentMethodID='', newPaymentMethodType='card') {
   try {
-<<<<<<< HEAD
-=======
-    // if(savedpaymentMethodID){
-    //
-    // check if the paymentMethod ID exists in the users
-    // }
->>>>>>> 9e7eb84 (Customer subgroup commit)
     if (!savedpaymentMethodID && newPaymentMethodID && !['card'].includes(newPaymentMethodType)) {
       return {message: 'invalid fields', success: false};
     }
@@ -311,7 +270,6 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
     if (!(description.length > 3 && description.length <=200)) {
       return {message: 'description length is not in the range of 3-200', success: false};
     }
-<<<<<<< HEAD
     const userResult = await getUser(userID, '');
     if (!userResult) {
       return {message: 'user does not exists in our app', success: false};
@@ -330,14 +288,13 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
       }
       finalPayment = 'savedPayment';
     }
+
     const amountInCents = parseInt(parsedAmount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
     console.log(result)
-=======
     const amountInCents = parseInt(parsedAmount*100);
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, newPaymentMethodID, newPaymentMethodType);
->>>>>>> 9e7eb84 (Customer subgroup commit)
     if (result) {
       const paymentData = {
         userID: userID,
@@ -357,12 +314,9 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
         customer: result.customer,
         last_payment_error: result.last_payment_error,
         latest_charge: result.latest_charge,
-<<<<<<< HEAD
         isRefund: false,
         refundAmount: 0,
         paymentType: finalPayment,
-=======
->>>>>>> 9e7eb84 (Customer subgroup commit)
       };
       const addedResult = await addPayment(result.id, paymentData);
       if (addedResult) {
@@ -379,22 +333,14 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
 
 /**
  *
-<<<<<<< HEAD
  * @param {string} userID - amount of the payment
  * @param {string} paymentID - payment id of the paid payment
  */
 async function refundPaidPayment(userID, paymentID) {
-=======
- * @param {string} amount - amount of the payment
- * @param {string} paymentID - payment id of the paid payment
- */
-async function refundPaidPayment(amount, paymentID) {
->>>>>>> 9e7eb84 (Customer subgroup commit)
   try {
     // check if the userId has paymentID
     // pass the paymentID to function to check that payment is valid for the refund
     // make necessary changes after the refund i.e cleanup
-<<<<<<< HEAD
     const paymentResult = await getPaymentID(paymentID);
     if (!paymentResult) {
       return {message: 'paymentID is not valid', success: false};
@@ -414,16 +360,6 @@ async function refundPaidPayment(amount, paymentID) {
         redundID: result.id,
       };
       const updatedResult = await updatePayment(paymentID, updatedData );
-=======
-    const parsedAmount = parseFloat(amount).toFixed(2);
-    if (isNaN(parsedAmount)) {
-      return {message: 'invalid amount type', success: false};
-    }
-    const amountInCents = parseInt(parsedAmount*100);
-    const result = await refundPayment(amountInCents*0.8, paymentID);
-    if (result) {
-      const updatedResult = await updatePayment(paymentID, 'refund', parsedAmount*0.8);
->>>>>>> 9e7eb84 (Customer subgroup commit)
       if (!updatedResult) {
         console.log('Payment is updated but the result is not updated in the database ');
       }
@@ -440,23 +376,14 @@ async function refundPaidPayment(amount, paymentID) {
  *
  * @param {string} userID - unique id of the user
  * @param {string} newAmount - new amount of the payment
-<<<<<<< HEAD
  * @param {string} paymentIntentID - payment id of the intent
  * @return {object} - result response
  */
 async function updatePaymentAmount(userID, newAmount, paymentIntentID) {
-=======
- * @param {string} initialAmount - original amount of the payment
- * @param {string} paymentIntentID - payment id of the intent
- * @return {object} - result response
- */
-async function updatePaymentAmount(userID, newAmount, initialAmount, paymentIntentID) {
->>>>>>> 9e7eb84 (Customer subgroup commit)
   try {
     // check if the userID has the paymentIntentID
     // check the intialamount with original paymentAmount
     // check updatedAmount is greater than intialAmount
-<<<<<<< HEAD
     const parsedNewAmount = parseFloat(newAmount).toFixed(2);
 
     if (isNaN(parsedNewAmount)) {
@@ -498,21 +425,6 @@ async function updatePaymentAmount(userID, newAmount, initialAmount, paymentInte
         console.log('Payment is updated but the result is not updated in the database');
         return {message: 'Payment is updated but the result is not updated in the database ', success: false};
       }
-=======
-    const parsedInitialAmount = parseFloat(initialAmount).toFixed(2);
-    const parsedNewAmount = parseFloat(newAmount).toFixed(2);
-
-    if (isNaN(parsedNewAmount) && isNaN(parsedInitialAmount)) {
-      return {message: 'invalid amount type', success: false};
-    }
-    if (parsedInitialAmount > parsedNewAmount) {
-      return {message: 'cannot update the new amount to less price than inital amount of the payment', success: false};
-    }
-    // const initialAmountInCents = parseInt(parsedInitialAmount*100);
-    const newAmountInCents = parseInt(parsedNewAmount*100);
-    const result = await updatePaymentIntent(paymentIntentID, newAmountInCents);
-    if (result) {
->>>>>>> 9e7eb84 (Customer subgroup commit)
       return {message: 'successfully updated the payment amount of the paymentIntent', success: true, data: result};
     }
     return {message: 'failed to update the payment intent', success: false};
@@ -522,8 +434,4 @@ async function updatePaymentAmount(userID, newAmount, initialAmount, paymentInte
   }
 }
 
-<<<<<<< HEAD
 module.exports = {getUserPaymentMethods, checkMembershipStatus, verifyPaymentID, savePaymentMethod, deletePM, makePayment, refundPaidPayment, updatePaymentAmount};
-=======
-module.exports = {getUserPaymentMethods, checkMembershipStatus, verifyPaymentID, savePaymentMethod, deletePaymentMethod, makePayment, refundPaidPayment, updatePaymentAmount};
->>>>>>> 9e7eb84 (Customer subgroup commit)

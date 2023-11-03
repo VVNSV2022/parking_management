@@ -1,4 +1,4 @@
-const { getFirestore } = require('firebase-admin/firestore');
+const {getFirestore} = require('firebase-admin/firestore');
 
 const db = getFirestore();
 
@@ -11,12 +11,12 @@ const db = getFirestore();
 async function getVehicleIDByLicensePlate(licensePlate) {
   try {
     const vehiclesCollection = db.collection('vehicles');
-    const { licensePlateNumber: licensePlateNum } = licensePlate
+    const {licensePlateNumber: licensePlateNum} = licensePlate;
     // console.log(licensePlateNum)
     const querySnapshot = await vehiclesCollection.where('licensePlateNumber', '==', licensePlateNum).get();
     if (!querySnapshot.empty) {
       const vehicleDoc = querySnapshot.docs[0].data();
-      return vehicleDoc.vehicleID; 
+      return vehicleDoc.vehicleID;
     }
 
     return null; // License plate not found.
@@ -30,25 +30,25 @@ async function getVehicleIDByLicensePlate(licensePlate) {
  * Get reservations for a vehicle by its ID.
  *
  * @param {string} vehicleID - Vehicle ID to search for reservations.
- * @returns {object} reservations for the vehicle.
+ * @return {object} reservations for the vehicle.
  */
 async function getVehicleReservation(vehicleID) {
   try {
     const reservationRef = db.collection('reservations');
-    
-    const { vehicleId: Vehicleid1 } = vehicleID;
+
+    const {vehicleId: Vehicleid1} = vehicleID;
     const reservationSnapshot = await reservationRef.where('vehicleID', '==', Vehicleid1).get();
 
-    if (!reservationSnapshot.empty){
-        const reservationDoc = reservationSnapshot.docs[0].data();
-        return reservationDoc.reservationID;
+    if (!reservationSnapshot.empty) {
+      const reservationDoc = reservationSnapshot.docs[0].data();
+      return reservationDoc.reservationID;
     }
 
-    return null
+    return null;
   } catch (err) {
     console.error('Error occurred while retrieving reservations from Firebase Firestore: ', err.message);
     throw err;
   }
 }
 
-module.exports = { getVehicleReservation, getVehicleIDByLicensePlate };
+module.exports = {getVehicleReservation, getVehicleIDByLicensePlate};

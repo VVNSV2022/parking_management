@@ -26,7 +26,7 @@ async function getParkingLotID(parkingLotID) {
 
 
 /**
- * 
+ *
  * @param {string} regionId - The ID of the region for which we want to retrieve parking lots.
  * @return {object[]} - An array of parking lot data objects in the specified region.
  */

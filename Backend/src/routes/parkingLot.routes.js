@@ -27,8 +27,8 @@
 
 // module.exports = parkingLotRouter;
 
-const { CustomRoutes, CustomResponse } = require('../utilities/server');
-const { getRegionsAndParkingLots } = require('../controllers/parkingLot.controller');
+const {CustomRoutes, CustomResponse} = require('../utilities/server');
+const {getRegionsAndParkingLots} = require('../controllers/parkingLot.controller');
 
 const parkingLotRouter = new CustomRoutes();
 const response = new CustomResponse();
@@ -43,16 +43,16 @@ parkingLotRouter.get('/api/regions', async (req, res) => {
       console.log(result);
 
       if (result && result.parkingLots.length > 0) {
-        return response.setResponse(res, result, 200); 
+        return response.setResponse(res, result, 200);
       } else {
-        return response.setResponse(res, { message: 'No data found for the specified region' }, 404);
+        return response.setResponse(res, {message: 'No data found for the specified region'}, 404);
       }
     } else {
-      return response.setResponse(res, { message: 'Missing regionId query parameter' }, 400);
+      return response.setResponse(res, {message: 'Missing regionId query parameter'}, 400);
     }
   } catch (error) {
     console.error('Error occurred while fetching regions and parking lots: ', error.message);
-    return response.setResponse(res, { error: 'An error occurred while processing your request' }, 500);
+    return response.setResponse(res, {error: 'An error occurred while processing your request'}, 500);
   }
 });
 

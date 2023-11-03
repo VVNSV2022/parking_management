@@ -11,13 +11,9 @@ reservationRouter.post('/api/reservation', async (req, res)=>{
     if (!userID|| !startTime|| !endTime|| !parkingLotID|| !price|| !permitType || !vehicleID || !paymentType || !paymentMethod) {// || !paymentID
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
-<<<<<<< HEAD
     const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod);
-=======
-    const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod, '');
->>>>>>> 9e7eb84 (Customer subgroup commit)
     if (result.success) {
-      return response.setResponse(res, {message: 'Created Reservation Successfully', error: false}, 200);
+      return response.setResponse(res, {message: 'Created Reservation Successfully', data: result.data, error: false}, 200);
     }
     return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (err) {
