@@ -261,10 +261,10 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
       }
       finalPayment = 'savedPayment';
     }
+
     const amountInCents = parseInt(parsedAmount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
-    console.log(result)
     if (result) {
       const paymentData = {
         userID: userID,

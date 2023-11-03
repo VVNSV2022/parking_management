@@ -151,7 +151,7 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
       paymentIntentInfo.payment_method = newPaymentMethodResult.id;
     }
     // write a code to create a payment Intent using the credit card token
-
+    console.log('Executing the payment intent');
     const paymentIntent = await stripe.paymentIntents.create(paymentIntentInfo);
 
     console.log('One-time Payment:', paymentIntent);

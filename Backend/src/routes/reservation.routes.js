@@ -14,7 +14,7 @@ reservationRouter.post('/api/reservation', async (req, res)=>{
     }
     const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod);
     if (result.success) {
-      return response.setResponse(res, {message: 'Created Reservation Successfully', error: false}, 200);
+      return response.setResponse(res, {message: 'Created Reservation Successfully', data: result.data, error: false}, 200);
     }
     return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (err) {

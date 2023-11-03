@@ -1,153 +1,96 @@
-const {User, Token} = require('../models/user.model.js');
-const {authCreate} = require('../thirdParty/firebaseAuth.js');
+const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser} = require('../thirdParty/user.firestore');
 
-/**
- * Create a new user in the database.
- *
- * @param {Object} userData - User data to be saved.
- * @return {Promise} A promise that resolves to the saved user document.
- * @throws {Error} If an error occurs during user creation.
- */
-async function createUser(userData) {
+async function registerUser(email, password) {
   try {
-    const savedUser = await authCreate(userData);
-    return savedUser;
+    const user = await createUserWithEmailPassword(email, password);
+
+    if (user && user.uid) {
+      return {
+        message: 'User registration successful',
+        userId: user.uid,
+        success: true,
+      };
+    }
+
+    return {
+      message: 'User registration failed',
+      success: false,
+    };
   } catch (err) {
-    console.error('Error occurred while creating a user...');
+    console.error('Error occurred at controller while registering a user: ', err.message);
     throw err;
   }
 }
 
-/**
- * Retrieve user information by user ID.
- *
- * @param {string} userId - The unique identifier of the user.
- * @return {Promise} A promise that resolves to the user data.
- * @throws {Error} If an error occurs while fetching user data.
- */
-async function getUserById(userId) {
+async function loginUser(email, password) {
   try {
-    const userData = await User.findOne({
-      userId: userId,
-      userActive: true,
-    });
-    return userData;
+    const user = await signInUser(email, password);
+    return {success: true, user: user};
   } catch (err) {
-    console.error('Got an error while reading the user: ', userId);
-    throw err;
+    console.error('Error occurred in the controller while trying to login:', err.message);
+    return {success: false, message: 'Login failed'};
   }
 }
 
-/**
- * Retrieve user information by emailID.
- *
- * @param {string} emailID - The unique identifier of the user.
- * @return {Promise} A promise that resolves to the user data.
- * @throws {Error} If an error occurs while fetching user data.
- */
-async function getUserByEmail(emailID) {
+async function logoutUser(token) {
   try {
-    const userData = await User.findOne({
-      email: emailID,
-      userActive: true,
-    });
-    return userData;
+    const result = await signOutUser(token);
+    return {success: true, message: result.message};
   } catch (err) {
-    console.error('Got an error while reading the user: ', emailID);
-    throw err;
+    console.error('Error occurred in the controller while trying to logout:', err.message);
+    return {success: false, message: 'Logout failed'};
   }
 }
 
-/**
- * Delete a user by marking them as inactive.
- *
- * @param {string} userId - The unique identifier of the user to be deleted.
- * @return {Promise} A promise that resolves to the result of the delete operation.
- * @throws {Error} If an error occurs while deleting the user.
- */
 async function deleteUser(userId) {
   try {
-    const result = await User.findOneAndUpdate(
-        {userId: userId},
-        {userActive: false},
-    );
-    return result;
+    await removeUser(userId);
+    return {success: true};
   } catch (err) {
-    console.error('Got an error while deleting the user: ', userId);
-    throw err;
+    console.error('Error occurred in the controller while trying to delete:', err.message);
+    return {success: false, message: 'Deletion failed'};
   }
 }
 
-/**
- *
- * @param {String} userId - user id
- * @param {String} accessToken  - access token created at time of login
- * @param {String} refreshToken - refreshtoken used to verify user
- * @return {result}
- */
-async function loginUser(userId, accessToken, refreshToken) {
+async function getUser(userId, email) {
   try {
-    const tokenData = new Token({
-      userId: userId,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
-    const result = await tokenData.save();
-    return result;
+    return await fetchUser(userId, email);
   } catch (err) {
-    console.error(
-        'Error occurred while writing login details to database',
-        err.message,
-    );
+    console.error('Error occurred in the controller while trying to retrieve:', err.message);
     throw err;
   }
 }
-
-/**
- *
- * @param {String} userId  - user id
- * @return {result}
- */
-async function logoutUser(userId) {
+async function getAccountDetailsByCustomerId(customerId) {
   try {
-    const deletedUser = await Token.findOneAndRemove({userId: userId});
-    if (!deletedUser) {
-      throw new Error('User not found in the token database');
+    const userAccountDetails = await getCustomerdetails(customerId);
+    if (userAccountDetails) {
+      const membershipType = await getmembershiptype(customerId);
+      const dateOfBirth = userAccountDetails.dateOfBirth.toDate().toLocaleDateString('en-US');
+      return {
+        customer_id: customerId,
+        role_id: userAccountDetails.role_id,
+        username: userAccountDetails.username,
+        dateOfBirth: dateOfBirth,
+        licenseNumber: userAccountDetails.licenseNumber,
+        isDisabled: userAccountDetails.isDisabled,
+        address: userAccountDetails.currentAddress,
+        membership: membershipType,
+        email: userAccountDetails.email,
+      };
+    } else {
+      return null;
     }
-    return deletedUser;
-  } catch (err) {
-    console.error(
-        'Error occurred while deleting the login details to database',
-        err.message,
-    );
-    throw err;
+  } catch (error) {
+    console.error('Error occurred while fetching customer account details:', error);
+    throw error;
   }
 }
 
-/**
- *
- * @param {string} userId - userid
- * @return {result} usertoken
- */
-async function findUserToken(userId) {
-  try {
-    const userToken = await Token.findOne({userId: userId});
-    return userToken;
-  } catch (err) {
-    console.error(
-        'Error occured while searching the token of user',
-        err.message,
-    );
-    throw err;
-  }
-}
 
 module.exports = {
-  createUser,
-  getUserById,
-  getUserByEmail,
-  deleteUser,
+  registerUser,
   loginUser,
   logoutUser,
-  findUserToken,
+  getUser,
+  getAccountDetailsByCustomerId,
 };
