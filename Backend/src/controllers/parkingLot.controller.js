@@ -1,5 +1,5 @@
 const {getParkingLotID, getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
-const {getReservationsByTime} = require('../thirdParty/reservation.firestore');
+const {getReservationsByTime, hasMaxReservations, hasReservation} = require('../thirdParty/reservation.firestore');
 
 /**
  *
@@ -43,16 +43,15 @@ async function getRegionsAndParkingLots(regionId) {
 
 /**
  *
+ * @param {string} userID
  * @param {string} parkingLotID
  * @param {number} numberofParkingSpots
  * @param {time} startTime
  * @param {time} endTime
  * @return {object} result
  */
-async function verifyAndBookSlot(parkingLotID, numberofParkingSpots, startTime, endTime) {
+async function verifyAndBookSlot(userID, parkingLotID, numberofParkingSpots, startTime, endTime) {
   try {
-    // check if user has already booked a slot in the given time
-    // check if user has more than 4 reservations for day
     const result = await getReservationsByTime(parkingLotID, startTime, endTime);
     if (result) {
       if (result.size >= numberofParkingSpots) {

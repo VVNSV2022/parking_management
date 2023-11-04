@@ -65,7 +65,7 @@ async function getAccountDetailsByCustomerId(customerId) {
   try {
     const userAccountDetails = await getCustomerdetails(customerId);
     if (userAccountDetails) {
-      const membershipType = await getmembershiptype(customerId);     
+      const membershipType = await getmembershiptype(customerId);
       const dateOfBirth = userAccountDetails.dateOfBirth.toDate().toLocaleDateString('en-US');
       return {
         customer_id: customerId,
@@ -86,9 +86,6 @@ async function getAccountDetailsByCustomerId(customerId) {
     throw error;
   }
 }
-
-
-
 
 
 module.exports = {

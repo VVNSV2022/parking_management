@@ -21,7 +21,7 @@ async function getVehicleID(userID, vehicleID) {
     }
     return null;
   } catch (err) {
-    console.error('Error occured while getting the paymentID from firestore: ', err.message);
+    console.error('Error occured while getting the vehicleID from firestore: ', err.message);
     throw err;
   }
 }

@@ -105,12 +105,11 @@ async function hasMaxReservations(userID, startTime, endTime, maxReservations) {
     const reservationData=[];
     reservationSnapshot.forEach((doc)=>{
       const docData = doc.data();
-      console.log(docData.startTime.toDate(), startTime, docData.endTime.toDate(), endTime);
-      if (docData.reservationStatus != 'cancelled' && docData.endTime.toDate() < endTime && docData.startTime.toDate() >= startTime) {
+      if (docData.reservationStatus != 'cancelled' && docData.endTime.toDate() <= endTime && docData.startTime.toDate() >= startTime) {
         reservationData.push(docData);
       }
     });
-    if (reservationData.length > maxReservations) {
+    if (reservationData.length >= maxReservations) {
       return true;
     }
     return false;
@@ -123,27 +122,30 @@ async function hasMaxReservations(userID, startTime, endTime, maxReservations) {
 /**
  * Check if user has already booked a reservation in the given time interval
  * @param {string} userID
- * @param {string} parkingLotID
  * @param {Date} startTime
  * @param {Date} endTime
  * @return {boolean} true if user has already booked a reservation, false otherwise
  */
-async function hasReservation(userID, parkingLotID, startTime, endTime) {
+async function hasReservation(userID, startTime, endTime) {
   try {
     const reservationsRef = db.collection('reservations');
     const reservationsSnapshot = await reservationsRef.where('userID', '==', userID).get();
     if (reservationsSnapshot.empty) {
       return false;
     }
-    const reservationData=[];
+    let status = false;
     reservationsSnapshot.forEach((doc)=>{
       const docData = doc.data();
-      if (docData.reservationStatus != 'cancelled' && docData.end_time > startTime && docData.start_time < endTime) {
-        reservationData.push(docData);
-        return true;
+      console.log(docData.endTime.toDate(), docData.startTime.toDate(), startTime, endTime);
+      console.log(docData.reservationStatus != 'cancelled' && docData.endTime.toDate() >= startTime && docData.startTime.toDate() <= endTime);
+      if (docData.reservationStatus != 'cancelled' && docData.endTime.toDate() >= startTime && docData.startTime.toDate() <= endTime) {
+        status = true;
       }
     },
     );
+    if (status) {
+      return true;
+    }
     return false;
   } catch (err) {
     console.error('Error occured while getting reservations from the firebase firestore: ', err.message);
@@ -198,6 +200,9 @@ async function getReservation(reservationID) {
         reservationData.push(docData);
       }
     });
+    if (reservationData.length === 0) {
+      return null;
+    }
     return reservationData;
   } catch (err) {
     console.error('Error occured while getting reservatio ndata from the firebase firestore: ', err.message);

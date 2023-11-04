@@ -146,6 +146,7 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
         },
         card: {token: newPaymentMethodID},
       };
+      // creating the payment method for the card usign the token
       const newPaymentMethodResult = await stripe.paymentMethods.create(paymentInfo);
 
       paymentIntentInfo.payment_method = newPaymentMethodResult.id;
@@ -177,18 +178,23 @@ async function refundPayment(amount, paymentIntentID) {
     });
     return refundresult;
   } catch (err) {
+    console.log('Error while refundign the payment: ', err.message);
     if (err.type === 'StripePermissionError') {
       console.error('Attempting to cancel PaymentIntent...');
       try {
-        const canceledPaymentIntent = await stripe.paymentIntents.cancel(paymentIntentId);
+        const canceledPaymentIntent = await stripe.paymentIntents.cancel(paymentIntentID);
         console.log('PaymentIntent canceled:', canceledPaymentIntent);
         return canceledPaymentIntent;
       } catch (cancellationError) {
         console.error('Error canceling PaymentIntent:', cancellationError.message);
+        throw cancellationError;
       }
-      console.error('Error refunding the payment:', err.message);
-      throw err;
+    } else if (err.type === 'StripeInvalidRequestError' && err.code === 'charge_already_refunded') {
+      console.error('Charge is already refunded.');
+      // Handle this specific case where the charge is already refunded
     }
+    console.error('Error refunding the payment:', err.message);
+    throw err;
   }
 }
 

@@ -265,6 +265,7 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
     const amountInCents = parseInt(parsedAmount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
+    console.log(result);
     if (result) {
       const paymentData = {
         userID: userID,
@@ -323,6 +324,7 @@ async function refundPaidPayment(userID, paymentID) {
     }
     const amountInCents = paymentResult.paymentMoneyInCents;
     const result = await refundPayment(amountInCents, paymentID);
+    console.log(result, amountInCents, paymentID);
     if (result) {
       const updatedData = {
         isRefund: true,

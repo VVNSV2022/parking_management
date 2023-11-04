@@ -1,6 +1,6 @@
 const {v4: uuidv4} = require('uuid');
 
-const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails,getAllReservations} = require('../thirdParty/reservation.firestore.js');
+const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation} = require('../thirdParty/reservation.firestore.js');
 const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
 const {verifyVehicleID} = require('./vehicle.controller.js');
@@ -56,6 +56,20 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
     if (!userResult) {
       return {message: 'user does not exists in our app', success: false};
     }
+    // check if user has already booked a slot in the given time
+    // check if user has more than 4 reservations for day
+    const morningTime = new Date(startTime);
+    morningTime.setHours(0, 0, 0, 0);
+    const nightTime = new Date(startTime);
+    nightTime.setHours(23, 59, 59, 999);
+    const hasMaxReservationsResult = await hasMaxReservations(userID, morningTime, nightTime, 4);
+    if (hasMaxReservationsResult) {
+      return {message: 'user has execeeded the maximum number of reservations for the day', success: false};
+    }
+    const hasReservationResult = await hasReservation(userID, startTime, endTime);
+    if (hasReservationResult) {
+      return {message: 'user has already booked a reservation in the given time interval', success: false};
+    }
 
     // if it comes here every detail sent is valid except the payment
     const membershipID = '';
@@ -66,8 +80,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
         return {message: membershipResult.message, success: false};
       }
     } else {
-      
-      let savePaymentMethodID=' '; let newPaymentMethodID=' '; let newPaymentMethodType='';
+      let savePaymentMethodID=''; let newPaymentMethodID=''; let newPaymentMethodType='';
       if (paymentMethod === 'saved') {
         savePaymentMethodID = paymentID;
       } else if (paymentMethod === 'new') {
@@ -75,13 +88,14 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
         newPaymentMethodType = paymentType;
       }
       const result = await makePayment(userID, price, 'making payment for the reservation', savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
-      paymentNumber = result.id;
+      console.log(result);
       if (!result.success) {
         return {message: 'Invalid payment', success: false};
       }
+      paymentNumber = result.id;
     }
     // if it comes here then payment is verified
-    const parkingSpotResult = await verifyAndBookSlot(parkingLotID, parkingLotResult.numberOfParkingSpots, startTime, endTime);
+    const parkingSpotResult = await verifyAndBookSlot(userID, parkingLotID, parkingLotResult.numberOfParkingSpots, startTime, endTime);
     if (!parkingSpotResult.success) {
       return {message: parkingSpotResult.message, success: false};
     }
@@ -117,18 +131,18 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
 /**
  *
  * @param {string} userID
- * @param {string} reserationID
+ * @param {string} reservationID
  * @param {string} startTime
  * @param {string} endTime
  * @param {string} vehicleID
  * @return {object} result
  */
-async function updateReservation(userID, reserationID, startTime='', endTime='', vehicleID='') {
+async function updateReservation(userID, reservationID, startTime='', endTime='', vehicleID='') {
   try {
     // getReservationID details
     // verify the userID will actual userID
     // change the updated details for that userID
-    const result = await getReservation(reserationID);
+    const result = await getReservation(reservationID);
     if (!result) {
       return {message: 'we cannot find the reservation id in our database', success: false};
     }
@@ -166,7 +180,7 @@ async function updateReservation(userID, reserationID, startTime='', endTime='',
     }
     return {message: 'Failed to update the reservation', success: false};
   } catch (err) {
-    console.error('Error occured while creating the reservation: ', err.message);
+    console.error('Error occured while updating the reservation: ', err.message);
     throw err;
   }
 }
@@ -188,23 +202,30 @@ async function deleteReservation(userID, reserationID) {
   if (result[0].reservationStatus === 'active') {
     return {message: 'you cannot delete an active reservation', success: false};
   }
-  const reservationTime = new Date(result.startTime).getTime();
+  const reservationTime = result[0].startTime.toDate().getTime();
   const currentTime = new Date().getTime();
+
   if ((reservationTime - currentTime)<3600000) {
     return {message: 'Time is expired to delete the reservation', success: false};
   }
-  // delete the reservation and
+  // delete the reservation and refund the money if possible
   const deletedResult = await deleteDetails(reserationID);
   if (deletedResult) {
-    const paymentID = result.paymentID[0];
+    if (result[0].permitType === 'membership') {
+      return {message: 'Successfully deleted the reservation', success: true};
+    }
+    const paymentID = result[0].paymentID[0];
     if (result[0].paymentStatus === 'complete') {
       return {message: 'Reservation is deleted but Cannot refund the money back payment is already completed', success: false};
     }
-    const paymentResult = await refundPaidPayment(userID, result.price, paymentID);
+    console.log('paymentID: ', paymentID);
+    const paymentResult = await refundPaidPayment(userID, paymentID);
     if (paymentResult.success) {
       return {message: 'Successfully deleted the reservation and payment refund is began', success: true};
     }
+    return {message: 'Successfully deleted the reservation but failed to refund the payment', success: true};
   }
+  return {message: 'Failed to delete the reservation', success: false};
 }
 
 /**
