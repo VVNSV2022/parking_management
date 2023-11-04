@@ -13,8 +13,6 @@ elevatorRouter.post('/api/elevator/scan-license-plate', async (req, res) => {
     if (!licensePlateNumber) {
       return response.setResponse(res, {message: 'Missing license plate number', error: true}, 400);
     }
-
-
     const vehicleID = await vehicleForLicensePlate(licensePlateNumber);
 
     if (!vehicleID) {

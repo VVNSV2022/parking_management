@@ -14,6 +14,7 @@ if (result.error) {
 const port = process.env.PORT;
 firebaseInit();
 
+
 // error occuring when we place this before firebase initialisation because reservation router is using firebase before it
 const paymentRouter = require('./routes/payments.routes.js');
 const reservationRouter = require('./routes/reservation.routes.js');
@@ -35,6 +36,8 @@ server.setRoutes(parkingLotRouter);
 server.setRoutes(billDetailsRouter);
 server.setRoutes(membershipRouter);
 server.setRoutes(vehicleRouter);
+server.setRoutes(elevatorRouter);
+
 
 server.setRoutes(commonRouter);
 server.get('/', (req, res) => {

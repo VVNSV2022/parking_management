@@ -1,7 +1,11 @@
 const http = require('http');
 const url = require('url');
+<<<<<<< HEAD
 const path = require('path');
 const fs = require('fs');
+=======
+const cors = require('cors');
+>>>>>>> 400bb97 (Added some headers)
 
 /**
  * CustomResponse class for handling HTTP response related operations.
@@ -184,7 +188,16 @@ class CustomServer {
 
     // creating the server
     this.server = http.createServer(async (req, res) => {
+
       const method = req.method;
+      const parsedURL = url.parse(req.url, true);
+      req.queryParameters = parsedURL.query;
+      // parsing the cookies
+      this.parseCookies(req);
+      res.setHeader('Access-Control-Allow-Origin', '*'); 
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      // res.setHeader('Access-Control-Allow-Credentials', 'true');
 
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
       if (method == 'GET' && req.url.match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
@@ -286,6 +299,7 @@ class CustomServer {
         }
       }
     });
+
 
     // basic error handler
     this.server.on('error', (err) => {
@@ -395,5 +409,5 @@ class CustomServer {
     this.server.listen(port, callback);
   }
 }
-
+// CustomServer.use(cors());
 module.exports = {CustomServer, CustomResponse, CustomRequest, CustomRoutes};
