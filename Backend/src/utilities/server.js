@@ -196,8 +196,6 @@ class CustomServer {
       this.parseCookies(req);
       res.setHeader('Access-Control-Allow-Origin', '*'); 
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      // res.setHeader('Access-Control-Allow-Credentials', 'true');
 
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
       if (method == 'GET' && req.url.match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
