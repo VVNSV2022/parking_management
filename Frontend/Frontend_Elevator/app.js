@@ -3,12 +3,13 @@ function handleLicensePlateButtonClick() {
 
     if (licensePlateInput) {
         // Making an API request to check the license plate
-        fetch('/api/elevator/scan-license-plate', {
+        fetch('http://localhost:4000/api/elevator/scan-license-plate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ licensePlate: licensePlateInput })
+
         })
         .then(response => {
             if (response.status === 200) {
@@ -16,7 +17,7 @@ function handleLicensePlateButtonClick() {
                 return response.json()
                     .then(data => {
                         alert(data.message);
-                        window.location.href = 'home.html';
+                        window.location.href = '../index.html';
                     });
             } else if (response.status === 404) {
                 // When license plate not found, we show not found message and redirect to notFound.html
