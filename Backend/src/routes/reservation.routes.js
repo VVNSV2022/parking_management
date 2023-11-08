@@ -121,29 +121,31 @@ reservationRouter.get('/api/allreservations', async (req, res)=>{
 });
 
 reservationRouter.get('/reservation.html', async (req, res) => {
-  const reservationpath = path.join(__dirname, '../../../frontend/Customer/',req.url);
-  console.log("reservationpath",reservationpath);
+  const reservationpath = path.join(__dirname, '../../../frontend/Customer/', req.url);
+  console.log('reservationpath', reservationpath);
   fs.readFile(reservationpath, (err, data) => {
     if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not Found');
+      res.writeHead(404, {'Content-Type': 'text/plain'});
+      res.end('Not Found');
     } else {
-        res.writeHead(200);
-        res.end(data);
-    }});
+      res.writeHead(200);
+      res.end(data);
+    }
+  });
 });
 
 reservationRouter.get('/manager/reservation.html', async (req, res) => {
-  const reservationpath = path.join(__dirname, '../../../frontend/',req.url);
-  console.log("reservationpath",reservationpath);
+  const reservationpath = path.join(__dirname, '../../../frontend/', req.url);
+  console.log('reservationpath', reservationpath);
   fs.readFile(reservationpath, (err, data) => {
     if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not Found');
+      res.writeHead(404, {'Content-Type': 'text/plain'});
+      res.end('Not Found');
     } else {
-        res.writeHead(200);
-        res.end(data);
-    }});
+      res.writeHead(200);
+      res.end(data);
+    }
+  });
 });
 
 

@@ -48,24 +48,23 @@ async function findReservation(vehicleID) {
  * @return {Promise} A promise that resolves to true if a parkingLotid is found, false otherwise.
  * @throws {Error} If an error occurs while checking parkingLotIds.
  */
-async function parkingIdforReservation(reservationID){
-    try {
-        const parkingLotID = await getparkingIDbyReservation({ reservationID });
-        if (!parkingLotID) {
-          return null;
-        }
-    
-        return parkingLotID; // Return the parkingLotID
-      } catch (err) {
-        console.error('Error occurred while getting the vehicle ID: ', err.message);
-        throw err;
-      }
+async function parkingIdforReservation(reservationID) {
+  try {
+    const parkingLotID = await getparkingIDbyReservation({reservationID});
+    if (!parkingLotID) {
+      return null;
     }
-  
+
+    return parkingLotID; // Return the parkingLotID
+  } catch (err) {
+    console.error('Error occurred while getting the vehicle ID: ', err.message);
+    throw err;
+  }
+}
 
 
 module.exports = {
   vehicleForLicensePlate,
   findReservation,
-  parkingIdforReservation
+  parkingIdforReservation,
 };

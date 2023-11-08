@@ -190,36 +190,63 @@ class CustomServer {
 
       if (method == 'PUT' || method == 'POST' || method == 'DELETE') {
         await new Promise((resolve, reject) => {
-          let body = '';
+          if (req.headers['content-type'] === 'application/json') {
+            let body = '';
+            // Handle incoming data in the request
+            req.on('data', (chunk) => {
+              body += chunk;
+            });
 
-          // Handle incoming data in the request
-          req.on('data', (chunk) => {
-            body += chunk;
-          });
-
-          req.on('end', async () => {
-            try {
+            req.on('end', async () => {
+              try {
               // Parse the received data as JSON
-              if (body) {
-                req.body = await JSON.parse(body);
-              } else {
-                req.body = {};
+                if (body) {
+                  req.body = await JSON.parse(body);
+                } else {
+                  req.body = {};
+                }
+                resolve();
+              } catch (err) {
+                req.body = {}; // Set an empty object if parsing fails
+                console.log(
+                    'Error Occurred while getting the data from the request object',
+                    err,
+                );
+                reject(err);
               }
-              resolve();
-            } catch (err) {
-              req.body = {}; // Set an empty object if parsing fails
-              console.log(
-                  'Error Occurred while getting the data from the request object',
-                  err,
-              );
-              reject(err);
-            }
-          });
+            });
+          } else {
+            const body = [];
+            // Handle incoming data in the request
+            req.on('data', (chunk) => {
+              body.push(chunk);
+            });
+
+            req.on('end', async () => {
+              try {
+              // Parse the received data as JSON
+                if (body) {
+                  req.file = Buffer.concat(body);
+                  req.fileType = req.headers['content-type'];
+                } else {
+                  req.file = '';
+                }
+                resolve();
+              } catch (err) {
+                req.body = ''; // Set an empty object if parsing fails
+                console.log(
+                    'Error Occurred while getting the data from the request object',
+                    err,
+                );
+                reject(err);
+              }
+            });
+          }
         });
       }
 
       // req.url, req.raw_headers
-      res.setHeader('Powered_by', 'Team11');
+      res.setHeader('Powered_by', 'Team9');
 
       if (this.routes[method] && this.routes[method][parsedURL.pathname]) {
         console.debug(`${method}: ${parsedURL.pathname} is requested`);

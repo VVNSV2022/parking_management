@@ -1,4 +1,4 @@
-const { getFirestore } = require('firebase-admin/firestore');
+const {getFirestore} = require('firebase-admin/firestore');
 
 const db = getFirestore();
 
@@ -16,8 +16,8 @@ async function getLayoutbyParkingId(layout_id) {
     if (!layoutSnapshot.empty) {
       const layoutDoc = layoutSnapshot.docs[0].data();
       parkingLayouttype = layoutDoc.layoutType;
-      
-      return parkingLayouttype   
+
+      return parkingLayouttype;
     }
 
     return null;
@@ -28,4 +28,4 @@ async function getLayoutbyParkingId(layout_id) {
 }
 
 
-module.exports = { getLayoutbyParkingId};
+module.exports = {getLayoutbyParkingId};

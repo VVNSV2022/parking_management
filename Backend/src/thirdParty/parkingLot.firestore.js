@@ -25,5 +25,4 @@ async function getParkingLotID(parkingLotID) {
 }
 
 
-
 module.exports = {getParkingLotID};

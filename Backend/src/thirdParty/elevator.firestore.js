@@ -39,10 +39,10 @@ async function getVehicleReservation(vehicleID) {
     const {vehicleId: Vehicleid1} = vehicleID;
     const reservationSnapshot = await reservationRef.where('vehicleID', '==', Vehicleid1).get();
 
-    if (!reservationSnapshot.empty){
-        const reservationDoc = reservationSnapshot.docs[0].data();
-        reservationID1 = reservationDoc.reservationID
-        return reservationID1;
+    if (!reservationSnapshot.empty) {
+      const reservationDoc = reservationSnapshot.docs[0].data();
+      reservationID1 = reservationDoc.reservationID;
+      return reservationID1;
     }
 
     return null;
@@ -56,24 +56,24 @@ async function getVehicleReservation(vehicleID) {
  * Get reservations for a vehicle by its ID.
  *
  * @param {string} reservationID - Vehicle ID to search for reservations.
- * @returns {object} reservations for the vehicle.
+ * @return {object} reservations for the vehicle.
  */
 async function getparkingIDbyReservation(reservationID) {
   try {
     const parkingRef = db.collection('reservations');
-  //   console.log(reservationID)
-    const { reservationID: reservationid1 } = reservationID;
+    //   console.log(reservationID)
+    const {reservationID: reservationid1} = reservationID;
     const parkingSnapshot = await parkingRef.where('reservationID', '==', reservationid1).get();
 
-    if (!parkingSnapshot.empty){
-        const parkingDoc = parkingSnapshot.docs[0].data();
-        return parkingDoc.parkingLotID;
+    if (!parkingSnapshot.empty) {
+      const parkingDoc = parkingSnapshot.docs[0].data();
+      return parkingDoc.parkingLotID;
     }
 
-    return null
+    return null;
   } catch (err) {
     console.error('Error occurred while retrieving reservations from Firebase Firestore: ', err.message);
     throw err;
   }
 }
-module.exports = { getVehicleReservation, getVehicleIDByLicensePlate, getparkingIDbyReservation };
+module.exports = {getVehicleReservation, getVehicleIDByLicensePlate, getparkingIDbyReservation};

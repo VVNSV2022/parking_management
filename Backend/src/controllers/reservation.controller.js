@@ -279,4 +279,4 @@ async function getReservationsAll() {
   }
 }
 
-module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation,getReservationsAll};
+module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll};
