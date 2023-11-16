@@ -44,7 +44,7 @@ async function createCustomer(userID, name, email, phone) {
  * @param {string} customerID - unique customer id
  * @return {object} - paymentmethod
  */
-async function createPaymentMethod(userID, paymentType, paymentToken, billingDetails, customerID=' ') {
+async function createPaymentMethod(userID, paymentType, paymentToken, billingDetails, customerID='') {
   try {
     const paymentInfo = {
       type: paymentType,
@@ -159,6 +159,15 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
     return paymentIntent;
   } catch (error) {
     console.error('Error making one-time payment:', error.message);
+    if (error.type === 'StripeInvalidRequestError') {
+      // Handle specific error related to invalid request (e.g., missing parameters)
+      console.error('Invalid request error:', error.message);
+      return null;
+    } else if (error.type === 'StripeCardError') {
+      // Handle specific error related to the card (e.g., insufficient funds)
+      console.error('Card error:', error.message);
+      return null;
+    }
     throw error;
   }
 };
@@ -202,25 +211,30 @@ async function refundPayment(amount, paymentIntentID) {
  *
  * @param {string} paymentIntentID - id of the payment
  * @param {number} newAmount - amount to change for the payment
+ * @param {boolean} changeAmount - if true then only change the amount
  * @return {object} - latest updated paymentIntent
  */
-async function updatePaymentIntent(paymentIntentID, newAmount) {
+async function updatePaymentIntent(paymentIntentID, newAmount, changeAmount=true) {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentID);
 
     if (!['succeeded', 'canceled'].includes(paymentIntent.status)) {
-      paymentIntent.amount = newAmount;
-      // updated payment intent
-      await stripe.paymentIntents.update(paymentIntentID, {
-        amount: newAmount,
-      });
-
+      if (changeAmount) {
+        paymentIntent.amount = newAmount;
+        // updated payment intent
+        await stripe.paymentIntents.update(paymentIntentID, {
+          amount: newAmount,
+        });
+      }
       const confirmedPaymentIntent = await stripe.paymentIntents.confirm(paymentIntentID);
 
       console.log('PaymentIntent confirmed:', confirmedPaymentIntent.id);
       return confirmedPaymentIntent;
     } else {
       console.log('Payment Intent cannot be updated once it is confirmed');
+      if (paymentIntent.status === 'succeeded' ) {
+        return paymentIntent;
+      }
       return null;
     }
   } catch (err) {

@@ -1,5 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll} = require('../controllers/reservation.controller');
+const {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout} = require('../controllers/reservation.controller');
 const path = require('path');
 const fs = require('fs');
 const reservationRouter = new CustomRoutes();
@@ -116,6 +116,40 @@ reservationRouter.get('/api/allreservations', async (req, res)=>{
     return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (err) {
     console.error('Error occurred while handling the request to get reservation: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
+reservationRouter.post('/api/reservation/checkin', async (req, res)=>{
+  try {
+    const {userID, reservationID} = req.body;
+    if (!userID || !reservationID) {
+      return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
+    }
+    const result = await checkin(userID, reservationID);
+    if (result.success) {
+      return response.setResponse(res, {message: 'Checked in Successfully', error: false}, 200);
+    }
+    return response.setResponse(res, {message: result.message, error: true}, 400);
+  } catch (err) {
+    console.error('Error occurred while handling the request to checkin: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
+reservationRouter.put('/api/reservation/checkout', async (req, res)=>{
+  try {
+    const {userID, reservationID} = req.body;
+    if (!userID || !reservationID) {
+      return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
+    }
+    const result = await checkout(userID, reservationID);
+    if (result.success) {
+      return response.setResponse(res, {message: 'Checked out Successfully', error: false}, 200);
+    }
+    return response.setResponse(res, {message: result.message, error: true}, 400);
+  } catch (err) {
+    console.error('Error occurred while handling the request to checkout: ', err.message);
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });

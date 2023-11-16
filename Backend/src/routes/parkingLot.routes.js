@@ -38,9 +38,8 @@ parkingLotRouter.get('/api/regions', async (req, res) => {
   try {
     const regionId = req.queryParameters.regionId;
     if (regionId) {
-      console.log(regionId);
       const result = await getRegionsAndParkingLots(regionId);
-      console.log(result);
+
 
       if (result && result.parkingLots.length > 0) {
         return response.setResponse(res, result, 200);

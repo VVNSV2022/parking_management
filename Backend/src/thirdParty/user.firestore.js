@@ -205,7 +205,8 @@ async function fetchUser(userId, email) {
       if (doc.exists) {
         return {id: doc.id, ...doc.data()};
       } else {
-        throw new Error('No user found with the given userId.');
+        return null;
+        // throw new Error('No user found with the given userId.');
       }
     }
 
@@ -218,7 +219,8 @@ async function fetchUser(userId, email) {
         const userDoc = querySnapshot.docs[0];
         return {id: userDoc.id, ...userDoc.data()};
       } else {
-        throw new Error('No user found with the given email.');
+        return null;
+        // throw new Error('No user found with the given email.');
       }
     }
 
@@ -273,7 +275,7 @@ async function getmembershiptype(userID) {
     if (!querySnapshot.empty) {
       const membershipDoc = querySnapshot.docs[0];
       const membershipType = membershipDoc.get('membershipType');
-      console.log(membershipType);
+      // console.log(membershipType);
       return membershipType;
     } else {
       throw new Error('No membership found with the given userID.');

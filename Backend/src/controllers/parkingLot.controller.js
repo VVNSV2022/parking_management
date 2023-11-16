@@ -1,5 +1,5 @@
 const {getParkingLotID, getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
-const {getReservationsByTime, hasMaxReservations, hasReservation} = require('../thirdParty/reservation.firestore');
+const {getReservationsByTime} = require('../thirdParty/reservation.firestore');
 
 /**
  *
@@ -52,6 +52,7 @@ async function getRegionsAndParkingLots(regionId) {
  */
 async function verifyAndBookSlot(userID, parkingLotID, numberofParkingSpots, startTime, endTime) {
   try {
+    console.log(startTime, endTime, parkingLotID, numberofParkingSpots);
     const result = await getReservationsByTime(parkingLotID, startTime, endTime);
     if (result) {
       if (result.size >= numberofParkingSpots) {
@@ -59,7 +60,7 @@ async function verifyAndBookSlot(userID, parkingLotID, numberofParkingSpots, sta
       }
       const reservedSpotNumbers = new Set();
       result.forEach((reservationData)=>{
-        reservedSpotNumbers.add(reservationData.parking_spot);
+        reservedSpotNumbers.add(reservationData.parkingSpot);
       });
       let availableSpotNumber;
       do {

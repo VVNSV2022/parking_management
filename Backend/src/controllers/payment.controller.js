@@ -34,13 +34,16 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
     const result = await getMemberships(userID, regionID);
 
     if (result) {
-      let finalEndDate=new Date();
+      let finalEndDate=new Date(0);
+      const membershipMap = {'PLATINUM': 3, 'GOLD': 2, 'SILVER': 1};
       let membershipStatus='SILVER';
-
+      let membershipID = '';
       result.forEach((element) => {
-        if (finalEndDate.getTime()<timestampToDate(element.endDate).getTime()) {
-          finalEndDate = timestampToDate(element.endDate);
+        const endDate = timestampToDate(element.endDate);
+        if (endDate.getTime() > finalEndDate.getTime() && membershipMap[element.membershipType] >= membershipMap[membershipStatus]) {
+          finalEndDate = endDate;
           membershipStatus = element.membershipType;
+          membershipID = element.membershipID;
         }
       });
 
@@ -48,12 +51,12 @@ async function checkMembershipStatus(userID, regionID, parkingLotRank) {
       if (finalEndDate<=new Date()) {
         return {message: 'membership status is invalid', success: false};
       }
-      if (!compareRanks(membershipStatus, parkingLotRank)) {
+      if (membershipMap[membershipStatus] < membershipMap[parkingLotRank]) {
         return {message: 'membership status is valid but cannot be used for higher parkingLots than membership status', success: false};
       }
-      return {message: 'membership status is available for this parking lot', success: true};
+      return {message: 'membership status is available for this parking lot', success: true, id: membershipID};
     }
-    return {message: 'there are no memberships for this user', success: false};
+    return {message: 'there are no memberships for this user in this region', success: false};
   } catch (err) {
     console.error('Error occred while checking the membership status of user: ', err.message);
     throw err;
@@ -129,6 +132,12 @@ function pickMembershipID(parkingLotRank, memberships) {
  */
 async function getUserPaymentMethods(userID) {
   try {
+    // check if the user exists in the database
+    const userResult = await getUser(userID, '');
+    if (!userResult) {
+      return {message: 'user does not exists in our app', success: false};
+    }
+    // get the payment methods of the user
     const result = await getPaymentMethodsByUser(userID);
     if (result) {
       return {message: 'got the user paymentmethods', data: result, success: true};
@@ -177,7 +186,7 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
       }
       return {message: 'payment method is saved in stripe but not in database', success: false};
     }
-    return {message: 'payment method is not saved', success: false};
+    return {message: 'payment method is failed to save', success: false};
   } catch (err) {
     console.error('Error occured at controller while saving a payment method: ', err.message);
     throw err;
@@ -265,11 +274,11 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
     const amountInCents = parseInt(parsedAmount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
-    console.log(result);
+
     if (result) {
       const paymentData = {
         userID: userID,
-        reason: 'charge',
+        reason: description,
         paymentID: result.id,
         paymentMoneyInCents: result.amount,
         recievedMoneyInCents: result.amount_received,
@@ -324,7 +333,6 @@ async function refundPaidPayment(userID, paymentID) {
     }
     const amountInCents = paymentResult.paymentMoneyInCents;
     const result = await refundPayment(amountInCents, paymentID);
-    console.log(result, amountInCents, paymentID);
     if (result) {
       const updatedData = {
         isRefund: true,
@@ -376,9 +384,8 @@ async function updatePaymentAmount(userID, newAmount, paymentIntentID) {
       return {message: 'new amount is less than the original payment amount', success: false};
     }
 
-    const result = await updatePaymentIntent(paymentIntentID, newAmountInCents);
+    const result = await updatePaymentIntent(paymentIntentID, newAmountInCents, true);
     if (result) {
-      console.log(result);
       // update the result in the database
       const updatedData = {
         paymentMoneyInCents: result.amount,

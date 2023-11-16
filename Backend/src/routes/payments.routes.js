@@ -38,8 +38,7 @@ paymentRouter.post('/payments/create', async (req, res)=>{
       return response.setResponse(res, {message: 'Payment Method saved successfully', data: result.data}, 200);
     } else {
       // Payment failed, provide an error message
-      console.log(result);
-      return response.setResponse(res, {message: 'Payment method failed to save'}, 200);
+      return response.setResponse(res, {message: result.message, success: false}, 200);
     }
   } catch (err) {
     console.error('Error occurred while handling the request to save the payment method: ', err.message);
