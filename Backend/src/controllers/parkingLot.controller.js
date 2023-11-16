@@ -9,8 +9,7 @@ const {getReservationsByTime} = require('../thirdParty/reservation.firestore');
 async function verifyParkingLotID(parkingLotID) {
   try {
     const result = await getParkingLotID(parkingLotID);
-
-    if (result.parkingLotID == parkingLotID) {
+    if (result && (result.parkingLotID == parkingLotID)) {
       return result;
     }
     return false;
@@ -52,7 +51,6 @@ async function getRegionsAndParkingLots(regionId) {
  */
 async function verifyAndBookSlot(userID, parkingLotID, numberofParkingSpots, startTime, endTime) {
   try {
-    console.log(startTime, endTime, parkingLotID, numberofParkingSpots);
     const result = await getReservationsByTime(parkingLotID, startTime, endTime);
     if (result) {
       if (result.size >= numberofParkingSpots) {

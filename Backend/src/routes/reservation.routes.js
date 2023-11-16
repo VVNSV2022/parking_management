@@ -1,5 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout} = require('../controllers/reservation.controller');
+const {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout, extendRequest} = require('../controllers/reservation.controller');
 const path = require('path');
 const fs = require('fs');
 const reservationRouter = new CustomRoutes();
@@ -9,11 +9,13 @@ const response = new CustomResponse();
 
 reservationRouter.post('/api/reservation', async (req, res)=>{
   try {
-    const {userID, startTime, endTime, parkingLotID, price, permitType, paymentID, paymentType, paymentMethod, vehicleID} = req.body;
-    if (!userID|| !startTime|| !endTime|| !parkingLotID|| !price|| !permitType || !vehicleID || !paymentType || !paymentMethod) {// || !paymentID
-      return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
+    const {userID, startTime, endTime, parkingLotID, permitType, isMembership, paymentID, paymentType, paymentMethod, vehicleID} = req.body;
+    if (!userID|| !startTime|| !endTime|| !parkingLotID|| !permitType || !isMembership || !vehicleID) {
+      if (isMembership === 'false' && (!paymentID || !paymentType || !paymentMethod)) {
+        return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
+      }
     }
-    const result = await createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID, paymentType, paymentMethod);
+    const result = await createReservation(userID, startTime, endTime, parkingLotID, permitType, isMembership, vehicleID, paymentID, paymentType, paymentMethod);
     if (result.success) {
       return response.setResponse(res, {message: 'Created Reservation Successfully', data: result.data, error: false}, 200);
     }
@@ -150,6 +152,23 @@ reservationRouter.put('/api/reservation/checkout', async (req, res)=>{
     return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (err) {
     console.error('Error occurred while handling the request to checkout: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
+reservationRouter.post('/api/reservation/extend', async (req, res)=>{
+  try {
+    const {userID, reservationID, message, newEndTime} = req.body;
+    if (!userID || !reservationID || !message || !newEndTime) {
+      return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
+    }
+    const result = await extendRequest(userID, reservationID, message, newEndTime);
+    if (result.success) {
+      return response.setResponse(res, {message: 'Extended request for Reservation Successfully done', error: false}, 200);
+    }
+    return response.setResponse(res, {message: result.message, error: true}, 400);
+  } catch (err) {
+    console.error('Error occurred while handling the request to extend reservation: ', err.message);
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });

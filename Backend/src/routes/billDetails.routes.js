@@ -76,7 +76,7 @@ billDetailsRouter.post('/api/payMembership', async (req, res)=>{
     if (!['MONTHLY', 'WEEKLY', 'QUATERLY'].includes(membershipPeriod)) {
       return response.setResponse(res, {message: 'Invalid Membership status', success: false}, 400);
     }
-    
+
     // check if the regionID is valid
     // check if the userID is valid
 

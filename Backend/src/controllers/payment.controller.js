@@ -245,8 +245,7 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
     if (!savedpaymentMethodID && newPaymentMethodID && !['card'].includes(newPaymentMethodType)) {
       return {message: 'invalid fields', success: false};
     }
-    const parsedAmount = parseFloat(amount).toFixed(2);
-    if (isNaN(parsedAmount)) {
+    if (isNaN(amount)) {
       return {message: 'invalid amount type', success: false};
     }
     if (!(description.length > 3 && description.length <=200)) {
@@ -271,7 +270,7 @@ async function makePayment(userID, amount, description, savedpaymentMethodID='',
       finalPayment = 'savedPayment';
     }
 
-    const amountInCents = parseInt(parsedAmount*100);
+    const amountInCents = parseInt(amount*100);
     const customerID = userResult.StripeCustomerID || '';
     const result = await makeOneTimePayment(userID, amountInCents, description, savedpaymentMethodID, customerID, newPaymentMethodID, newPaymentMethodType);
 
@@ -337,7 +336,8 @@ async function refundPaidPayment(userID, paymentID) {
       const updatedData = {
         isRefund: true,
         refundAmount: amountInCents,
-        redundID: result.id,
+        refundID: result.id,
+        payment_status: result.status,
       };
       const updatedResult = await updatePayment(paymentID, updatedData );
       if (!updatedResult) {

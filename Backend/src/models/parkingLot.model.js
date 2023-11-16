@@ -45,8 +45,6 @@ const parkingLotSchema = new mongoose.Schema({
     manager_email: String,
     manager_phone: String,
   },
-<<<<<<< HEAD
-=======
 });
 
 const parkingLotPricingSchema = new mongoose.Schema({
@@ -55,7 +53,6 @@ const parkingLotPricingSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
->>>>>>> 9e7eb84 (Customer subgroup commit)
   hourly_rate: {
     type: Number,
     required: true,

@@ -16,30 +16,21 @@ const {currentFirestoreTimestamp} = require('../utilities/util.js');
  * @param {*} startTime
  * @param {*} endTime
  * @param {*} parkingLotID
- * @param {*} price
  * @param {*} permitType
+ * @param {*} isMembership
  * @param {*} vehicleID
  * @param {*} paymentID
  * @param {*} paymentType
  * @param {*} paymentMethod
  * @return {object} result
  */
-async function createReservation(userID, startTime, endTime, parkingLotID, price, permitType, vehicleID, paymentID='', paymentType='card', paymentMethod='new') {
+async function createReservation(userID, startTime, endTime, parkingLotID, permitType, isMembership, vehicleID, paymentID='', paymentType='card', paymentMethod='new') {
   try {
-    // price verify
-    // check the membership ID
-    // permit validy for this reservation
-    // check to count number of reservations user can make for a day
     startTime = new Date(startTime);
     endTime = new Date(endTime);
 
     if (!((endTime>startTime) && (startTime.getTime()>new Date().getTime()))) { // also set time limit upto 7days something
       return {message: 'Invalid Times are sent', success: false};
-    }
-    const parsedPrice = parseFloat(price).toFixed(2);
-
-    if (isNaN(parsedPrice)) {
-      return {message: 'invalid amount type', success: false};
     }
     if (!['membership', 'hourly', 'daily'].includes(permitType)) {
       return {message: 'invalid permit type', success: false};
@@ -47,6 +38,24 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
     const parkingLotResult = await verifyParkingLotID(parkingLotID);
     if (!parkingLotResult) {
       return {message: 'Invalid parkingLot ID', success: false};
+    }
+    let parsedPrice;
+    if (permitType === 'hourly') {
+      const hourlyRate = parkingLotResult.hourlyRate;
+      if (!hourlyRate) {
+        return {message: 'Parking Lot does not have hourly rate', success: false};
+      }
+      parsedPrice = hourlyRate * ((endTime.getTime() - startTime.getTime())/3600000);
+    } else if (permitType === 'daily') {
+      const dailyRate = parkingLotResult.dailyRate;
+      if (!dailyRate) {
+        return {message: 'Parking Lot does not have daily rate', success: false};
+      }
+      parsedPrice = dailyRate * Math.ceil((endTime.getTime() - startTime.getTime())/86400000);
+      startTime.setHours(0, 0, 0, 0);
+      endTime.setHours(23, 59, 59, 999);
+    } else {
+      return {message: 'Invalid permit type', success: false};
     }
 
     const vehicleResult = await verifyVehicleID(userID, vehicleID);
@@ -80,7 +89,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
     // if it comes here every detail sent is valid , slot is booked, except the payment
     let membershipID = '';
     let paymentNumber = '';
-    if (permitType === 'membership') {
+    if (isMembership === 'true') {
       const membershipResult = await checkMembershipStatus(userID, parkingLotResult.regionID, parkingLotResult.parkingLotRank);
       if (!membershipResult.success) {
         return {message: membershipResult.message, success: false};
@@ -94,10 +103,9 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
         newPaymentMethodID = paymentID;
         newPaymentMethodType = paymentType;
       }
-      const result = await makePayment(userID, price, 'making payment for the reservation', savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
-
+      const result = await makePayment(userID, parsedPrice, `making payment for the reservation using ${paymentMethod} payment details`, savePaymentMethodID, newPaymentMethodID, newPaymentMethodType );
       if (!result.success) {
-        return {message: 'Invalid payment', success: false};
+        return {message: result.message, success: false};
       }
       paymentNumber = result.id;
     }
@@ -111,6 +119,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, price
       parkingLotID: parkingLotID,
       price: parseFloat(parsedPrice),
       permitType: permitType,
+      isMembership: isMembership==='true'? true: false,
       paymentID: [membershipID? membershipID: paymentNumber],
       vehicleID: vehicleID,
       parkingSpot: parkingSpotResult.parkingSpot,
@@ -202,9 +211,9 @@ async function updateReservation(userID, reservationID, startTime='', endTime=''
       // so the reservation result has actual startTime, endTime and price for that time
       // for the new start time and end time we need to calculate the new price based on the previous price
       const prevPricePerHour = result[0].price / ((result[0].endTime.toDate().getTime() - result[0].startTime.toDate().getTime())/3600000);
-      const newPricePerHour = prevPricePerHour * ((endTime.getTime() - startTime.getTime())/3600000);
+      const newPrice = prevPricePerHour * ((endTime.getTime() - startTime.getTime())/3600000);
       newData.parkingSpot = newSlotresult.parkingSpot;
-      newData.price = newPricePerHour;
+      newData.price = newPrice;
     }
 
     const updatedResult = await updateDetails(reservationID, newData);
@@ -244,7 +253,7 @@ async function deleteReservation(userID, reserationID) {
   // delete the reservation and refund the money if possible
   const deletedResult = await deleteDetails(reserationID);
   if (deletedResult) {
-    if (result[0].permitType === 'membership') {
+    if (result[0].isMembership) {
       return {message: 'Successfully deleted the reservation', success: true};
     }
     const paymentID = result[0].paymentID[0];
@@ -383,6 +392,7 @@ async function checkout(userID, reservationID) {
     if (result[0].reservationStatus === 'complete') {
       return {message: 'reservation is already completed', success: false};
     }
+
     const reservationTime = result[0].endTime.toDate().getTime();
     const currentTime = new Date().getTime();
 
@@ -390,15 +400,20 @@ async function checkout(userID, reservationID) {
     if (currentTime <= reservationTime) {
       price = result[0].price;
     } else {
+      const parkingResult = await verifyParkingLotID(result[0].parkingLotID);
+      if (!parkingResult) {
+        return {message: 'Invalid parkingLot ID', success: false};
+      }
       // calculate the extra time in minutes and charge the user for that
-      const extraTime = Math.ceil((currentTime - reservationTime)/60000);
-      const extraAmount = extraTime * 0.5;
+      const extraTime = Math.ceil((currentTime - reservationTime)/3600000);
+      const prevPricePerHour = result[0].price / ((result[0].endTime.toDate().getTime() - result[0].startTime.toDate().getTime())/3600000);
+      const extraAmount = extraTime * prevPricePerHour + parkingResult.extraFine;
       price = result[0].price + extraAmount;
       changeAmount = true;
     }
     // if membership then there is no payment
     // else then there will be a payment so we need to update the payment intent
-    if (result[0].permitType !== 'membership') {
+    if (!result[0].isMembership) {
       const paymentID = result[0].paymentID[0];
       const updatePaymentResult = await updatePaymentIntent(paymentID, price, changeAmount);
       if (!updatePaymentResult) {
@@ -406,7 +421,7 @@ async function checkout(userID, reservationID) {
       }
     }
 
-    const updatedResult = await updateDetails(reservationID, {reservationStatus: 'complete', paymentStatus: 'complete', checkoutTime: currentFirestoreTimestamp()});
+    const updatedResult = await updateDetails(reservationID, {reservationStatus: 'complete', paymentStatus: 'complete', price: price, checkoutTime: currentFirestoreTimestamp()});
     if (updatedResult) {
       return {message: 'Successfully checked out the user for the reservation', success: true};
     }
@@ -417,4 +432,56 @@ async function checkout(userID, reservationID) {
   }
 }
 
-module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout};
+/**
+ *
+ * @param {string} userID
+ * @param {string} reservationID
+ * @param {string} message
+ * @param {string} newEndTime
+ */
+async function extendRequest(userID, reservationID, message, newEndTime) {
+  // check if the reservation is valid
+  // check if the user is connected with userID and reservationID
+  // check if the reservation status is active or not
+  // check if the reservation is already extended
+
+  try {
+    const result = await getReservation(reservationID);
+    if (!result) {
+      return {message: 'we cannot find the reservation id in our database', success: false};
+    }
+    if (!(result[0].userID === userID)) {
+      return {message: 'you do not have access to edit this reservation', success: false};
+    }
+    if (result[0].reservationStatus === 'cancelled') {
+      return {message: 'reservation is cancelled', success: false};
+    }
+    if (result[0].reservationStatus === 'inactive') {
+      return {message: 'reservation is not active you cannot request to extend but you can try to request the update', success: false};
+    }
+    if (result[0].reservationStatus === 'complete') {
+      return {message: 'reservation is already completed', success: false};
+    }
+    const endTime = new Date(newEndTime);
+    if (endTime < new Date()) {
+      return {message: 'end time is already finished', success: false};
+    }
+    if ( endTime < result[0].endTime.toDate()) {
+      return {message: 'new end time should not be less than original end time ', success: false};
+    }
+    const extensionResult = await findExtension(reservationID);
+    if (extensionResult) {
+      return {message: 'reservation is already extended cannot extend more than once', success: false};
+    }
+    const updatedResult = await addExtension(reservationID, {reservationID: reservationID, message: message, newEndTime: endTime, active: true});
+    if (updatedResult) {
+      return {message: 'Successfully requested to extend the reservation', success: true};
+    }
+    return {message: 'Failed to request to extend the reservation', success: false};
+  } catch (err) {
+    console.error('Error occured while requesting the extend for the reservation: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout, extendRequest};

@@ -181,26 +181,31 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
  */
 async function refundPayment(amount, paymentIntentID) {
   try {
-    const refundresult = await stripe.refunds.create({
-      payment_intent: paymentIntentID,
-      amount: amount,
-    });
-    return refundresult;
+    let result;
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentID);
+    if (paymentIntent.status !== 'succeeded') {
+      const canceledPaymentIntent = await stripe.paymentIntents.cancel(paymentIntentID);
+      console.log('PaymentIntent canceled:', canceledPaymentIntent);
+      result = canceledPaymentIntent;
+    } else {
+      const refundresult = await stripe.refunds.create({
+        payment_intent: paymentIntentID,
+        amount: amount,
+      });
+      console.log('Refund:', refundresult);
+      result = refundresult;
+    }
+    return result;
   } catch (err) {
-    console.log('Error while refundign the payment: ', err.message);
+    console.log('Error while refunding the payment: ', err.message, err.type);
     if (err.type === 'StripePermissionError') {
-      console.error('Attempting to cancel PaymentIntent...');
-      try {
-        const canceledPaymentIntent = await stripe.paymentIntents.cancel(paymentIntentID);
-        console.log('PaymentIntent canceled:', canceledPaymentIntent);
-        return canceledPaymentIntent;
-      } catch (cancellationError) {
-        console.error('Error canceling PaymentIntent:', cancellationError.message);
-        throw cancellationError;
-      }
+      console.error('You do not have permission to refund this charge.');
+      // Handle this specific error case
+      return null;
     } else if (err.type === 'StripeInvalidRequestError' && err.code === 'charge_already_refunded') {
       console.error('Charge is already refunded.');
       // Handle this specific case where the charge is already refunded
+      return null;
     }
     console.error('Error refunding the payment:', err.message);
     throw err;
