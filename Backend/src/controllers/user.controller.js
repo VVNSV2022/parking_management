@@ -7,7 +7,7 @@ async function registerUser(email, password) {
     if (user && user.uid) {
       return {
         message: 'User registration successful',
-        userId: user.uid,
+        userId: user.user_id,
         success: true,
       };
     }
@@ -18,9 +18,10 @@ async function registerUser(email, password) {
     };
   } catch (err) {
     console.error('Error occurred at controller while registering a user: ', err.message);
-    throw err;
+    throw { type: 'validation', message: 'Failed to register user', originalError: err };
   }
 }
+
 
 async function loginUser(email, password) {
   try {

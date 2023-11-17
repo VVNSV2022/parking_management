@@ -1,4 +1,8 @@
-const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser, getCustomerdetails, getmembershiptype} = require('../thirdParty/user.firestore');
+const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser, getCustomerdetails, getmembershiptype,
+storeRefreshToken, getUserByEmail, verifyRefreshToken, invalidateRefreshToken} = require('../thirdParty/user.firestore');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 
 async function registerUser(email, password) {
   try {
@@ -22,23 +26,62 @@ async function registerUser(email, password) {
   }
 }
 
-async function loginUser(email, password) {
+async function refreshAccessToken(refreshToken) {
   try {
-    const user = await signInUser(email, password);
-    return {success: true, user: user};
+    const userData = await verifyRefreshToken(refreshToken);
+
+    if (!userData) {
+      return null;
+    }
+
+    const newAccessToken = jwt.sign({ userId: userData.uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+
+    return newAccessToken;
   } catch (err) {
-    console.error('Error occurred in the controller while trying to login:', err.message);
-    return {success: false, message: 'Login failed'};
+    console.error('Error occurred at controller while refreshing access token: ', err.message);
+    throw err;
   }
 }
 
-async function logoutUser(token) {
+async function loginUser(email, password) {
   try {
-    const result = await signOutUser(token);
-    return {success: true, message: result.message};
+    const userRecord = await getUserByEmail(email);
+    if (!userRecord) {
+      throw new Error('User not found. Please register before signing in.');
+    }
+
+    const isValid = await bcrypt.compare(password, userRecord.hashedPassword);
+    if (!isValid) {
+      throw new Error('Invalid credentials. Please try again.');
+    }
+
+    const accessToken = jwt.sign({ userId: userRecord.uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ userId: userRecord.uid }, process.env.REFRESH_TOKEN_SECRET);
+
+    // Store refreshToken in the database
+    console.log("controller", refreshToken);
+    await storeRefreshToken(userRecord.uid, refreshToken);
+
+    return {
+      message: 'Login successful',
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      success: true
+    };
   } catch (err) {
-    console.error('Error occurred in the controller while trying to logout:', err.message);
-    return {success: false, message: 'Logout failed'};
+    console.error('Error occurred in the controller while trying to login: ', err.message);
+    // Pass the error message to the calling function
+    throw { type: 'login', message: err.message };
+  }
+}
+
+
+async function logoutUser(userId) {
+  try {
+    await invalidateRefreshToken(userId);
+  } catch (err) {
+    console.error('Error occurred at controller while logging out a user: ', err.message);
+    throw err;
   }
 }
 
@@ -94,4 +137,5 @@ module.exports = {
   logoutUser,
   getUser,
   getAccountDetailsByCustomerId,
+  refreshAccessToken,
 };

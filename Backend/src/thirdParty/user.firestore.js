@@ -3,27 +3,21 @@ const {getAuth} = require('firebase-admin/auth');
 const admin = require('firebase-admin');
 const bcrypt = require('bcrypt');
 const db = getFirestore();
+const jwt = require('jsonwebtoken');
 const {
   createAccessToken,
   createRefreshToken,
   verifyAccessToken,
 } = require('../utilities/jwtHelper');
 
+
 async function createUserWithEmailPassword(email, password) {
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Store the hashed password in your database
-    // await storeUserPassword(email, hashedPassword);
-
-    const userRecord = await getAuth().createUser({email, password});
-
-    // Generate a user-friendly user_id. This is just a simple example.
-    // Depending on your needs, you might want to use a different method.
+    const userRecord = await getAuth().createUser({ email, password });
     const userId = `user-${Date.now()}`;
 
-    // Add the user to the 'users' collection in Firestore
     await db.collection('users').doc(userRecord.uid).set({
       email: email,
       hashedPassword: hashedPassword,
@@ -34,9 +28,80 @@ async function createUserWithEmailPassword(email, password) {
     return userRecord;
   } catch (err) {
     console.error('Error occurred while creating the user: ', err.message);
+    throw { type: 'user-creation', message: err.message };
+  }
+}
+
+async function getUserByEmail(email) {
+  try {
+    const usersRef = db.collection('users');
+    const snapshot = await usersRef.where('email', '==', email).get();
+
+    if (snapshot.empty) {
+      console.log('No matching documents for the given email.');
+      return null;
+    }
+
+    let userData = null;
+    snapshot.forEach(doc => {
+      // Assuming there's only one user with the given email
+      userData = {
+        uid: doc.id, // or user_id if you store the custom userId in the document
+        email: doc.data().email,
+        hashedPassword: doc.data().hashedPassword,
+        // Add other user fields you might need
+      };
+    });
+
+    return userData;
+  } catch (err) {
+    console.error('Error occurred while fetching user by email: ', err.message);
     throw err;
   }
 }
+
+async function storeRefreshToken(userId, refreshToken) {
+  try {
+    await db.collection('refreshTokens').doc(userId).set({ refreshToken });
+  } catch (err) {
+    console.error('Error occurred while storing the refresh token: ', err.message);
+    throw err;
+  }
+}
+
+async function verifyRefreshToken(refreshToken) {
+  try {
+    const snapshot = await db.collection('refreshTokens').where('refreshToken', '==', refreshToken).get();
+
+    if (snapshot.empty) {
+      console.log('No matching refresh token found.');
+      return null;
+    }
+
+    let userData = null;
+    snapshot.forEach(doc => {
+      // Retrieve user data linked to the refresh token
+      userData = { uid: doc.id }; // Adjust according to your user data structure
+    });
+
+    // Verify the token's validity
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    return userData;
+  } catch (err) {
+    console.error('Error occurred while verifying refresh token: ', err.message);
+    if (err instanceof jwt.JsonWebTokenError) {
+      // Handle JWT specific errors (like token expiry) here if needed
+      return null;
+    }
+    throw err;
+  }
+}
+
+
+
+
+
 
 async function signInUser(email, password) {
   try {
@@ -82,6 +147,17 @@ async function storeRefreshToken(userId, refreshToken) {
   }
 }
 
+async function invalidateRefreshToken(userId) {
+  try {
+    await db.collection('refreshTokens').doc(userId).delete();
+    // Any additional database operations for logout can be added here
+  } catch (err) {
+    console.error('Error occurred while invalidating the refresh token: ', err.message);
+    throw err;
+  }
+}
+
+
 async function signOutUser(token) {
   try {
     // Assuming token is the ID of the document for simplicity
@@ -125,13 +201,13 @@ async function signOutUser(token) {
 }
 
 
-async function invalidateRefreshToken(userId) {
-  // Here we are deleting the refresh token, but you might want to just mark it as invalid
-  // depending on your refresh token reuse policy
-  await db.collection('users').doc(userId).update({
-    refreshToken: firebase.firestore.FieldValue.delete(),
-  });
-}
+// async function invalidateRefreshToken(userId) {
+//   // Here we are deleting the refresh token, but you might want to just mark it as invalid
+//   // depending on your refresh token reuse policy
+//   await db.collection('users').doc(userId).update({
+//     refreshToken: firebase.firestore.FieldValue.delete(),
+//   });
+// }
 
 /**
  * Retrieve user hashed password from the 'users' collection in Firestore.
@@ -295,4 +371,8 @@ module.exports = {
   updateUserDetails,
   getCustomerdetails,
   getmembershiptype,
+  getUserByEmail,
+  storeRefreshToken,
+  verifyRefreshToken,
+  invalidateRefreshToken
 };
