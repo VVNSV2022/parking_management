@@ -1,5 +1,7 @@
 const http = require('http');
 const url = require('url');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * CustomResponse class for handling HTTP response related operations.
@@ -183,79 +185,105 @@ class CustomServer {
     // creating the server
     this.server = http.createServer(async (req, res) => {
       const method = req.method;
-      const parsedURL = url.parse(req.url, true);
-      req.queryParameters = parsedURL.query;
-      // parsing the cookies
-      this.parseCookies(req);
 
-      if (method == 'PUT' || method == 'POST' || method == 'DELETE') {
-        await new Promise((resolve, reject) => {
-          if (req.headers['content-type'] === 'application/json') {
-            let body = '';
-            // Handle incoming data in the request
-            req.on('data', (chunk) => {
-              body += chunk;
-            });
+      // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
+      if (method == 'GET' && req.url.match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
+        const filePath = path.join(__dirname, '..', '..', '..', 'UI', req.url);
+        const extname = path.extname(filePath).toLowerCase();
 
-            req.on('end', async () => {
-              try {
-              // Parse the received data as JSON
-                if (body) {
-                  req.body = await JSON.parse(body);
-                } else {
-                  req.body = {};
-                }
-                resolve();
-              } catch (err) {
-                req.body = {}; // Set an empty object if parsing fails
-                console.log(
-                    'Error Occurred while getting the data from the request object',
-                    err,
-                );
-                reject(err);
-              }
-            });
+        fs.access(filePath, fs.constants.R_OK, (err) => {
+          if (err) {
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            res.write('<h1 color:"red">Server Error</h1>');
+            res.end();
           } else {
-            const body = [];
-            // Handle incoming data in the request
-            req.on('data', (chunk) => {
-              body.push(chunk);
-            });
-
-            req.on('end', async () => {
-              try {
-              // Parse the received data as JSON
-                if (body) {
-                  req.file = Buffer.concat(body);
-                  req.fileType = req.headers['content-type'];
-                } else {
-                  req.file = '';
-                }
-                resolve();
-              } catch (err) {
-                req.body = ''; // Set an empty object if parsing fails
-                console.log(
-                    'Error Occurred while getting the data from the request object',
-                    err,
-                );
-                reject(err);
+            fs.readFile(filePath, (err, data) => {
+              if (err) {
+                res.writeHead(404, {'Content-Type': 'text/plain'});
+                res.end('Internal Server Error');
+              } else {
+                res.writeHead(200, {'Content-Type': `text/${extname.slice(1)}`});
+                res.end(data);
               }
             });
           }
         });
-      }
-
-      // req.url, req.raw_headers
-      res.setHeader('Powered_by', 'Team9');
-
-      if (this.routes[method] && this.routes[method][parsedURL.pathname]) {
-        console.debug(`${method}: ${parsedURL.pathname} is requested`);
-
-        // calling the handler function
-        this.routes[method][parsedURL.pathname](req, res, parsedURL);
       } else {
+        const parsedURL = url.parse(req.url, true);
+        req.queryParameters = parsedURL.query;
+
+        // parsing the cookies
+        this.parseCookies(req);
+
+        if (method == 'PUT' || method == 'POST' || method == 'DELETE') {
+          await new Promise((resolve, reject) => {
+            if (req.headers['content-type'] === 'application/json') {
+              let body = '';
+              // Handle incoming data in the request
+              req.on('data', (chunk) => {
+                body += chunk;
+              });
+
+              req.on('end', async () => {
+                try {
+                  // Parse the received data as JSON
+                  if (body) {
+                    req.body = await JSON.parse(body);
+                  } else {
+                    req.body = {};
+                  }
+                  resolve();
+                } catch (err) {
+                  req.body = {}; // Set an empty object if parsing fails
+                  console.log(
+                      'Error Occurred while getting the data from the request object',
+                      err,
+                  );
+                  reject(err);
+                }
+              });
+            } else {
+              const body = [];
+              // Handle incoming data in the request
+              req.on('data', (chunk) => {
+                body.push(chunk);
+              });
+
+              req.on('end', async () => {
+                try {
+                  // Parse the received data as JSON
+                  if (body) {
+                    req.file = Buffer.concat(body);
+                    req.fileType = req.headers['content-type'];
+                  } else {
+                    req.file = '';
+                  }
+                  resolve();
+                } catch (err) {
+                  req.body = ''; // Set an empty object if parsing fails
+                  console.log(
+                      'Error Occurred while getting the data from the request object',
+                      err,
+                  );
+                  reject(err);
+                }
+              });
+            }
+          });
+        }
+
+        // req.url, req.raw_headers
+        res.setHeader('Powered_by', 'Team9');
+
+        if (this.routes[method] && this.routes[method][parsedURL.pathname]) {
+          console.debug(`${method}: ${parsedURL.pathname} is requested`);
+
+          // calling the handler function
+          this.routes[method][parsedURL.pathname](req, res, parsedURL);
+        } else {
         // could not find any route in the server
-        this.handleNotFound(res, method, parsedURL);
+          this.handleNotFound(res, method, parsedURL);
+        }
       }
     });
 
@@ -275,9 +303,9 @@ class CustomServer {
     console.error(
         `${method}: ${parsedURL.pathname} is requested but cannot find it in the server`,
     );
-    res.writeHead(404, {'Content-Type': 'text/plain'});
-    res.write('Server cannot found request route');
-    res.end('Not Found');
+    res.writeHead(404, {'Content-Type': 'text/html'});
+    res.write('<h1 color="red">Server cannot found request route</h1>');
+    res.end('');
   }
 
   /**
