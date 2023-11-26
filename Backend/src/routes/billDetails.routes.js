@@ -2,6 +2,7 @@ const {v4: uuidv4} = require('uuid');
 
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
 const {getReservationsByID} = require('../controllers/reservation.controller');
+const {getAllReservations} = require('../thirdParty/reservation.firestore');
 const {getParkingLotID} = require('../thirdParty/parkingLot.firestore');
 const {makePayment} = require('../controllers/payment.controller');
 const {updatePaymentIntent} = require('../thirdParty/StripeAPI');
@@ -34,19 +35,47 @@ billDetailsRouter.get('/api/billDetails', async (req, res)=>{
         ...parkingLotData,
       };
 
+      //console.log(combinedData);
+
 
       // Calculate time difference in minutes
-      const {clockout_time, endTime, userID, regionID, price, overstays} = combinedData;
+      const {clockout_time, endTime, userID, regionID, price, overstays, penalties, startTime, reservationID} = combinedData;
       const timeDifference = (clockout_time._seconds - endTime._seconds) / 60;
       // Calculate overstay charges for every 30 minutes of overstay
       const overstay_charge = Math.max(Math.ceil(timeDifference / 30), 0) * overstays;
+      
+      console.log(penalties);
+
+
+
+      // calculate penality charge
+      let penality_charge = 0
+      const other_reservations = await getAllReservations()
+      //console.log(other_reservations)
+
+
+      for (const otherReservation of other_reservations) {
+        // Check if the userID is different and if clockout_time is within the reservation time range
+        if (otherReservation.userID !== userID &&
+          clockout_time._seconds >= otherReservation.startTime._seconds &&
+          clockout_time._seconds <= otherReservation.endTime._seconds) {
+          // Set the conflictFlag to 1
+          penality_charge = penalties;
+          break; // Exit the loop since we found a conflict
+        }
+      }
 
       // Create the response data
       const responseData = {
+        reservationID,
         userID,
         regionID,
         price,
+        startTime, 
+        endTime,
         overstay_charge,
+        penality_charge,
+  
       };
 
 

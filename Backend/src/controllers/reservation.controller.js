@@ -1,6 +1,6 @@
 const {v4: uuidv4} = require('uuid');
 
-const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation} = require('../thirdParty/reservation.firestore.js');
+const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation, getAllReservations} = require('../thirdParty/reservation.firestore.js');
 const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
 const {updatePaymentIntent} = require('../thirdParty/StripeAPI.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
