@@ -41,7 +41,7 @@ userRouter.post('/user/login', async (req, res) => {
       return response.setResponse(res, {message: 'Missing email or password', error: true}, 400);
     }
 
-    const result = await loginUser(email, password);
+    const result = await loginUser(email, password, 'customer');
 
     if (result.success) {
       return response.setResponse(res, {

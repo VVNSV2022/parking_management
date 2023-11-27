@@ -32,9 +32,15 @@ async function createUserWithEmailPassword(email, password) {
   }
 }
 
-async function getUserByEmail(email) {
+async function getUserByEmail(email, role) {
   try {
-    const usersRef = db.collection('users');
+    let usersRef;
+    if(role === "customer"){
+      usersRef = db.collection('customer');
+    }else{
+      usersRef = db.collection('admin');
+
+    }
     const snapshot = await usersRef.where('email', '==', email).get();
 
     if (snapshot.empty) {

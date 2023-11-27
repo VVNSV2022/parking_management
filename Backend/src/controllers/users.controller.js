@@ -43,9 +43,9 @@ async function refreshAccessToken(refreshToken) {
   }
 }
 
-async function loginUser(email, password) {
+async function loginUser(email, password, role) {
   try {
-    const userRecord = await getUserByEmail(email);
+    const userRecord = await getUserByEmail(email, role);
     if (!userRecord) {
       throw new Error('User not found. Please register before signing in.');
     }
