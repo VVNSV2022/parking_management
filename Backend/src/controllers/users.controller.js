@@ -59,7 +59,6 @@ async function loginUser(email, password, role) {
     const refreshToken = jwt.sign({userId: userRecord.uid}, process.env.REFRESH_TOKEN_SECRET);
 
     // Store refreshToken in the database
-    console.log('controller', refreshToken);
     await storeRefreshToken(userRecord.uid, refreshToken);
 
     return {

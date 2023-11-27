@@ -36,7 +36,7 @@ async function getUserByEmail(email, role) {
   try {
     let usersRef;
     if(role === "customer"){
-      usersRef = db.collection('customer');
+      usersRef = db.collection('users');
     }else{
       usersRef = db.collection('admin');
 
