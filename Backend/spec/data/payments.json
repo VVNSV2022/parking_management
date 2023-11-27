@@ -1,0 +1,23 @@
+{
+    "userID": "123456",
+    "payments":[
+{
+    "paymentType": "card",
+    "paymentToken": "tok_amex",
+    "BillingDetails": {
+        "name": "sairam balu",
+        "email": "balusairam26@gmail.com",
+        "phone": "7322890890",
+        "address": {
+            "line1": "41 Phelps Ave",
+            "line2": "Apt D",
+            "city": "New Brunswick",
+            "state": "New Jersey",
+            "postal_code": "08904",
+            "country": "US"
+        }
+    }
+}
+],
+"paymentMethodIDs": []
+}

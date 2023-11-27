@@ -115,32 +115,32 @@ userRouter.delete('/user/delete', async (req, res) => {
   }
 });
 
-userRouter.get('/user', async (req, res) => {
-  try {
-    // Parse the URL and the query string
-    const parsedUrl = url.parse(req.url, true);
+// userRouter.get('/user', async (req, res) => {
+//   try {
+//     // Parse the URL and the query string
+//     const parsedUrl = url.parse(req.url, true);
 
-    // Get the query params
-    const queryParams = parsedUrl.query;
+//     // Get the query params
+//     const queryParams = parsedUrl.query;
 
-    // Destructure the userId and email from query params
-    const {userId, email} = queryParams;
+//     // Destructure the userId and email from query params
+//     const {userId, email} = queryParams;
 
-    if (!userId && !email) {
-      return response.setResponse(res, {message: 'User ID or email required', error: true}, 400);
-    }
+//     if (!userId && !email) {
+//       return response.setResponse(res, {message: 'User ID or email required', error: true}, 400);
+//     }
 
-    const user = await getUser(userId, email);
-    if (user) {
-      return response.setResponse(res, {user}, 200);
-    } else {
-      return response.setResponse(res, {message: 'User not found'}, 404);
-    }
-  } catch (err) {
-    console.error('Error occurred while trying to retrieve user:', err.message);
-    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
-  }
-});
+//     const user = await getUser(userId, email);
+//     if (user) {
+//       return response.setResponse(res, {user}, 200);
+//     } else {
+//       return response.setResponse(res, {message: 'User not found'}, 404);
+//     }
+//   } catch (err) {
+//     console.error('Error occurred while trying to retrieve user:', err.message);
+//     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+//   }
+// });
 
 userRouter.get('/api/customer', async (req, res) => {
   try {

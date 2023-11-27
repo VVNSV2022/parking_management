@@ -35,7 +35,7 @@ paymentRouter.post('/payments/create', async (req, res)=>{
     // Handle the response from the controller
     if (result.success) {
       // Payment was successful
-      return response.setResponse(res, {message: 'Payment Method saved successfully', data: result.data}, 200);
+      return response.setResponse(res, {message: 'Payment Method saved successfully', data: result.data}, 201);
     } else {
       // Payment failed, provide an error message
       return response.setResponse(res, {message: result.message, success: false}, 200);

@@ -5,15 +5,29 @@ const fs = require('fs');
 const reservationRouter = new CustomRoutes();
 const response = new CustomResponse();
 
+const authenticateToken = require('../utilities/authMiddleware');
+
 // create reservation
 
 reservationRouter.post('/api/reservation', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
+
     const {userID, startTime, endTime, parkingLotID, permitType, isMembership, paymentID, paymentType, paymentMethod, vehicleID} = req.body;
     if (!userID|| !startTime|| !endTime|| !parkingLotID|| !permitType || !isMembership || !vehicleID) {
       if (isMembership === 'false' && (!paymentID || !paymentType || !paymentMethod)) {
         return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
       }
+    }
+    
+    if (userID !== authResult.userId) {
+      return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
     }
     const result = await createReservation(userID, startTime, endTime, parkingLotID, permitType, isMembership, vehicleID, paymentID, paymentType, paymentMethod);
     if (result.success) {
