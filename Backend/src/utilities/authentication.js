@@ -1,5 +1,5 @@
 // utilities.authentication.js
-const { verifyAccessToken } = require('./jwtHelper'); // Assuming you have a tokenUtility.js for verifying tokens
+const {verifyAccessToken} = require('./jwtHelper'); // Assuming you have a tokenUtility.js for verifying tokens
 
 async function authenticate(token) {
   try {
@@ -16,7 +16,7 @@ async function authenticate(token) {
     return {'valid': false, 'message': error.message}; // Indicates that the request should not proceed to the handler
   }
 
-  return {'valid': true, 'message': 'valid token'} // Indicates that the request is authenticated and can proceed
+  return {'valid': true, 'message': 'valid token'}; // Indicates that the request is authenticated and can proceed
 }
 
 module.exports = {

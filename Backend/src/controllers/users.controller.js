@@ -1,5 +1,5 @@
 const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser, getCustomerdetails, getmembershiptype,
-storeRefreshToken, getUserByEmail, verifyRefreshToken, invalidateRefreshToken} = require('../thirdParty/user.firestore');
+  storeRefreshToken, getUserByEmail, verifyRefreshToken, invalidateRefreshToken} = require('../thirdParty/user.firestore');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -34,7 +34,7 @@ async function refreshAccessToken(refreshToken) {
       return null;
     }
 
-    const newAccessToken = jwt.sign({ userId: userData.uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    const newAccessToken = jwt.sign({userId: userData.uid}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
 
     return newAccessToken;
   } catch (err) {
@@ -55,23 +55,23 @@ async function loginUser(email, password) {
       throw new Error('Invalid credentials. Please try again.');
     }
 
-    const accessToken = jwt.sign({ userId: userRecord.uid }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ userId: userRecord.uid }, process.env.REFRESH_TOKEN_SECRET);
+    const accessToken = jwt.sign({userId: userRecord.uid}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
+    const refreshToken = jwt.sign({userId: userRecord.uid}, process.env.REFRESH_TOKEN_SECRET);
 
     // Store refreshToken in the database
-    console.log("controller", refreshToken);
+    console.log('controller', refreshToken);
     await storeRefreshToken(userRecord.uid, refreshToken);
 
     return {
       message: 'Login successful',
       accessToken: accessToken,
       refreshToken: refreshToken,
-      success: true
+      success: true,
     };
   } catch (err) {
     console.error('Error occurred in the controller while trying to login: ', err.message);
     // Pass the error message to the calling function
-    throw { type: 'login', message: err.message };
+    throw {type: 'login', message: err.message};
   }
 }
 

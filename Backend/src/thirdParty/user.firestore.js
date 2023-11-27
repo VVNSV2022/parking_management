@@ -15,7 +15,7 @@ async function createUserWithEmailPassword(email, password) {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userRecord = await getAuth().createUser({ email, password });
+    const userRecord = await getAuth().createUser({email, password});
     const userId = `user-${Date.now()}`;
 
     await db.collection('users').doc(userRecord.uid).set({
@@ -28,7 +28,7 @@ async function createUserWithEmailPassword(email, password) {
     return userRecord;
   } catch (err) {
     console.error('Error occurred while creating the user: ', err.message);
-    throw { type: 'user-creation', message: err.message };
+    throw {type: 'user-creation', message: err.message};
   }
 }
 
@@ -43,7 +43,7 @@ async function getUserByEmail(email) {
     }
 
     let userData = null;
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       // Assuming there's only one user with the given email
       userData = {
         uid: doc.id, // or user_id if you store the custom userId in the document
@@ -62,7 +62,7 @@ async function getUserByEmail(email) {
 
 async function storeRefreshToken(userId, refreshToken) {
   try {
-    await db.collection('refreshTokens').doc(userId).set({ refreshToken });
+    await db.collection('refreshTokens').doc(userId).set({refreshToken});
   } catch (err) {
     console.error('Error occurred while storing the refresh token: ', err.message);
     throw err;
@@ -79,9 +79,9 @@ async function verifyRefreshToken(refreshToken) {
     }
 
     let userData = null;
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       // Retrieve user data linked to the refresh token
-      userData = { uid: doc.id }; // Adjust according to your user data structure
+      userData = {uid: doc.id}; // Adjust according to your user data structure
     });
 
     // Verify the token's validity
@@ -97,10 +97,6 @@ async function verifyRefreshToken(refreshToken) {
     throw err;
   }
 }
-
-
-
-
 
 
 async function signInUser(email, password) {
@@ -374,5 +370,5 @@ module.exports = {
   getUserByEmail,
   storeRefreshToken,
   verifyRefreshToken,
-  invalidateRefreshToken
+  invalidateRefreshToken,
 };

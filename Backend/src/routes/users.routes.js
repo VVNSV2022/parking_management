@@ -9,71 +9,71 @@ const response = new CustomResponse();
 
 userRouter.post('/user/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const {email, password} = req.body;
 
     if (!email || !password) {
-      return response.setResponse(res, { message: 'Missing email or password', error: true }, 400);
+      return response.setResponse(res, {message: 'Missing email or password', error: true}, 400);
     }
 
     const result = await registerUser(email, password);
 
     if (result.userId) {
-      return response.setResponse(res, { message: 'Registration successful', userId: result.userId }, 200);
+      return response.setResponse(res, {message: 'Registration successful', userId: result.userId}, 200);
     } else {
       console.log(result);
-      return response.setResponse(res, { message: 'Registration failed', error: true }, 400);
+      return response.setResponse(res, {message: 'Registration failed', error: true}, 400);
     }
   } catch (err) {
     console.error('Error occurred while handling the request to register a user: ', err.message);
     if (err.type === 'user-creation') {
-      return response.setResponse(res, { message: err.message, error: true }, 400);
+      return response.setResponse(res, {message: err.message, error: true}, 400);
     } else {
-      return response.setResponse(res, { message: 'Internal Server Error', error: true }, 500);
+      return response.setResponse(res, {message: 'Internal Server Error', error: true}, 500);
     }
   }
 });
 
 userRouter.post('/user/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const {email, password} = req.body;
 
     if (!email || !password) {
-      return response.setResponse(res, { message: 'Missing email or password', error: true }, 400);
+      return response.setResponse(res, {message: 'Missing email or password', error: true}, 400);
     }
 
     const result = await loginUser(email, password);
 
     if (result.success) {
-      return response.setResponse(res, { 
-        message: 'Login successful', 
-        accessToken: result.accessToken, 
-        refreshToken: result.refreshToken 
+      return response.setResponse(res, {
+        message: 'Login successful',
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       }, 200);
     }
   } catch (err) {
     console.error('Error occurred while handling the login request: ', err.message);
-    return response.setResponse(res, { message: err.message, error: true }, 400);
+    return response.setResponse(res, {message: err.message, error: true}, 400);
   }
 });
 
 userRouter.post('/token', async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const {refreshToken} = req.body;
 
     if (!refreshToken) {
-      return response.setResponse(res, { message: 'Refresh token is required', error: true }, 400);
+      return response.setResponse(res, {message: 'Refresh token is required', error: true}, 400);
     }
 
     const newAccessToken = await refreshAccessToken(refreshToken);
 
     if (newAccessToken) {
-      return response.setResponse(res, { accessToken: newAccessToken }, 200);
+      return response.setResponse(res, {accessToken: newAccessToken}, 200);
     } else {
-      return response.setResponse(res, { message: 'Invalid or expired refresh token', error: true }, 403);
+      return response.setResponse(res, {message: 'Invalid or expired refresh token', error: true}, 403);
     }
   } catch (err) {
     console.error('Error occurred while handling the token refresh request: ', err.message);
-    return response.setResponse(res, { message: 'Internal Server Error', error: true }, 500);
+    return response.setResponse(res, {message: 'Internal Server Error', error: true}, 500);
   }
 });
 
@@ -83,16 +83,16 @@ userRouter.post('/user/logout', async (req, res) => {
     const authResult = authenticateToken(req);
 
     if (authResult.error) {
-      return response.setResponse(res, { message: authResult.error, error: true }, authResult.status);
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
     }
 
     const userId = authResult.user.userId; // Extracted from the token
     await logoutUser(userId);
 
-    return response.setResponse(res, { message: 'Logout successful' }, 200);
+    return response.setResponse(res, {message: 'Logout successful'}, 200);
   } catch (err) {
     console.error('Error occurred while handling the logout request: ', err.message);
-    return response.setResponse(res, { message: 'Internal Server Error', error: true }, 500);
+    return response.setResponse(res, {message: 'Internal Server Error', error: true}, 500);
   }
 });
 

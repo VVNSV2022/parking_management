@@ -18,7 +18,7 @@ async function registerUser(email, password) {
     };
   } catch (err) {
     console.error('Error occurred at controller while registering a user: ', err.message);
-    throw { type: 'validation', message: 'Failed to register user', originalError: err };
+    throw {type: 'validation', message: 'Failed to register user', originalError: err};
   }
 }
 
