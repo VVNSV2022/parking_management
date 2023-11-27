@@ -9,6 +9,13 @@ const response = new CustomResponse();
 // add vehicle
 vehicleRouter.post('/api/vehicle', async (req, res) => {
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, licensePlateNumber, vehicleMake, vehicleModel, vehicleColor, vehicleYear, VIN, ownersName, isVehicleInsured, isRental} = req.body;
     if (!userID || !licensePlateNumber || !vehicleMake || !vehicleModel || !vehicleColor || !vehicleYear || !VIN || !ownersName || !isVehicleInsured.toString() || !isRental.toString()) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
@@ -26,6 +33,13 @@ vehicleRouter.post('/api/vehicle', async (req, res) => {
 // delete vehicle
 vehicleRouter.delete('/api/vehicle', async (req, res) => {
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, vehicleID} = req.queryParameters;
     if (!userID || !vehicleID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
@@ -44,6 +58,13 @@ vehicleRouter.delete('/api/vehicle', async (req, res) => {
 // get vehicles
 vehicleRouter.get('/api/vehicle', async (req, res) => {
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, vehicleID} = req.queryParameters;
     if (!userID || !vehicleID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
@@ -61,6 +82,13 @@ vehicleRouter.get('/api/vehicle', async (req, res) => {
 
 vehicleRouter.get('/api/vehicles', async (req, res) => {
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID} = req.queryParameters;
     if (!userID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);

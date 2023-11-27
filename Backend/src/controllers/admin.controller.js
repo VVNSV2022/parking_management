@@ -1,4 +1,4 @@
-const { fetchReservations } = require('../thirdParty/admin.firestore');
+const {fetchReservations} = require('../thirdParty/admin.firestore');
 
 async function getReservations(startTime, endTime) {
   try {

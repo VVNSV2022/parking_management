@@ -1,5 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {registerUser, loginUser, logoutUser, getUser, getAccountDetailsByCustomerId, refreshAccessToken} = require('../controllers/users.controller');
+const {registerUser, loginUser, logoutUser, getUser, getAccountDetailsByCustomerId, refreshAccessToken, updateAccountDetailsByCustomerId} = require('../controllers/users.controller');
 const url = require('url');
 const authenticateToken = require('../utilities/authMiddleware');
 
@@ -157,6 +157,39 @@ userRouter.get('/api/customer', async (req, res) => {
     }
   } catch (err) {
     console.error('Error occurred while trying to fetch customer account details:', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
+userRouter.put('/api/customer', async (req, res) => {
+  try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+    const {userID, phoneNumber, currentAddress, permanantAddress} = req.body;
+    if (!userID || !(phoneNumber || currentAddress || permanantAddress)) {
+      return response.setResponse(res, {message: 'Missing important fields', error: true}, 400);
+    }
+    const data = {};
+    if (phoneNumber) {
+      data.phoneNumber = phoneNumber;
+    }
+    if (currentAddress) {
+      data.currentAddress = currentAddress;
+    }
+    if (permanantAddress) {
+      data.permanantAddress = permanantAddress;
+    }
+    const userAccountDetails = await updateAccountDetailsByCustomerId(userID, data);
+    if (userAccountDetails) {
+      return response.setResponse(res, userAccountDetails, 204);
+    }
+    return response.setResponse(res, {message: userAccountDetails.message}, 404);
+  } catch (err) {
+    console.error('Error occurred while trying to update customer account details:', err.message);
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });

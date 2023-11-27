@@ -6,6 +6,13 @@ const response = new CustomResponse();
 
 paymentRouter.get('/payments/', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const queryParameters = req.queryParameters;
     if (!queryParameters.userID) {
       return response.setResponse(res, {message: 'Missing important fields', success: false}, 400);
@@ -24,6 +31,13 @@ paymentRouter.get('/payments/', async (req, res)=>{
 
 paymentRouter.post('/payments/create', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, paymentType, paymentToken, BillingDetails} = req.body;
     // Check if all required values are present in the request body
     if (!userID || !paymentType || !paymentToken || !BillingDetails) {
@@ -48,6 +62,13 @@ paymentRouter.post('/payments/create', async (req, res)=>{
 
 paymentRouter.delete('/payments/delete', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, paymentMethodID} = req.body;
     // Check if all required values are present in the request body
     if (!userID || !paymentMethodID) {
@@ -68,6 +89,13 @@ paymentRouter.delete('/payments/delete', async (req, res)=>{
 
 paymentRouter.post('/payments/makePayment', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, amount, description, savePaymentMethodID, newPaymentMethodID, newPaymentMethodType} = req.body;
     if (!userID || !amount || !description || !(savePaymentMethodID || (newPaymentMethodID && newPaymentMethodType) )) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
@@ -87,6 +115,13 @@ paymentRouter.post('/payments/makePayment', async (req, res)=>{
 
 paymentRouter.post('/payments/refund', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, paymentID} = req.body;
     if (!userID || !paymentID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
@@ -105,6 +140,13 @@ paymentRouter.post('/payments/refund', async (req, res)=>{
 
 paymentRouter.put('/payments/updatePaymentAmount', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, paymentIntentID, newAmount} = req.body;
     if (!userID || !paymentIntentID || !newAmount) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);

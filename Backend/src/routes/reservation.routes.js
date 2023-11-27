@@ -25,10 +25,10 @@ reservationRouter.post('/api/reservation', async (req, res)=>{
         return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
       }
     }
-    
-    if (userID !== authResult.userId) {
-      return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
-    }
+
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await createReservation(userID, startTime, endTime, parkingLotID, permitType, isMembership, vehicleID, paymentID, paymentType, paymentMethod);
     if (result.success) {
       return response.setResponse(res, {message: 'Created Reservation Successfully', data: result.data, error: false}, 200);
@@ -46,6 +46,13 @@ reservationRouter.post('/api/reservation', async (req, res)=>{
 
 reservationRouter.put('/api/reservation', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, reservationID, newDetails} = req.body;
     if (!userID || !reservationID || !newDetails) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
@@ -56,6 +63,9 @@ reservationRouter.put('/api/reservation', async (req, res)=>{
       return response.setResponse(res, {message: 'Invalid data in sent', error: true}, 400);
     }
 
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await updateReservation(userID, reservationID, newDetails.startTime, newDetails.endTime, newDetails.vehicleID);
     if (result.success) {
       return response.setResponse(res, {message: 'Updated Reservation Successfully', error: false}, 200);
@@ -71,10 +81,21 @@ reservationRouter.put('/api/reservation', async (req, res)=>{
 // start_time more than one hour then he can
 reservationRouter.delete('/api/reservation', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, reservationID} = req.body;
     if (!userID || !reservationID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
+
     const result = await deleteReservation(userID, reservationID);
     if (result.success) {
       return response.setResponse(res, {message: 'Deleted Reservation Successfully', error: false}, 200);
@@ -88,11 +109,21 @@ reservationRouter.delete('/api/reservation', async (req, res)=>{
 
 reservationRouter.get('/api/reservation', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const queryParameters = req.queryParameters;
     if (!queryParameters.reservationID) {
       return response.setResponse(res, {message: 'Missing important fields', success: false}, 400);
     }
     const reservationID = queryParameters.reservationID;
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await getReservationsByID(reservationID);
     if (result.success) {
       return response.setResponse(res, {message: result.message, success: true, data: result.data}, 200);
@@ -106,11 +137,21 @@ reservationRouter.get('/api/reservation', async (req, res)=>{
 
 reservationRouter.get('/api/reservations', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const queryParameters = req.queryParameters;
     if (!queryParameters.userID) {
       return response.setResponse(res, {message: 'Missing important fields', success: false}, 400);
     }
     const userID = queryParameters.userID;
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await getReservationsByUser(userID);
     if (result.success) {
       return response.setResponse(res, {message: result.message, success: true, data: result.data}, 200);
@@ -138,10 +179,19 @@ reservationRouter.get('/api/allreservations', async (req, res)=>{
 
 reservationRouter.post('/api/reservation/checkin', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
     const {userID, reservationID} = req.body;
     if (!userID || !reservationID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await checkin(userID, reservationID);
     if (result.success) {
       return response.setResponse(res, {message: 'Checked in Successfully', error: false}, 200);
@@ -155,10 +205,20 @@ reservationRouter.post('/api/reservation/checkin', async (req, res)=>{
 
 reservationRouter.put('/api/reservation/checkout', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, reservationID} = req.body;
     if (!userID || !reservationID) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await checkout(userID, reservationID);
     if (result.success) {
       return response.setResponse(res, {message: 'Checked out Successfully', error: false}, 200);
@@ -172,10 +232,20 @@ reservationRouter.put('/api/reservation/checkout', async (req, res)=>{
 
 reservationRouter.post('/api/reservation/extend', async (req, res)=>{
   try {
+    // authentication middleware
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
     const {userID, reservationID, message, newEndTime} = req.body;
     if (!userID || !reservationID || !message || !newEndTime) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
+    // if (userID !== authResult.user.userId) {
+    //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
+    // }
     const result = await extendRequest(userID, reservationID, message, newEndTime);
     if (result.success) {
       return response.setResponse(res, {message: 'Extended request for Reservation Successfully done', error: false}, 200);

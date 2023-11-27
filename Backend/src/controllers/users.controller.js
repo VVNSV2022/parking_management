@@ -1,8 +1,8 @@
 const {createUserWithEmailPassword, signInUser, signOutUser, removeUser, fetchUser, getCustomerdetails, getmembershiptype,
-  storeRefreshToken, getUserByEmail, verifyRefreshToken, invalidateRefreshToken} = require('../thirdParty/user.firestore');
+  storeRefreshToken, getUserByEmail, verifyRefreshToken, invalidateRefreshToken, updateUserDetails} = require('../thirdParty/user.firestore');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const {isValidAddress} = require('../utilities/util');
 
 async function registerUser(email, password) {
   try {
@@ -129,6 +129,33 @@ async function getAccountDetailsByCustomerId(customerId) {
   }
 }
 
+/**
+ *
+ * @param {string} userID
+ * @param {object} data
+ * @return {object} {message: string, success: boolean}
+ */
+async function updateAccountDetailsByCustomerId(userID, data) {
+  try {
+    if ( (data.phoneNumber && !(/^\d{10}$/.test(phonenumber)))||( data.currentAddress && !(isValidAddress(data.currentAddress)) ) ||(data.permanantAddress && !(isValidAddress(data.permanantAddress)))) {
+      return {message: 'Invalid data', success: false};
+    }
+    const userResult = await getUser(userID, '');
+    if (!userResult) {
+      return {message: 'user does not exists in our app', success: false};
+    }
+
+    if (userResult) {
+      const updatedUserAccountDetails = await updateUserDetails(userID, data);
+      return {message: 'user account details updated successfully', success: true};
+    } else {
+      return {message: 'user account details not updated', success: false};
+    }
+  } catch (error) {
+    console.error('Error occurred while updating customer account details:', error);
+    throw error;
+  }
+}
 
 module.exports = {
   registerUser,
@@ -137,4 +164,5 @@ module.exports = {
   getUser,
   getAccountDetailsByCustomerId,
   refreshAccessToken,
+  updateAccountDetailsByCustomerId,
 };
