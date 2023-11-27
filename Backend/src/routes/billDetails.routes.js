@@ -35,7 +35,7 @@ billDetailsRouter.get('/api/billDetails', async (req, res)=>{
         ...parkingLotData,
       };
 
-      //console.log(combinedData);
+      // console.log(combinedData);
 
 
       // Calculate time difference in minutes
@@ -43,15 +43,14 @@ billDetailsRouter.get('/api/billDetails', async (req, res)=>{
       const timeDifference = (clockout_time._seconds - endTime._seconds) / 60;
       // Calculate overstay charges for every 30 minutes of overstay
       const overstay_charge = Math.max(Math.ceil(timeDifference / 30), 0) * overstays;
-      
+
       console.log(penalties);
 
 
-
       // calculate penality charge
-      let penality_charge = 0
-      const other_reservations = await getAllReservations()
-      //console.log(other_reservations)
+      let penality_charge = 0;
+      const other_reservations = await getAllReservations();
+      // console.log(other_reservations)
 
 
       for (const otherReservation of other_reservations) {
@@ -71,11 +70,11 @@ billDetailsRouter.get('/api/billDetails', async (req, res)=>{
         userID,
         regionID,
         price,
-        startTime, 
+        startTime,
         endTime,
         overstay_charge,
         penality_charge,
-  
+
       };
 
 

@@ -23,6 +23,7 @@ const elevatorRouter = require('./routes/elevator.routes.js'); // for elevator t
 const commonRouter = require('./routes/common.routes.js');
 const billDetailsRouter = require('./routes/billDetails.routes.js');
 const membershipRouter = require('./routes/memberships.routes.js');
+const vehicleRouter = require('./routes/vehicle.routes.js');
 
 server.setRoutes(userRouter);
 server.setRoutes(paymentRouter);
@@ -31,6 +32,7 @@ server.setRoutes(elevatorRouter);
 server.setRoutes(parkingLotRouter);
 server.setRoutes(billDetailsRouter);
 server.setRoutes(membershipRouter);
+server.setRoutes(vehicleRouter);
 
 server.setRoutes(commonRouter);
 server.get('/', (req, res) => {
