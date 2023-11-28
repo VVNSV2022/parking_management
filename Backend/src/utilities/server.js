@@ -195,7 +195,6 @@ class CustomServer {
 
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
       if (method == 'GET' && req.url.split('?')[0].match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
-
         const filePath = path.join(__dirname, '..', '..', '..', 'UI', req.url.split('?')[0]);
         const extname = path.extname(filePath).toLowerCase();
 
