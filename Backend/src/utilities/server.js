@@ -1,11 +1,7 @@
 const http = require('http');
 const url = require('url');
-<<<<<<< HEAD
 const path = require('path');
 const fs = require('fs');
-=======
-const cors = require('cors');
->>>>>>> 400bb97 (Added some headers)
 
 /**
  * CustomResponse class for handling HTTP response related operations.
