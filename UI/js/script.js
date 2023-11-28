@@ -1,4 +1,4 @@
-fetch('/api/reservations?userID=123456', {
+fetch('/payments/?userID=12345678', {
   //mode: 'no-cors',
   method: 'GET',
   headers: {

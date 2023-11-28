@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div id="payment-form">
+    <h1>Payment Gateway</h1>
+    
+    <!-- Card Details Form -->
+    <form id="card-details-form">
+      <div>
+        <label for="card-number">Card or Account Number:</label>
+        <input type="text" id="card-number" placeholder="Enter card number" required>
+      </div>
+      
+      <div>
+        <label for="expiry-date">Expiry Date:</label>
+        <input type="text" id="expiry-date" placeholder="MM/YY" required>
+      </div>
+      
+      <div>
+        <label for="cvc">CVC:</label>
+        <input type="text" id="cvc" placeholder="Enter CVC" required>
+      </div>
+
+      <!-- Billing Details -->
+      <div>
+        <label for="billing-name">Name:</label>
+        <input type="text" id="billing-name" placeholder="Enter your name" required>
+      </div>
+      
+      <div>
+        <label for="billing-email">Email:</label>
+        <input type="email" id="billing-email" placeholder="Enter your email" required>
+      </div>
+
+      <div>
+        <label for="billing-phone">Phone:</label>
+        <input type="tel" id="billing-phone" placeholder="Enter your phone number" required>
+      </div>
+
+      <div>
+        <label for="billing-address-line1">Address Line 1:</label>
+        <input type="text" id="billing-address-line1" placeholder="Enter address line 1" required>
+      </div>
+
+      <div>
+        <label for="billing-address-line2">Address Line 2:</label>
+        <input type="text" id="billing-address-line2" placeholder="Enter address line 2">
+      </div>
+      
+      <div>
+        <label for="billing-city">City:</label>
+        <input type="text" id="billing-city" placeholder="Enter city" required>
+      </div>
+      
+      <div>
+        <label for="billing-state">State:</label>
+        <input type="text" id="billing-state" placeholder="Enter state" required>
+      </div>
+
+      <div>
+        <label for="billing-postal-code">Postal Code:</label>
+        <input type="text" id="billing-postal-code" placeholder="Enter postal code" required>
+      </div>
+
+      <!-- Payment Type -->
+      <div>
+        <label for="payment-type">Payment Type:</label>
+        <select id="payment-type" required>
+          <option value="card">Card</option>
+          <option value="us_bank_account">Bank Transfer</option>
+        </select>
+      </div>
+
+      <div>
+        <p id="payment-amount">Payment Amount: $<span id="amount">0.00</span></p>
+      </div>
+
+      <button type="submit" onclick="handlePayment()">Process Payment</button>
+    </form>
+
+    <!-- Saved Card Details Section -->
+    <div id="saved-cards">
+      <h2>Saved Payment Options</h2>
+      <!-- Display saved card details -->
+      <select id="saved-card-dropdown">
+        <!-- Cards will be populated here -->
+      </select>
+      <button type="submit" onclick="handleRepeatPayment()">Submit Payment</button>
+    </div>
+  </div>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="../js/payment.js"></script>
+  <script>
+    // This Function to handle payment amount and user ID from URL query parameters
+    function getPaymentInfo() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentAmount = urlParams.get('amount');
+      const userID = urlParams.get('userID');
+
+      if (paymentAmount) {
+        document.getElementById('amount').textContent = paymentAmount;
+      }
+
+      if (userID) {
+        document.getElementById('userId').textContent = userID;
+      }
+    }
+    // Call the function on page load
+    window.onload = getPaymentInfo;
+  </script>
+
+</body>
+</html>
+
