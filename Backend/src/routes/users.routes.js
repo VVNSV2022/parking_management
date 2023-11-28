@@ -9,7 +9,7 @@ const response = new CustomResponse();
 
 userRouter.post('/user/register', async (req, res) => {
   try {
-    const {email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber } = req.body;
+    const {email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber} = req.body;
 
     if (!email || !password || !username || !dob || !licenseNumber || isDisabled === undefined || !currentAddress || !permanentAddress || !phoneNumber) {
       return response.setResponse(res, {message: 'Missing required fields', error: true}, 400);

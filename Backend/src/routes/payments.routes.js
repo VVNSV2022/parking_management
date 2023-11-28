@@ -4,6 +4,8 @@ const {getUserPaymentMethods, savePaymentMethod, deletePM, makePayment, refundPa
 const paymentRouter = new CustomRoutes();
 const response = new CustomResponse();
 
+const authenticateToken = require('../utilities/authMiddleware');
+
 paymentRouter.get('/payments/', async (req, res)=>{
   try {
     // authentication middleware

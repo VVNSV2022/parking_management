@@ -184,13 +184,12 @@ class CustomServer {
 
     // creating the server
     this.server = http.createServer(async (req, res) => {
-
       const method = req.method;
       const parsedURL = url.parse(req.url, true);
       req.queryParameters = parsedURL.query;
       // parsing the cookies
       this.parseCookies(req);
-      res.setHeader('Access-Control-Allow-Origin', '*'); 
+      res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files

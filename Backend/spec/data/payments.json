@@ -1,5 +1,7 @@
 {
-    "userID": "123456",
+    "email": "customer1@example.com",
+    "password": "secretpassword",
+    "userID": "user-1699648999782",
     "payments":[
 {
     "paymentType": "card",

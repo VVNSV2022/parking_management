@@ -28,7 +28,7 @@ async function createUserWithEmailPassword(email, password, username, dob, licen
       isDisabled: isDisabled,
       currentAddress: currentAddress,
       permanentAddress: permanentAddress,
-      phoneNumber: phoneNumber
+      phoneNumber: phoneNumber,
     });
 
     return userId;
