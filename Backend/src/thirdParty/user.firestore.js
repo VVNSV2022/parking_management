@@ -11,21 +11,27 @@ const {
 } = require('../utilities/jwtHelper');
 
 
-async function createUserWithEmailPassword(email, password) {
+async function createUserWithEmailPassword(email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber) {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const userRecord = await getAuth().createUser({email, password});
     const userId = `user-${Date.now()}`;
 
-    await db.collection('users').doc(userRecord.uid).set({
+    await db.collection('users').doc(userId).set({
       email: email,
       hashedPassword: hashedPassword,
-      user_id: userId,
-      role_id: 2,
+      userId: userId,
+      username: username,
+      dob: dob,
+      licenseNumber: licenseNumber,
+      isDisabled: isDisabled,
+      currentAddress: currentAddress,
+      permanentAddress: permanentAddress,
+      phoneNumber: phoneNumber
     });
 
-    return userRecord;
+    return userId;
   } catch (err) {
     console.error('Error occurred while creating the user: ', err.message);
     throw {type: 'user-creation', message: err.message};

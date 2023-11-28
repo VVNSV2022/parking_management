@@ -4,14 +4,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {isValidAddress} = require('../utilities/util');
 
-async function registerUser(email, password) {
+async function registerUser(email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber) {
   try {
-    const user = await createUserWithEmailPassword(email, password);
+    const userId = await createUserWithEmailPassword(email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber);
 
-    if (user && user.uid) {
+    if (userId) {
       return {
         message: 'User registration successful',
-        userId: user.uid,
+        userId: userId,
         success: true,
       };
     }

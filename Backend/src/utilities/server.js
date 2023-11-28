@@ -184,7 +184,14 @@ class CustomServer {
 
     // creating the server
     this.server = http.createServer(async (req, res) => {
+
       const method = req.method;
+      const parsedURL = url.parse(req.url, true);
+      req.queryParameters = parsedURL.query;
+      // parsing the cookies
+      this.parseCookies(req);
+      res.setHeader('Access-Control-Allow-Origin', '*'); 
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
       if (method == 'GET' && req.url.split('?')[0].match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
@@ -287,6 +294,7 @@ class CustomServer {
         }
       }
     });
+
 
     // basic error handler
     this.server.on('error', (err) => {
@@ -396,5 +404,5 @@ class CustomServer {
     this.server.listen(port, callback);
   }
 }
-
+// CustomServer.use(cors());
 module.exports = {CustomServer, CustomResponse, CustomRequest, CustomRoutes};

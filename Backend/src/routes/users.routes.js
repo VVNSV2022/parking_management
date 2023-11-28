@@ -9,13 +9,13 @@ const response = new CustomResponse();
 
 userRouter.post('/user/register', async (req, res) => {
   try {
-    const {email, password} = req.body;
+    const {email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber } = req.body;
 
-    if (!email || !password) {
-      return response.setResponse(res, {message: 'Missing email or password', error: true}, 400);
+    if (!email || !password || !username || !dob || !licenseNumber || isDisabled === undefined || !currentAddress || !permanentAddress || !phoneNumber) {
+      return response.setResponse(res, {message: 'Missing required fields', error: true}, 400);
     }
 
-    const result = await registerUser(email, password);
+    const result = await registerUser(email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber);
 
     if (result.userId) {
       return response.setResponse(res, {message: 'Registration successful', userId: result.userId}, 200);

@@ -28,8 +28,8 @@ async function createReservation(userID, startTime, endTime, parkingLotID, permi
   try {
     startTime = new Date(startTime);
     endTime = new Date(endTime);
-
-    if (!((endTime>startTime) && (startTime.getTime()>new Date().getTime()))) { // also set time limit upto 7days something
+    const currentTime = new Date();
+    if (!((endTime > startTime) && (startTime.getTime() > (currentTime.getTime()-18000000)))) { // also set time limit up to 7 days something
       return {message: 'Invalid Times are sent', success: false};
     }
     if (!['membership', 'hourly', 'daily'].includes(permitType)) {
@@ -57,7 +57,6 @@ async function createReservation(userID, startTime, endTime, parkingLotID, permi
     } else {
       return {message: 'Invalid permit type', success: false};
     }
-
     const vehicleResult = await verifyVehicleID(userID, vehicleID);
     if (!vehicleResult.success) {
       return {message: 'Invalid Vehicle ID', success: false};
