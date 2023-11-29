@@ -342,9 +342,6 @@ async function checkin(userID, reservationID) {
     if (result[0].reservationStatus === 'active') {
       return {message: 'reservation is already active', success: false};
     }
-    if (result[0].reservationStatus === 'cancelled') {
-      return {message: 'reservation is cancelled', success: false};
-    }
     const reservationTime = result[0].startTime.toDate().getTime();
     const currentTime = new Date().getTime();
     if (currentTime < reservationTime) {
@@ -381,9 +378,6 @@ async function checkout(userID, reservationID) {
     }
     if (!(result[0].userID === userID)) {
       return {message: 'you do not have access to edit this reservation', success: false};
-    }
-    if (result[0].reservationStatus === 'cancelled') {
-      return {message: 'reservation is cancelled', success: false};
     }
     if (result[0].reservationStatus === 'inactive') {
       return {message: 'reservation is not active you cannot check out', success: false};

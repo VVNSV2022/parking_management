@@ -114,7 +114,7 @@ async function addNewVehicle(userID, licensePlateNumber, vehicleMake, vehicleMod
     }
     const result = await addVehicle(data);
     if (result) {
-      return {message: 'vehicle is added successfully', success: true};
+      return {message: 'vehicle is added successfully', success: true, data: vehicleID};
     }
     return {message: 'vehicle is failed to add', success: false};
   } catch (err) {

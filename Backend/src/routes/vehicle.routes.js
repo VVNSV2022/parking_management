@@ -4,7 +4,7 @@ const {addNewVehicle, getVehicleByID, getVehiclesByUser, deleteVehicle} = requir
 
 const vehicleRouter = new CustomRoutes();
 const response = new CustomResponse();
-
+const authenticateToken = require('../utilities/authMiddleware');
 
 // add vehicle
 vehicleRouter.post('/api/vehicle', async (req, res) => {
@@ -22,7 +22,7 @@ vehicleRouter.post('/api/vehicle', async (req, res) => {
     }
     const vehicle = await addNewVehicle(userID, licensePlateNumber, vehicleMake, vehicleModel, vehicleColor, vehicleYear, VIN, ownersName, isVehicleInsured, isRental);
     if (vehicle.success) {
-      return response.setResponse(res, {message: vehicle.message, success: true, data: vehicle.data}, 200);
+      return response.setResponse(res, {message: vehicle.message, success: true, data: vehicle.data}, 201);
     }
     return response.setResponse(res, {message: vehicle.message, success: false}, 400);
   } catch (err) {

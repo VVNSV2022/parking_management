@@ -17,7 +17,7 @@ userRouter.post('/user/register', async (req, res) => {
 
     const result = await registerUser(email, password, username, dob, licenseNumber, isDisabled, currentAddress, permanentAddress, phoneNumber);
 
-    if (result.userId) {
+    if (result.userID) {
       return response.setResponse(res, {message: 'Registration successful', userId: result.userId}, 200);
     } else {
       console.log(result);

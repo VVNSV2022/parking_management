@@ -221,7 +221,7 @@ reservationRouter.put('/api/reservation/checkout', async (req, res)=>{
     // }
     const result = await checkout(userID, reservationID);
     if (result.success) {
-      return response.setResponse(res, {message: 'Checked out Successfully', error: false}, 200);
+      return response.setResponse(res, {message: 'Checked out Successfully', error: false}, 204);
     }
     return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (err) {

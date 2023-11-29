@@ -21,7 +21,7 @@ async function createUserWithEmailPassword(email, password, username, dob, licen
     await db.collection('users').doc(userId).set({
       email: email,
       hashedPassword: hashedPassword,
-      userId: userId,
+      userID: userId,
       username: username,
       dob: dob,
       licenseNumber: licenseNumber,

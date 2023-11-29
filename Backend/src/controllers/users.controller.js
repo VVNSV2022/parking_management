@@ -11,7 +11,7 @@ async function registerUser(email, password, username, dob, licenseNumber, isDis
     if (userId) {
       return {
         message: 'User registration successful',
-        userId: userId,
+        userID: userId,
         success: true,
       };
     }
