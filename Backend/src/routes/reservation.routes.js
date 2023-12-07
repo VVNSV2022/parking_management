@@ -96,7 +96,7 @@ reservationRouter.delete('/api/reservation', async (req, res)=>{
     //   return response.setResponse(res, {message: 'Unauthorized', error: true}, 401);
     // }
 
-    const result = await deleteReservation(userID, reservationID);
+    const result = await deleteReservation(userID, reservationID, false);
     if (result.success) {
       return response.setResponse(res, {message: 'Deleted Reservation Successfully', error: false}, 200);
     }

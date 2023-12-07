@@ -2,6 +2,7 @@ const {CustomRoutes, CustomResponse} = require('../utilities/server');
 const {loginUser, logoutUser} = require('../controllers/users.controller');
 const url = require('url');
 const authenticateToken = require('../utilities/authMiddleware');
+const {deleteReservation} = require('../controllers/reservation.controller');
 
 const adminRouter = new CustomRoutes();
 const response = new CustomResponse();
@@ -62,6 +63,29 @@ adminRouter.get('/admin/reservation', authenticateToken, async (req, res) => {
     return response.setResponse(res, {message: err.message, error: true}, 400);
   }
 });
+
+adminRouter.delete('/api/admin/reservation', async (req, res) => {
+  try {
+    // Assuming authenticateAdmin is a middleware to authenticate admin users
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
+    const { userID, reservationID } = req.body;
+    if (!reservationID) {
+      return response.setResponse(res, {message: 'Missing reservation ID', success: false}, 400);
+    }
+
+    const result = await deleteReservation(userID, reservationID, true); // Pass true for isAdmin
+    return response.setResponse(res, result.message, result.success ? 200 : 400);
+  } catch (err) {
+    console.error('Error in admin reservation deletion: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
+
 
 
 module.exports = adminRouter;

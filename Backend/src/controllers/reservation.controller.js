@@ -229,28 +229,36 @@ async function updateReservation(userID, reservationID, startTime='', endTime=''
 /**
  *
  * @param {string} userID
- * @param {atring} reserationID
+ * @param {atring} reservationID
  * @return {object} result
  */
-async function deleteReservation(userID, reserationID) {
-  const result = await getReservation(reserationID);
+async function deleteReservation(userID, reservationID, isAdmin=false) {
+  const result = await getReservation(reservationID);
   if (!result) {
     return {message: 'we cannot find the reservation id in our database', success: false};
   }
-  if (!(result[0].userID === userID)) {
+  if (!isAdmin && !(result[0].userID === userID)) {
     return {message: 'you do not have access to edit this reservation', success: false};
   }
-  if (result[0].reservationStatus === 'active') {
+  if (!isAdmin && result[0].reservationStatus === 'active') {
     return {message: 'you cannot delete an active reservation', success: false};
   }
+
   const reservationTime = result[0].startTime.toDate().getTime();
   const currentTime = new Date().getTime();
+  const oneHour = 3600000; // One hour in milliseconds
 
-  if ((reservationTime - currentTime)<3600000) {
+  // Regular users can only delete reservations more than one hour before the start time
+  if (!isAdmin && (reservationTime - currentTime) < oneHour) {
     return {message: 'Time is expired to delete the reservation', success: false};
   }
+
+  // Admins can delete reservations until the start time
+  if (isAdmin && currentTime >= reservationTime) {
+    return {message: 'Cannot delete past or ongoing reservations', success: false};
+  }
   // delete the reservation and refund the money if possible
-  const deletedResult = await deleteDetails(reserationID);
+  const deletedResult = await deleteDetails(reservationID);
   if (deletedResult) {
     if (result[0].isMembership) {
       return {message: 'Successfully deleted the reservation', success: true};
@@ -288,13 +296,13 @@ async function getReservationsByUser(userID) {
 
 /**
  *
- * @param {string} reserationID - id of the user
+ * @param {string} reservationID - id of the user
  * @return {object} result
  */
-async function getReservationsByID(reserationID) {
+async function getReservationsByID(reservationID) {
   // we need to get the vehicle info and payment info for that
   try {
-    const result = await getReservation(reserationID);
+    const result = await getReservation(reservationID);
     if (result) {
       return {message: 'successfully got the reservation data for the user', data: result, success: true};
     }
