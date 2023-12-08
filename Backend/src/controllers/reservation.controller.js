@@ -1,6 +1,6 @@
 const {v4: uuidv4} = require('uuid');
 
-const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation, getAllReservations} = require('../thirdParty/reservation.firestore.js');
+const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation, getAllReservations, checkOverlappingReservations, getPenaltyAmount} = require('../thirdParty/reservation.firestore.js');
 const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
 const {updatePaymentIntent} = require('../thirdParty/StripeAPI.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
@@ -380,6 +380,8 @@ async function checkout(userID, reservationID) {
   // call the payment Intent confirmation.
   // update the reservation status to complete, add checkout time
   //
+    let overstay = false;
+    let penalty = false;
     const result = await getReservation(reservationID);
     if (!result) {
       return {message: 'we cannot find the reservation id in our database', success: false};
@@ -401,6 +403,7 @@ async function checkout(userID, reservationID) {
     if (currentTime <= reservationTime) {
       price = result[0].price;
     } else {
+      overstay = true;
       const parkingResult = await verifyParkingLotID(result[0].parkingLotID);
       if (!parkingResult) {
         return {message: 'Invalid parkingLot ID', success: false};
@@ -412,6 +415,19 @@ async function checkout(userID, reservationID) {
       price = result[0].price + extraAmount;
       changeAmount = true;
     }
+
+    // Check for overlapping reservations
+    const overlappingReservations = await checkOverlappingReservations(reservationID, result[0].parkingLotID, currentTime);
+    if (overlappingReservations) {
+      penalty = true;
+      const penaltyDetails = await getPenaltyAmount(result[0].parkingLotID); // Fetch penalty from parkingLots collection
+      if (penaltyDetails) {
+        price += penaltyDetails.penaltyAmount; // Add penalty to the total price
+      } else {
+        return {message: 'Details missings for penalty Calculation', success: false};
+      }
+    }
+
     // if membership then there is no payment
     // else then there will be a payment so we need to update the payment intent
     if (!result[0].isMembership) {
@@ -422,7 +438,8 @@ async function checkout(userID, reservationID) {
       }
     }
 
-    const updatedResult = await updateDetails(reservationID, {reservationStatus: 'complete', paymentStatus: 'complete', price: price, checkoutTime: currentFirestoreTimestamp()});
+    const remarksUpdate = overstay && penalty ? {remarks: 'overstay,penalty'} : overstay ? {remarks: 'overstay'} : {};
+    const updatedResult = await updateDetails(reservationID, {reservationStatus: 'complete', paymentStatus: 'complete', price: price, checkoutTime: currentFirestoreTimestamp(), remarksUpdate});
     if (updatedResult) {
       return {message: 'Successfully checked out the user for the reservation', success: true};
     }

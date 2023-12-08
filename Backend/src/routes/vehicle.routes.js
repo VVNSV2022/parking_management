@@ -4,7 +4,6 @@ const {addNewVehicle, getVehicleByID, getVehiclesByUser, deleteVehicle} = requir
 
 const vehicleRouter = new CustomRoutes();
 const response = new CustomResponse();
-const authenticateToken = require('../utilities/authMiddleware');
 
 // add vehicle
 vehicleRouter.post('/api/vehicle', async (req, res) => {

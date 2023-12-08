@@ -237,4 +237,67 @@ async function getAllReservations() {
   }
 }
 
-module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations, getAllReservations};
+// thirdParty/reservations.firestore.js
+
+/**
+ * Checks for overlapping reservations.
+ * 
+ * @param {string} currentReservationID The ID of the current reservation
+ * @param {string} parkingLotID The ID of the parking lot to check for overlapping reservations
+ * @param {number} currentTime The current time in milliseconds
+ * @return {Promise<boolean>} True if there is an overlapping reservation, false otherwise
+ */
+async function checkOverlappingReservations(currentReservationID, parkingLotID, currentTime) {
+  try {
+    const reservationRef = db.collection('reservations');
+    const overlappingReservationsSnapshot = await reservationRef
+      .where('parkingLotID', '==', parkingLotID)
+      .where('reservationID', '!=', currentReservationID)
+      .get();
+
+    if (overlappingReservationsSnapshot.empty) {
+      return false;
+    }
+
+    let isOverlap = false;
+    overlappingReservationsSnapshot.forEach((doc) => {
+      const reservation = doc.data();
+      const startTime = reservation.startTime.toDate().getTime();
+      const endTime = reservation.endTime.toDate().getTime();
+
+      if (currentTime >= startTime && currentTime <= endTime) {
+        isOverlap = true;
+      }
+    });
+
+    return isOverlap;
+  } catch (err) {
+    console.error('Error occurred while checking overlapping reservations: ', err.message);
+    throw err;
+  }
+}
+
+
+/**
+ * Retrieves the penalty amount for a given parking lot.
+ * 
+ * @param {string} parkingLotID
+ * @return {Promise<number>}
+ */
+async function getPenaltyAmount(parkingLotID) {
+  try {
+    const parkingLotRef = db.collection('parkingLots').doc(parkingLotID);
+    const doc = await parkingLotRef.get();
+    if (!doc.exists) {
+      console.log('No such parking lot found!');
+      return null;
+    }
+    const parkingLotData = doc.data();
+    return parkingLotData.penalties || null;
+  } catch (err) {
+    console.error('Error occurred while getting penalty amount: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations, getAllReservations, checkOverlappingReservations, getPenaltyAmount};
