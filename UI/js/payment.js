@@ -1,25 +1,14 @@
-//const userID = "12345678"
-//localStorage.setItem('userID', '12345678');
-
-
-// const userID = localStorage.getItem('userID');
-// const amount = 5
-// const accessToken = getAccessToken()
-
-//const cookie = require('cookie');
-
 let userID;
 let accessToken;
 const amount = 5
 let stripe;
 let elements;
 let cardElement;
-localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIwMDQ2MzYsImV4cCI6MTcwMjAwNTUzNn0.CHkAVFvQRiGBw42CqRro2hq6SUvFG8d6tVqcN0ha6ZY');
+localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIwNjQ0MjksImV4cCI6MTcwMjA2NTMyOX0.85WOSs_A8K2flJLmygE2yEkJupdFXVpY2Xum3tcJwQs');
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     userID = localStorage.getItem('userID');
-    //const accessToken = await getAccessToken();
     accessToken = localStorage.getItem('accessToken');
     populateSavedCards(userID, accessToken);
     initStripe();
@@ -28,47 +17,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-
 function initStripe() {
   stripe = Stripe('pk_test_51O5BKpIML3jMLAcettZqNVnL1vsrfiNDEevn85N5pAKJdhKcGdIBL65tXBI6K9pf2ZQr4Mr2nos18TNPyOkq6tU700jTjo4Kjw');
   elements = stripe.elements();
-  cardElement = elements.create('card');
+  var cardElementStyle = {
+    base: {
+      fontSize: '13px',
+    },
+    invalid: {
+      iconColor: '#FF0000',
+      color: '#FF0000',
+    },
+  };
+
+  cardElement = elements.create('card', { style: cardElementStyle });
   cardElement.mount('#cardElement');
-}
-
-async function getAccessToken() {
-  try {
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: 'balusairam262gmail.com',
-        password: 'balusairam',
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to fetch access token: ${errorData.message}`);
-    }
-
-    // Assuming 'accessToken' is the cookie name
-    const accessToken = getCookie('accessToken');
-
-    console.log('Access Token:', accessToken);
-
-    return accessToken;
-  } catch (error) {
-    console.error('Error fetching access token:', error.message);
-    throw error;
-  }
-}
-
-function getCookie(cookieName) {
-  const cookies = cookie.parse(document.cookie);
-  return cookies[cookieName] || null;
 }
 
 
@@ -106,9 +69,6 @@ async function populateSavedCards(userID, accessToken) {
 // Save user's payment method
 async function saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken) {
   try {
-    //const accessToken = '8bG72JkLsd92k3L8s91ldKk29sKsjL38Dlskfj29D';
-    //  http://127.0.0.1:4000/payments/create
-    //'http://localhost:4000/payments/create'
     const response = await fetch('/payments/create', {
       method: 'POST',
       headers: {
@@ -133,7 +93,6 @@ async function saveUserPayment(userID, paymentType, paymentMethodID, billingDeta
 // Make a payment
 async function makeUserPayment(userID, amount, description, savedPaymentMethodID, accessToken) {
   try {
-    //const accessToken = '8bG72JkLsd92k3L8s91ldKk29sKsjL38Dlskfj29D';
     const response = await fetch('http://localhost:4000/payments/makePayment', {
       method: 'POST',
       headers: {
@@ -160,8 +119,6 @@ async function makeUserPayment(userID, amount, description, savedPaymentMethodID
 // Get user's saved payment methods
 async function getUserPayment(userID, accessToken) {
   try {
-    //const accessToken = '8bG72JkLsd92k3L8s91ldKk29sKsjL38Dlskfj29D'; 
-    //http://localhost:4000/payments/?userID=${userID}
     const response = await fetch(`/payments/?userID=${userID}`, {
       method: 'GET',
       headers: {
@@ -205,84 +162,8 @@ function handleRepeatPayment() {
   makeUserPayment(userID, amount, "sample", savedPaymentMethodID, accessToken);
 }
 
-// async function handlePaymentMethod(userID, paymentType, billingDetails, accessToken) {
-//   try {
-//     const stripe = Stripe('pk_test_51O5BKpIML3jMLAcettZqNVnL1vsrfiNDEevn85N5pAKJdhKcGdIBL65tXBI6K9pf2ZQr4Mr2nos18TNPyOkq6tU700jTjo4Kjw'); 
-//     const cardElement = document.getElementById('card-number');
-
-//     const { token, error } = await stripe.createToken(cardElement);
-//     console.log(token, error);
-//     if (error) {
-//       console.error('Error creating token:', error.message);
-//       return;
-//     }
-//     const paymentToken = token.id;
-
-//     // Calling the function to create a payment method
-//     const createdPaymentMethod = await saveUserPayment(userID, paymentType, paymentToken, billingDetails, accessToken);
-
-//     if (createdPaymentMethod) {
-//       const description = 'sample';
-//       await makeUserPayment(userID, amount, description, createdPaymentMethod.id, accessToken);
-//     }
-//   } catch (error) {
-//     console.error('Error:', error.message);
-//   }
-// }
-
-
-//trails
-// async function handlePaymentMethod(userID, paymentType, billingDetails, accessToken) {
-//   try {
-//     const stripe = Stripe('pk_test_51O5BKpIML3jMLAcettZqNVnL1vsrfiNDEevn85N5pAKJdhKcGdIBL65tXBI6K9pf2ZQr4Mr2nos18TNPyOkq6tU700jTjo4Kjw'); 
-//     const elements = stripe.elements();
-//     const cardElement = elements.create('card');
-
-//     const { paymentMethod, error } = await stripe.createPaymentMethod({
-//       type: paymentType,
-//       card: cardElement,
-//       billing_details: billingDetails,
-//     });
-
-//     if (error) {
-//       console.error('Error creating Payment Method:', error.message);
-//       return;
-//     }
-
-//     const paymentMethodID = paymentMethod.id;
-
-//     // Calling the function to create a payment method
-//     const createdPaymentMethod = await saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken);
-
-//     if (createdPaymentMethod) {
-//       const amount = getPaymentInfo.amount; // Make sure to define amount
-//       const description = 'sample';
-//       await makeUserPayment(userID, amount, description, createdPaymentMethod.id, accessToken);
-//     }
-//   } catch (error) {
-//     console.error('Error:', error.message);
-//   }
-// }
-
-
-//trails2
 async function handlePaymentMethod(userID, paymentType, billingDetails, accessToken) {
   try {
-    // const stripe = Stripe('pk_test_51O5BKpIML3jMLAcettZqNVnL1vsrfiNDEevn85N5pAKJdhKcGdIBL65tXBI6K9pf2ZQr4Mr2nos18TNPyOkq6tU700jTjo4Kjw');
-    // const elements = stripe.elements();
-
-
-    // const cardElement = document.getElementById('card-number');
-    // console.log(cardElement);
-    // const cardElementValue = cardElement.value;
-    // console.log(cardElementValue);
-
-
-
-    // const cardElement = elements.create('card');
-    // cardElement.mount('#cardElement');
-
-    // Using billing details to create a Payment Method
     const { paymentMethod, error } = await stripe.createPaymentMethod({
       type: paymentType,
       card: cardElement,
@@ -300,15 +181,12 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, accessTo
     const paymentMethodID = paymentMethod.id;
     console.log(paymentMethodID)
     // await saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken);
-
-    // Function to make a payment using the saved payment method
-    // const amount = getPaymentInfo.amount; // Here I need TO FETCH the amount variable
     const amount = 5;
-    const description = 'sample';
+    const description = 'sample2';
     await makeUserPayment(userID, amount, description, paymentMethodID, accessToken);
+    alert('Transaction successful!');
 
     makeReservationAfterPayment(userID, paymentMethodID);
-
 
   } catch (error) {
     console.error('Error:', error.message);
@@ -316,7 +194,7 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, accessTo
 }
 
 async function makeReservationAfterPayment(userID, paymentID) {
-  // Fetch reservation data from the form
+  // Fetching reservation data from the form
   const startTime = document.getElementById('start-time').value; 
   const endTime = document.getElementById('end-time').value; 
   const parkingLotID = document.getElementById('parking-lot-id').value; 
@@ -357,4 +235,3 @@ async function makeReservationAfterPayment(userID, paymentID) {
     console.error('Error creating reservation:', error.message);
   }
 }
-
