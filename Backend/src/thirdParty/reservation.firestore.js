@@ -266,7 +266,7 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
     overlappingReservationsSnapshot.forEach((doc) => {
       const reservation = doc.data();
       const startTime = reservation.startTime.toDate().getTime();
-      const endTime = reservation.endTime.toDate().getTime();
+      const endTime = reservation.endTime.toDate().getTime(); 
 
       if (currentTime >= startTime && currentTime <= endTime) {
         isOverlap = true;
@@ -303,4 +303,32 @@ async function getPenaltyAmount(parkingLotID) {
   }
 }
 
-module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations, getAllReservations, checkOverlappingReservations, getPenaltyAmount};
+async function getReservationsWithinTimeFrame(parkingLotID, fromDate, toDate) {
+  try {
+    const reservationRef = db.collection('reservations');
+    const querySnapshot = await reservationRef
+      .where('parkingLotID', '==', parkingLotID)
+      .where('startTime', '>=', fromDate)
+      .get();
+
+    if (querySnapshot.empty) {
+      return [];
+    }
+
+    const reservations = [];
+    querySnapshot.forEach(doc => {
+      const reservation = doc.data();
+      if (reservation.endTime.toDate() <= toDate) {
+        reservations.push(reservation);
+      }
+    });
+
+    return reservations;
+  } catch (err) {
+    console.error('Error occurred while fetching reservations: ', err.message);
+    throw err;
+  }
+}
+
+
+module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations, getAllReservations, checkOverlappingReservations, getPenaltyAmount, getReservationsWithinTimeFrame};
