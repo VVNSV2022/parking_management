@@ -12,8 +12,8 @@ describe('Elevator API', () => {
       method: 'POST',
       json: true,
       body: {
-        licensePlate: 'WERTYU' 
-      }
+        licensePlate: 'WERTYU',
+      },
     };
 
     request(requestData, (error, response, body) => {
@@ -29,7 +29,7 @@ describe('Elevator API', () => {
       url: 'http://localhost:4000/api/elevator/scan-license-plate',
       method: 'POST',
       json: true,
-      body: {}
+      body: {},
     };
 
     request(requestData, (error, response, body) => {
@@ -45,8 +45,8 @@ describe('Elevator API', () => {
       method: 'POST',
       json: true,
       body: {
-        licensePlate: 'ABCD'
-      }
+        licensePlate: 'ABCD',
+      },
     };
 
     request(requestData, (error, response, body) => {

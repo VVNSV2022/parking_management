@@ -73,7 +73,7 @@ adminRouter.delete('/api/admin/reservation', async (req, res) => {
       return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
     }
 
-    const { userID, reservationID } = req.body;
+    const {userID, reservationID} = req.body;
     if (!reservationID) {
       return response.setResponse(res, {message: 'Missing reservation ID', success: false}, 400);
     }
@@ -85,7 +85,6 @@ adminRouter.delete('/api/admin/reservation', async (req, res) => {
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });
-
 
 
 module.exports = adminRouter;

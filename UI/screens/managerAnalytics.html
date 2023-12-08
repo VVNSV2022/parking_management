@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css/managerAnalytics.css">
+  <title>Analytics tab</title>
+</head>
+
+<body>
+  <div class="page-container">
+    <h1>Analytics Page</h1>
+
+    <div class="form-container">
+      <label for="regionDropdown">Select Region:</label>
+      <select id="regionDropdown">
+        <option value="" disabled selected>Select Region</option>
+      </select>
+
+      <label for="parkingLotDropdown">Select Parking Lot:</label>
+      <select id="parkingLotDropdown" disabled>
+        <option value="" disabled selected>Select Parking Lot</option>
+      </select>
+
+        <label for="startdate">Start Time:</label>
+        <input type="datetime-local" id="startdate" name="startdate" value="2023-12-08T00:00" step="300">
+        
+        <label for="enddate">End Time:</label>
+        <input type="datetime-local" id="enddate" name="enddate" value="2023-12-18T23:59" step="300">
+        
+        <label>
+            <input type="radio" name="timeRange" value="lastWeek" onchange="updateTimeRange()"> Last Week
+        </label>
+        <label>
+            <input type="radio" name="timeRange" value="lastMonth" onchange="updateTimeRange()"> Last Month
+        </label>
+      <button id="bookNowBtn">Get Analysis</button>
+    </div>
+  </div>
+
+  <script src="../js/managerAnalytics.js"></script>
+</body>
+
+</html>

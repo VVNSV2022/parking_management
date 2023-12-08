@@ -148,7 +148,7 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
       // // creating the payment method for the card usign the token
       // const newPaymentMethodResult = await stripe.paymentMethods.create(paymentInfo);
 
-       paymentIntentInfo.payment_method = newPaymentMethodID;
+      paymentIntentInfo.payment_method = newPaymentMethodID;
     }
     // write a code to create a payment Intent using the credit card token
     console.log('Executing the payment intent');
@@ -248,10 +248,9 @@ async function updatePaymentIntent(paymentIntentID, newAmount, changeAmount=true
 }
 
 async function attachCustomertoPM(customerID, paymentMethodID) {
-  try{
+  try {
 
-  }
-  catch(err){
+  } catch (err) {
 
   }
 }

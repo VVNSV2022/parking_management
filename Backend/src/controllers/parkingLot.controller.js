@@ -1,4 +1,4 @@
-const {getParkingLotID, getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
+const {getParkingLotID, getRegions, getParkingLotsInRegion} = require('../thirdParty/parkingLot.firestore');
 const {getReservationsByTime} = require('../thirdParty/reservation.firestore');
 
 /**
@@ -27,12 +27,11 @@ async function verifyParkingLotID(parkingLotID) {
 async function getRegionsAndParkingLots(regionId) {
   try {
     const parkingLots = await getParkingLotsInRegion(regionId);
-    const regionData = {
-      regionId: regionId,
-    };
     return {
-      region: regionData,
+      message: 'successfully fetched all regions and parking lots',
+      regionId: regionId,
       parkingLots: parkingLots,
+      success: true,
     };
   } catch (error) {
     console.error('Error occurred while fetching regions and parking lots: ', error.message);
@@ -73,4 +72,21 @@ async function verifyAndBookSlot(userID, parkingLotID, numberofParkingSpots, sta
   }
 }
 
-module.exports = {verifyParkingLotID, verifyAndBookSlot, getRegionsAndParkingLots};
+/**
+ *
+ * @return {object} regions
+ */
+async function getAllRegions() {
+  try {
+    const regions = await getRegions();
+    if (regions) {
+      return {message: 'successfully fetched all regions', success: true, regions: regions};
+    }
+    return {message: 'did not find any regions', success: false};
+  } catch (err) {
+    console.error('Error occured while fetching all regions: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {verifyParkingLotID, verifyAndBookSlot, getRegionsAndParkingLots, getAllRegions};

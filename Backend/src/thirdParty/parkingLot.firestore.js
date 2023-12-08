@@ -24,5 +24,50 @@ async function getParkingLotID(parkingLotID) {
   }
 }
 
+/**
+ * Get all the regions
+ * @return {object} regions
+ */
+async function getRegions() {
+  try {
+    const regionsRef = db.collection('region');
+    const regionsSnapshot = await regionsRef.get();
 
-module.exports = {getParkingLotID};
+    if (regionsSnapshot.empty) {
+      console.log('No matching documents');
+      return null;
+    }
+
+    const regions = [];
+    regionsSnapshot.forEach((doc) => {
+      regions.push(doc.data());
+    });
+    return regions;
+  } catch (err) {
+    console.error('Error occured while getting regions: ', err.message);
+    throw err;
+  }
+}
+
+async function getParkingLotsInRegion(regionId) {
+  try {
+    const parkingLotsRef = db.collection('ParkingLots');
+    const parkingLotsSnapshot = await parkingLotsRef.where('regionID', '==', regionId).get();
+
+    if (parkingLotsSnapshot.empty) {
+      console.log('No matching documents');
+      return null;
+    }
+
+    const parkingLots = [];
+    parkingLotsSnapshot.forEach((doc) => {
+      parkingLots.push(doc.data());
+    });
+    return parkingLots;
+  } catch (err) {
+    console.error('Error occured while getting parking lots in region: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {getParkingLotID, getRegions, getParkingLotsInRegion};

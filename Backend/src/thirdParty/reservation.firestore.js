@@ -241,7 +241,7 @@ async function getAllReservations() {
 
 /**
  * Checks for overlapping reservations.
- * 
+ *
  * @param {string} currentReservationID The ID of the current reservation
  * @param {string} parkingLotID The ID of the parking lot to check for overlapping reservations
  * @param {number} currentTime The current time in milliseconds
@@ -251,11 +251,11 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
   try {
     const reservationRef = db.collection('reservations');
     const overlappingReservationsSnapshot = await reservationRef
-      .where('parkingLotID', '==', parkingLotID)
-      .where('parkingSpot', '==', parkingSpot)
-      .where('reservationID', '!=', currentReservationID)
-      .where('reservationStatus', '!=', 'inactive')
-      .get();
+        .where('parkingLotID', '==', parkingLotID)
+        .where('parkingSpot', '==', parkingSpot)
+        .where('reservationID', '!=', currentReservationID)
+        .where('reservationStatus', '!=', 'inactive')
+        .get();
 
 
     if (overlappingReservationsSnapshot.empty) {
@@ -283,7 +283,7 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
 
 /**
  * Retrieves the penalty amount for a given parking lot.
- * 
+ *
  * @param {string} parkingLotID
  * @return {Promise<number>}
  */

@@ -41,7 +41,7 @@ async function createReservation(userID, startTime, endTime, parkingLotID, permi
     }
     let parsedPrice;
     if (permitType === 'hourly') {
-      // difference b/w start time and end time should be greater than or equal to 30 minutes and less than one day 
+      // difference b/w start time and end time should be greater than or equal to 30 minutes and less than one day
       if (!((endTime.getTime() - startTime.getTime()) >= 1800000 && (endTime.getTime() - startTime.getTime()) <= 86400000)) {
         return {message: 'Minimum Time slot is 30 mins and Max Time slot is one day using the hourly permit', success: false};
       }

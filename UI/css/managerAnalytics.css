@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .page-container {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  .form-container {
+    display: inline-block;
+    text-align: left;
+    margin-top: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  select {
+    width: 200px;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: not-allowed; /* Set cursor to "not-allowed" by default */
+    margin-top: 10px;
+    display: block; /* Ensure the button is displayed as a block element */
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Style for enabled button */
+  button:enabled {
+    cursor: pointer; /* Change cursor to pointer when button is enabled */
+  }
+  

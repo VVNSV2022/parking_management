@@ -51,7 +51,7 @@ describe('Payments Routes', ()=>{
       // Save the response data to the JSON file
       const responseData = body;
       console.log(responseData);
-     // paymentMethodID = responseData.data.paymentMethodID;
+      // paymentMethodID = responseData.data.paymentMethodID;
       expect(response.statusCode).toBe(201);
       done();
     });
