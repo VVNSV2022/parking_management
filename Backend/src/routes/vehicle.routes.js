@@ -1,5 +1,4 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const authenticateToken = require('../utilities/authMiddleware');
 
 const {addNewVehicle, getVehicleByID, getVehiclesByUser, deleteVehicle} = require('../controllers/vehicle.controller');
 
