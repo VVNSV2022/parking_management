@@ -253,10 +253,8 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
     const overlappingReservationsSnapshot = await reservationRef
         .where('parkingLotID', '==', parkingLotID)
         .where('parkingSpot', '==', parkingSpot)
-        .where('reservationID', '!=', currentReservationID)
         .where('reservationStatus', '!=', 'inactive')
         .get();
-
 
     if (overlappingReservationsSnapshot.empty) {
       return false;
@@ -264,6 +262,11 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
 
     let isOverlap = false;
     overlappingReservationsSnapshot.forEach((doc) => {
+      // Skip the current reservation
+      if (doc.id === currentReservationID) {
+        return;
+      }
+
       const reservation = doc.data();
       const startTime = reservation.startTime.toDate().getTime();
       const endTime = reservation.endTime.toDate().getTime(); 
@@ -279,6 +282,7 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
     throw err;
   }
 }
+
 
 
 /**
