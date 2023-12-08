@@ -1,0 +1,189 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    max-width: 800px;
+    margin: 20px auto;
+    justify-content: center;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #6b6b9e;
+    color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-right: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    border-bottom: 1px solid #fff;
+}
+
+.sidebar ul li:last-child {
+    border-bottom: none;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 20px;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #8a8acc;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+}
+
+/* User details */
+.user-details {
+    text-align: left;
+}
+
+.user-detail {
+    margin-bottom: 10px;
+}
+
+.update-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #6b6b9e;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.update-btn:hover {
+    background-color: #8a8acc;
+}
+
+/* Membership details */
+.membership-details {
+    text-align: left;
+}
+
+.membership-detail {
+    margin-bottom: 10px;
+}
+
+/* Vehicle details */
+.vehicle-details {
+    text-align: left;
+}
+
+.vehicle-detail {
+    margin-bottom: 20px;
+}
+
+.vehicle-info {
+    margin-bottom: 10px;
+}
+
+.vehicle-buttons {
+    text-align: center;
+}
+
+.add-btn,
+.delete-btn {
+    display: inline-block;
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #6b6b9e;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-btn:hover,
+.delete-btn:hover {
+    background-color: #8a8acc;
+}
+
+/* Add styles for the update form */
+#updateForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#updateForm label {
+    margin-bottom: 5px;
+}
+
+#updateForm input[type="text"] {
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+    /* Adjust width as needed */
+}
+
+#updateForm button[type="submit"] {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #6b6b9e;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#updateForm button[type="submit"]:hover {
+    background-color: #8a8acc;
+}
+
+/* Form styles */
+#paymentForm {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Input styles */
+#paymentForm input {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Submit button styles */
+#submitPayment {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+#submitPayment:hover {
+    background-color: #45a049;
+}
