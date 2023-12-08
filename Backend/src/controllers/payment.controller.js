@@ -170,7 +170,7 @@ async function savePaymentMethod(userID, paymentType, paymentMethodID, BillingDe
     if (!userResult) {
       return {message: 'user does not exists in our app', success: false};
     }
-    const result = await createPaymentMethod(userID, paymentType, paymentMethodID, BillingDetails, userResult.StripeCustomerID);
+    const result = await createPaymentMethod(userID, paymentMethodID, BillingDetails, userResult.StripeCustomerID);
     if (result) {
       delete result['livemode'];
       delete result['object'];

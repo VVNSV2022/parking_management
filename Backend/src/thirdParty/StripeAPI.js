@@ -38,28 +38,27 @@ async function createCustomer(userID, name, email, phone) {
 /**
  *
  * @param {string} userID - unique user id
- * @param {string} paymentType - type of the payment card or bank account
- * @param {object} paymentToken - details for the type of payment encrypted
+ * @param {object} paymentMethodID - details for the type of payment encrypted
  * @param {object} billingDetails -a ddress details
  * @param {string} customerID - unique customer id
  * @return {object} - paymentmethod
  */
-async function createPaymentMethod(userID, paymentType, paymentToken, billingDetails, customerID='') {
+async function createPaymentMethod(userID, paymentMethodID, billingDetails, customerID='') {
   try {
-    const paymentInfo = {
-      type: paymentType,
-      billing_details: billingDetails,
-      metadata: {
-        userID: userID,
-      },
-    };
-    if (paymentType=='card') {
-      paymentInfo.card = {token: paymentToken};
-    }// else {
-    //   paymentInfo.ach_debit = {token: paymentToken};
-    // }
-    // Create a Payment Method
-    const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
+    // const paymentInfo = {
+    //   type: paymentType,
+    //   billing_details: billingDetails,
+    //   metadata: {
+    //     userID: userID,
+    //   },
+    // };
+    // if (paymentType=='card') {
+    //   paymentInfo.card = {token: paymentToken};
+    // }// else {
+    // //   paymentInfo.ach_debit = {token: paymentToken};
+    // // }
+    // // Create a Payment Method
+    // const paymentMethod = await stripe.paymentMethods.create(paymentInfo);
     // customerID is created
     let stripeCustomerID = customerID;
     if (!customerID) {
@@ -68,7 +67,7 @@ async function createPaymentMethod(userID, paymentType, paymentToken, billingDet
     }
     // Attach the Payment Method to the Customer
     const attachedPaymentMethod = await stripe.paymentMethods.attach(
-        paymentMethod.id,
+        paymentMethodID,
         {customer: stripeCustomerID},
     );
     return attachedPaymentMethod;
