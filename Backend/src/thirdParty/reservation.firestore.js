@@ -269,7 +269,7 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
 
       const reservation = doc.data();
       const startTime = reservation.startTime.toDate().getTime();
-      const endTime = reservation.endTime.toDate().getTime(); 
+      const endTime = reservation.endTime.toDate().getTime();
 
       if (currentTime >= startTime && currentTime <= endTime) {
         isOverlap = true;
@@ -282,7 +282,6 @@ async function checkOverlappingReservations(currentReservationID, parkingLotID, 
     throw err;
   }
 }
-
 
 
 /**
@@ -311,16 +310,16 @@ async function getReservationsWithinTimeFrame(parkingLotID, fromDate, toDate) {
   try {
     const reservationRef = db.collection('reservations');
     const querySnapshot = await reservationRef
-      .where('parkingLotID', '==', parkingLotID)
-      .where('startTime', '>=', fromDate)
-      .get();
+        .where('parkingLotID', '==', parkingLotID)
+        .where('startTime', '>=', fromDate)
+        .get();
 
     if (querySnapshot.empty) {
       return [];
     }
 
     const reservations = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       const reservation = doc.data();
       if (reservation.endTime.toDate() <= toDate) {
         reservations.push(reservation);

@@ -1,6 +1,6 @@
 // const {fetchReservations} = require('../thirdParty/admin.firestore.js');
-const {getParkingLotID} = require('../thirdParty/parkingLot.firestore.js')
-const{getReservationsWithinTimeFrame} = require('../thirdParty/reservation.firestore.js')
+const {getParkingLotID} = require('../thirdParty/parkingLot.firestore.js');
+const {getReservationsWithinTimeFrame} = require('../thirdParty/reservation.firestore.js');
 
 // async function getReservations(startTime, endTime) {
 //   try {
@@ -36,7 +36,7 @@ async function getParkingStats(parkingLotID, fromDate, toDate) {
     const totalSpots = parkingLot.numberOfParkingSpots;
     const occupancyPercentage = (reservations.length / totalSpots) * 100;
 
-    const { overstayCount, penaltyCount } = calculateOverstayAndPenalty(reservations);
+    const {overstayCount, penaltyCount} = calculateOverstayAndPenalty(reservations);
     const overstayPercentage = (overstayCount / reservations.length) * 100;
     const penaltyPercentage = (penaltyCount / reservations.length) * 100;
 
@@ -47,9 +47,9 @@ async function getParkingStats(parkingLotID, fromDate, toDate) {
         occupancyPercentage,
         overstayPercentage,
         penaltyPercentage,
-        availabilityPercentage
+        availabilityPercentage,
       },
-      success: true
+      success: true,
     };
   } catch (err) {
     console.error('Error occurred while getting parking stats: ', err.message);
@@ -61,7 +61,7 @@ function calculateOverstayAndPenalty(reservations) {
   let overstayCount = 0;
   let penaltyCount = 0;
 
-  reservations.forEach(reservation => {
+  reservations.forEach((reservation) => {
     if (reservation.remarks) {
       if (reservation.remarks.includes('overstay')) {
         overstayCount += 1;
@@ -72,7 +72,7 @@ function calculateOverstayAndPenalty(reservations) {
     }
   });
 
-  return { overstayCount, penaltyCount };
+  return {overstayCount, penaltyCount};
 }
 
 

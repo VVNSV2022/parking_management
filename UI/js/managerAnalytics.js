@@ -28,14 +28,14 @@ function updateTimeRange() {
 document.addEventListener('DOMContentLoaded', function () {
 
     // logic for checking if the user is signed in
-    let isUserSignedIn = false;
-    const user = localStorage.getItem('user');
-    if(user){
-        isUserSignedIn = true;
-    }
-    else{
-        window.location.href = '/screens/login.html';
-    }
+    let isUserSignedIn = true;
+    // const user = localStorage.getItem('user');
+    // if(user){
+    //     isUserSignedIn = true;
+    // }
+    // else{
+    //     window.location.href = '/screens/login.html';
+    // }
   
     // Sample data
     const data = {
@@ -186,28 +186,68 @@ document.addEventListener('DOMContentLoaded', function () {
     const endTime = document.getElementById('enddate').value;
   
       if (isUserSignedIn) {
-        const selectedParkingLot = data.parkingLots.find(lot => lot.parkingLotID === selectedParkingLotId);
         let accessToken = localStorage.getItem('accessToken');
-        fetch('/admin/analytics', {
+        console.log(selectedRegion, selectedParkingLotId, startTime, endTime)
+        fetch('/api/admin/get-parking-stats', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${accessToken}`, 
             },
             body: JSON.stringify({
-              regionId: selectedRegion,
-              parkingLotId: selectedParkingLotId,
-              startTime: startTime,
-              endTime: endTime
+              parkingLotID: selectedParkingLotId,
+              fromDate: startTime,
+              toDate: endTime
             })
           }).then(response => response.json())
             .then(data => {
               console.log(data);
               if(data.success == true || data.error == false){
                 localStorage.setItem('analytics', JSON.stringify(data));
+                console.log(window.barChart)
+              if(window.barChart){
+                console.log('destroying chart')
+                  window.barChart.destroy();
               }
+                var ctx = document.getElementById('myBarChart').getContext('2d');
+                var barplotdata = {
+                  labels: Object.keys(data.data),
+                  datasets: [{
+                      label: 'Percentage',
+                      data: Object.values(data.data),
+                      backgroundColor: [
+                          'rgba(75, 192, 192, 0.2)',
+                          'rgba(255, 99, 132, 0.2)',
+                          'rgba(255, 205, 86, 0.2)',
+                          'rgba(54, 162, 235, 0.2)'
+                      ],
+                      borderColor: [
+                          'rgba(75, 192, 192, 1)',
+                          'rgba(255, 99, 132, 1)',
+                          'rgba(255, 205, 86, 1)',
+                          'rgba(54, 162, 235, 1)'
+                      ],
+                      borderWidth: 1
+                  }]
+              };
+                var barChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: barplotdata,
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100
+                                }
+                            }
+                        }
+                    });
+                window.barChart = barChart;
+
+              }
+            }).catch(err => {
+              console.log(err.message);
             });
-        console.log(`Booking ${selectedParkingLot.parkingLotName} in ${selectedRegion}`);
       }
     });
     // Initial population of the region dropdown

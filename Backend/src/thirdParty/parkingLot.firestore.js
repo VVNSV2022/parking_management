@@ -58,11 +58,11 @@ async function getParkingLotsInRegion(regionId) {
       console.log('No matching documents');
       return null;
     }
-
     const parkingLots = [];
     parkingLotsSnapshot.forEach((doc) => {
       parkingLots.push(doc.data());
     });
+    console.log(parkingLots)
     return parkingLots;
   } catch (err) {
     console.error('Error occured while getting parking lots in region: ', err.message);

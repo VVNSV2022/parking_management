@@ -22,4 +22,6 @@ async function getMembershipsByRegion(regionID) {
   }
 }
 
+
+
 module.exports = {getMembershipsByRegion};

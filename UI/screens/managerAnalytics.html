@@ -7,6 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css/managerAnalytics.css">
   <title>Analytics tab</title>
+  <style>
+    body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+     .chart {
+            width: 500px;
+            height: 500px;
+        }
+  </style>
 </head>
 
 <body>
@@ -38,8 +51,11 @@
         </label>
       <button id="bookNowBtn">Get Analysis</button>
     </div>
+    <div class="chart">
+      <canvas id="myBarChart" width="400" height="400"></canvas>
+    </div>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../js/managerAnalytics.js"></script>
 </body>
 

@@ -3,7 +3,7 @@ const {loginUser, logoutUser} = require('../controllers/users.controller');
 const url = require('url');
 const authenticateToken = require('../utilities/authMiddleware');
 const {deleteReservation} = require('../controllers/reservation.controller');
-const {getParkingStats} = require('../controllers/admin.controller')
+const {getParkingStats} = require('../controllers/admin.controller');
 
 const adminRouter = new CustomRoutes();
 const response = new CustomResponse();
@@ -96,7 +96,7 @@ adminRouter.post('/api/admin/get-parking-stats', async (req, res) => {
       return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
     }
 
-    const { parkingLotID, fromDate, toDate } = req.body;
+    const {parkingLotID, fromDate, toDate} = req.body;
     if (!parkingLotID || !fromDate || !toDate) {
       return response.setResponse(res, {message: 'Missing required fields', success: false}, 400);
     }
@@ -111,8 +111,6 @@ adminRouter.post('/api/admin/get-parking-stats', async (req, res) => {
     return response.setResponse(res, {message: 'Internal Server Error'}, 500);
   }
 });
-
-
 
 
 module.exports = adminRouter;
