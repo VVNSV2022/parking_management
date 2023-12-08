@@ -247,13 +247,16 @@ async function getAllReservations() {
  * @param {number} currentTime The current time in milliseconds
  * @return {Promise<boolean>} True if there is an overlapping reservation, false otherwise
  */
-async function checkOverlappingReservations(currentReservationID, parkingLotID, currentTime) {
+async function checkOverlappingReservations(currentReservationID, parkingLotID, parkingSpot, currentTime) {
   try {
     const reservationRef = db.collection('reservations');
     const overlappingReservationsSnapshot = await reservationRef
       .where('parkingLotID', '==', parkingLotID)
+      .where('parkingSpot', '==', parkingSpot)
       .where('reservationID', '!=', currentReservationID)
+      .where('reservationStatus', '!=', 'inactive')
       .get();
+
 
     if (overlappingReservationsSnapshot.empty) {
       return false;

@@ -417,7 +417,7 @@ async function checkout(userID, reservationID) {
     }
 
     // Check for overlapping reservations
-    const overlappingReservations = await checkOverlappingReservations(reservationID, result[0].parkingLotID, currentTime);
+    const overlappingReservations = await checkOverlappingReservations(reservationID, result[0].parkingLotID, result[0].parkingSpot, currentTime);
     if (overlappingReservations) {
       penalty = true;
       const penaltyDetails = await getPenaltyAmount(result[0].parkingLotID); // Fetch penalty from parkingLots collection
