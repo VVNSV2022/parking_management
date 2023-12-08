@@ -1,6 +1,5 @@
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
 const {getUserPaymentMethods, savePaymentMethod, deletePM, makePayment, refundPaidPayment, updatePaymentAmount} = require('../controllers/payment.controller');
-const authenticateToken = require('../utilities/authMiddleware');
 const paymentRouter = new CustomRoutes();
 const response = new CustomResponse();
 
