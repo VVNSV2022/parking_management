@@ -360,7 +360,7 @@ async function checkin(userID, reservationID) {
     }
     const reservationTime = result[0].startTime.toDate().getTime();
     const currentTime = new Date().getTime();
-    if (currentTime < reservationTime) {
+    if ((currentTime - 18000000) < reservationTime) {
       return {message: 'reservation time is is not started yet can you please wait for some time', success: false};
     }
     const updatedResult = await updateDetails(reservationID, {reservationStatus: 'active', checkinTime: currentFirestoreTimestamp()});
