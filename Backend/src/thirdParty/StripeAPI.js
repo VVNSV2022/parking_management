@@ -139,17 +139,17 @@ async function makeOneTimePayment(userID, amount, description, savedpaymentMetho
       paymentIntentInfo.payment_method = savedpaymentMethodID;
       paymentIntentInfo.customer = customerID;
     } else if (newPaymentMethodID) {
-      const paymentInfo = {
-        type: newPaymentMethodType,
-        metadata: {
-          userID: userID,
-        },
-        card: {token: newPaymentMethodID},
-      };
-      // creating the payment method for the card usign the token
-      const newPaymentMethodResult = await stripe.paymentMethods.create(paymentInfo);
+      // const paymentInfo = {
+      //   type: newPaymentMethodType,
+      //   metadata: {
+      //     userID: userID,
+      //   },
+      //   card: {token: newPaymentMethodID},
+      // };
+      // // creating the payment method for the card usign the token
+      // const newPaymentMethodResult = await stripe.paymentMethods.create(paymentInfo);
 
-      paymentIntentInfo.payment_method = newPaymentMethodResult.id;
+       paymentIntentInfo.payment_method = newPaymentMethodID;
     }
     // write a code to create a payment Intent using the credit card token
     console.log('Executing the payment intent');
@@ -245,6 +245,15 @@ async function updatePaymentIntent(paymentIntentID, newAmount, changeAmount=true
   } catch (err) {
     console.log('Error occured while updating the paymentIntent using stripe: ', err.message);
     throw err;
+  }
+}
+
+async function attachCustomertoPM(customerID, paymentMethodID) {
+  try{
+
+  }
+  catch(err){
+
   }
 }
 

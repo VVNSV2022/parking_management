@@ -31,6 +31,7 @@ paymentRouter.get('/payments/', async (req, res)=>{
   }
 });
 
+// useless
 paymentRouter.post('/payments/create', async (req, res)=>{
   try {
     // authentication middleware
@@ -40,13 +41,13 @@ paymentRouter.post('/payments/create', async (req, res)=>{
       return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
     }
 
-    const {userID, paymentType, paymentToken, BillingDetails} = req.body;
+    const {userID, paymentType, paymentMethodID, BillingDetails} = req.body;
     // Check if all required values are present in the request body
-    if (!userID || !paymentType || !paymentToken || !BillingDetails) {
+    if (!userID || !paymentType || !paymentMethodID || !BillingDetails) {
       return response.setResponse(res, {message: 'Missing required fields', error: true}, 400);
     }
     // Pass the details to the controller for further processing
-    const result = await savePaymentMethod(userID, paymentType, paymentToken, BillingDetails);
+    const result = await savePaymentMethod(userID, paymentType, paymentMethodID, BillingDetails);
 
     // Handle the response from the controller
     if (result.success) {

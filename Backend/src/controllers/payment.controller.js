@@ -154,11 +154,11 @@ async function getUserPaymentMethods(userID) {
  *
  * @param {string} userID
  * @param {string} paymentType
- * @param {object} paymentToken
+ * @param {object} paymentMethodID
  * @param {object} BillingDetails
  * @return {object} result
  */
-async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetails) {
+async function savePaymentMethod(userID, paymentType, paymentMethodID, BillingDetails) {
   try {
     if (!['card', 'us_bank_account'].includes(paymentType)) {
       return {message: 'payment method is not valid', success: false};
@@ -170,7 +170,7 @@ async function savePaymentMethod(userID, paymentType, paymentToken, BillingDetai
     if (!userResult) {
       return {message: 'user does not exists in our app', success: false};
     }
-    const result = await createPaymentMethod(userID, paymentType, paymentToken, BillingDetails, userResult.StripeCustomerID);
+    const result = await createPaymentMethod(userID, paymentType, paymentMethodID, BillingDetails, userResult.StripeCustomerID);
     if (result) {
       delete result['livemode'];
       delete result['object'];
