@@ -41,12 +41,20 @@ async function createReservation(userID, startTime, endTime, parkingLotID, permi
     }
     let parsedPrice;
     if (permitType === 'hourly') {
+      // difference b/w start time and end time should be greater than or equal to 30 minutes and less than one day 
+      if (!((endTime.getTime() - startTime.getTime()) >= 1800000 && (endTime.getTime() - startTime.getTime()) <= 86400000)) {
+        return {message: 'Minimum Time slot is 30 mins and Max Time slot is one day using the hourly permit', success: false};
+      }
       const hourlyRate = parkingLotResult.hourlyRate;
       if (!hourlyRate) {
         return {message: 'Parking Lot does not have hourly rate', success: false};
       }
       parsedPrice = hourlyRate * ((endTime.getTime() - startTime.getTime())/3600000);
     } else if (permitType === 'daily') {
+      // difference b/w start time and end time should be greater than one day or equal to one day and less than 7 days
+      if (!((endTime.getTime() - startTime.getTime()) >= 86400000 && (endTime.getTime() - startTime.getTime()) <= 604800000)) {
+        return {message: 'Minimum Time Slot is one day and maximum time slot is one week using the daily permit', success: false};
+      }
       const dailyRate = parkingLotResult.dailyRate;
       if (!dailyRate) {
         return {message: 'Parking Lot does not have daily rate', success: false};
