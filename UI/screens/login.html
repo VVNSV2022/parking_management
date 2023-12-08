@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/login.css">
+  </head>
+  <body>
+    <h1 class="title">Rutgers Smart Park</h1>
+    <section class="user">
+      <div class="user_options-container">
+        <div class="user_options-text">
+          <div class="user_options-unregistered">
+            <h2 class="user_unregistered-title">
+              Don't have an account?
+            </h2>
+            <p class="user_unregistered-text">
+              If you don't have an account. Please Signup to register your account. 
+              If you already have an account then why are you still reading this?
+            </p>
+            <button
+              class="user_unregistered-signup"
+              id="signup-button"
+            >
+              Sign up
+            </button>
+          </div>
+
+          <div class="user_options-registered">
+            <h2 class="user_registered-title">
+              Have an account?
+            </h2>
+            <p class="user_registered-text">
+              If you already have an account. Then please move to login page. 
+              Else it's your lucky day Signup and have fun.
+            </p>
+            <button
+              class="user_registered-login"
+              id="login-button"
+            >
+              Login
+            </button>
+          </div>
+        </div>
+
+        <div class="user_options-forms" id="user_options-forms">
+          <div class="user_forms-login">
+            <h2 class="forms_title">Login</h2>
+            <form class="forms_form" onsubmit="login(event)">
+              <fieldset class="forms_fieldset">
+                <div class="forms_field">
+                  <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="Email"
+                    class="forms_field-input"
+                    required
+                    autofocus
+                  />
+                </div>
+                <div class="forms_field">
+                  <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="Password"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+              </fieldset>
+              <div class="forms_buttons">
+                <a
+                  href="resetPassword.html"
+                  class="forms_buttons-forgot"
+                >
+                  Forgot password?
+                </a>
+                <input
+                  type="submit"
+                  value="Log In"
+                  class="forms_buttons-action"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="user_forms-signup">
+            <h2 class="forms_title">Sign Up</h2>
+            <form class="forms_form" onsubmit="signup(event)">
+              <fieldset class="forms_fieldset">
+                <!-- Username -->
+                <div class="forms_field">
+                  <input
+                    id="username"
+                    type="text"
+                    placeholder="Username"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+                <!-- Email -->
+                <div class="forms_field">
+                  <input
+                    id="signupEmail"
+                    type="email"
+                    placeholder="Email"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+                <!-- Password -->
+                <div class="forms_field">
+                  <input
+                    id="signupPassword"
+                    type="password"
+                    placeholder="Password"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+                <!-- Confirm Password -->
+                <div class="forms_field">
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm Password"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+                <!-- DOB -->
+                <div class="forms_field">
+                  <input
+                    id="dob"
+                    type="text"
+                    placeholder="Date of Birth"
+                    class="forms_field-input"
+                    onfocus="(this.type='date')"
+                    onblur="(this.type='text')"
+                    required
+                  />
+                </div>
+                <!-- License Plate Number -->
+                <div class="forms_field">
+                  <input
+                    id="licenseNumber"
+                    type="text"
+                    placeholder="License Plate Number"
+                    class="forms_field-input"
+                    maxlength="7"
+                    required
+                  />
+                </div>
+                <!-- Current Address -->
+                <div class="forms_field">
+                  <input
+                    type="text"
+                    id="currentAddress"
+                    placeholder="Current Address"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+                <!-- Permanent Address -->
+                <div class="forms_field">
+                  <input
+                    id="permanentAddress"
+                    type="text"
+                    placeholder="Permanent Address"
+                    class="forms_field-input"
+                    required
+                  />
+                </div>
+                <!-- Phone Number -->
+                <div class="forms_field">
+                  <input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="Phone Number"
+                    class="forms_field-input"
+                    maxlength="10"
+                    required
+                  />
+                </div>
+                <!-- Disabled or not -->
+                <div class="forms_field forms_field-input" id="disabled">
+                  <span>Disabled</span>
+                  <input type="radio" id="disabledNo" name="disabled" value="false" checked>
+                  <label for="disabledNo">No</label>
+                  <input type="radio" id="disabledYes" name="disabled" value="true">
+                  <label for="disabledYes">Yes</label>
+                </div>
+              </fieldset>
+              <div class="forms_buttons">
+                <input
+                  type="submit"
+                  value="Sign Up"
+                  class="forms_buttons-action"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="../js/login.js"></script>
+  </body>
+</html>
