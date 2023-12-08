@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Reservation</title>
+    <link rel="stylesheet" href="../css/makeReservationStyle.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Make Reservation</h1>
+
+    <form id="reservationForm" action="payment.html" method="get">
+      <label for="start-time">Start Time:</label>
+      <input type="time" id="start-time" name="start-time" required>
+
+      <label for="end-time">End Time:</label>
+      <input type="time" id="end-time" name="end-time" required>
+
+      <label for="parking-lot-id">Parking Lot ID:</label>
+      <input type="text" id="parking-lot-id" name="parking-lot-id" required>
+
+      <label for="permit-type">Permit Type:</label>
+      <input type="text" id="permit-type" name="permit-type" required>
+
+      <label for="vehicle-id">Vehicle ID:</label>
+      <input type="text" id="vehicle-id" name="vehicle-id" required>
+
+      <!-- Change the button type to "submit" -->
+      <button type="submit">Make Reservation</button>
+    </form>
+  </div>
+
+  <script src="../js/payment.js"></script>
+
+</body>
+</html>

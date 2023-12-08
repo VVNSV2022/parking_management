@@ -12,19 +12,11 @@
     
     <!-- Card Details Form -->
     <form id="card-details-form">
-      <div>
-        <label for="card-number">Card or Account Number:</label>
+      <div id="cardinfo">Card Information</div>
+
+      <div id="cardElement">
+        <label for="card-number"> Stripe CARD</label>
         <input type="text" id="card-number" placeholder="Enter card number" required>
-      </div>
-      
-      <div>
-        <label for="expiry-date">Expiry Date:</label>
-        <input type="text" id="expiry-date" placeholder="MM/YY" required>
-      </div>
-      
-      <div>
-        <label for="cvc">CVC:</label>
-        <input type="text" id="cvc" placeholder="Enter CVC" required>
       </div>
 
       <!-- Billing Details -->
@@ -97,25 +89,5 @@
 
   <script src="https://js.stripe.com/v3/"></script>
   <script src="../js/payment.js"></script>
-  <script>
-    // This Function to handle payment amount and user ID from URL query parameters
-    function getPaymentInfo() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const paymentAmount = urlParams.get('amount');
-      const userID = urlParams.get('userID');
-
-      if (paymentAmount) {
-        document.getElementById('amount').textContent = paymentAmount;
-      }
-
-      if (userID) {
-        document.getElementById('userId').textContent = userID;
-      }
-    }
-    // Call the function on page load
-    window.onload = getPaymentInfo;
-  </script>
-
 </body>
 </html>
-

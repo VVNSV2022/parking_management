@@ -15,7 +15,7 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
-  max-width: 100%; /* Allow the form to be responsive */
+  max-width: 100%;
   transition: box-shadow 0.3s ease;
 }
 
@@ -34,8 +34,8 @@ input {
   margin-bottom: 16px;
   box-sizing: border-box;
   transition: border-color 0.3s ease;
-  border: 1px solid #ccc; /* Added border to input fields */
-  border-radius: 4px; /* Added border-radius to input fields */
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 input:hover,
@@ -59,7 +59,7 @@ button:hover {
 
 #saved-cards {
   margin-top: 20px;
-  background-color: #f9f9f9; /* Added background color to saved-cards section */
+  background-color: #f9f9f9;
   padding: 15px;
   border-radius: 8px;
 }
@@ -82,18 +82,24 @@ button:hover {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 10px;
-  margin-top: 0px; /* Adjusted margin-top */
+  margin-top: 0px;
+}
+
+#cardinfo {
+  grid-column: 1 / 2;
+  margin-bottom: 20px;
+  font-size: 18px; /* Added font size */
+  color: #555; /* Added color */
+}
+
+#billing-name {
+  grid-column: 1 / 2; /* Separate column for Name */
 }
 
 h1 {
   text-align: center;
-  color: #333; /* Set the color for the Payment Gateway text */
-  font-size: 24px; /* Set the font size as needed */
-  margin-bottom: 15px; /* Adjusted margin-bottom */
-  margin-top: 80px; 
-}
-
-#card-details-form label,
-#card-details-form input {
-  width: 100%;
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 30px;
+  margin-top: 80px;
 }
