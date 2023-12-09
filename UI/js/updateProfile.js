@@ -16,6 +16,7 @@ try {
                               streetNumber: document.getElementById('street').value,
                               state:document.getElementById('state').value,
                               aptUnit:document.getElementById('aptUnit').value,
+                              zipcode:document.getElementById('zipcode').value,
                           },
                           userID: userID
                        };
@@ -29,15 +30,13 @@ try {
                         });
 
                     if (response.ok) {
-                        console.log(response)
                         document.getElementById('result').innerHTML = '<p>Profile updated successfully!</p>';
                     } else {
-                        console.log(response)
                         document.getElementById('result').innerHTML = '<p>Failed to update profile. Please try again later.</p>';
                     }
                 } catch (error) {
                     console.error('Error within form submission:', error);
-                    document.getElementById('result').innerHTML = '<p>Error adding vehicle. Please try again later.</p>';
+                    document.getElementById('result').innerHTML = '<p>Error updating profile. Please try again later.</p>';
                 }
             });
         } else {
