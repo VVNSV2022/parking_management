@@ -1,15 +1,13 @@
 let userID;
-let accessToken;
-const amount = 5
+let token;
 let stripe;
 let elements;
 let cardElement;
-localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIwMDQ2MzYsImV4cCI6MTcwMjAwNTUzNn0.CHkAVFvQRiGBw42CqRro2hq6SUvFG8d6tVqcN0ha6ZY');
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     userID = localStorage.getItem('userID');
-    accessToken = localStorage.getItem('accessToken');
+    token = localStorage.getItem('token');
     initStripe();
   } catch (error) {
     console.error('Error:', error.message);
@@ -19,7 +17,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initStripe() {
   stripe = Stripe('pk_test_51O5BKpIML3jMLAcettZqNVnL1vsrfiNDEevn85N5pAKJdhKcGdIBL65tXBI6K9pf2ZQr4Mr2nos18TNPyOkq6tU700jTjo4Kjw');
   elements = stripe.elements();
-  cardElement = elements.create('card');
+  var cardElementStyle = {
+    base: {
+      fontSize: '13px',
+    },
+    invalid: {
+      iconColor: '#FF0000',
+      color: '#FF0000',
+    },
+  };
+
+  cardElement = elements.create('card', { style: cardElementStyle });
   cardElement.mount('#cardElement');
 }
 
@@ -42,10 +50,10 @@ function handlePayment() {
   };
   console.log(userID)
   console.log('Billing Details:', billingDetails);
-  handlePaymentMethod(userID, paymentType, billingDetails, accessToken);
+  handlePaymentMethod(userID, paymentType, billingDetails, token);
 }
 
-async function handlePaymentMethod(userID, paymentType, billingDetails, accessToken) {
+async function handlePaymentMethod(userID, paymentType, billingDetails, token) {
   try {
     // Using billing details to create a Payment Method
     const { paymentMethod, error } = await stripe.createPaymentMethod({
@@ -63,28 +71,28 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, accessTo
     // Here, paymentMethod.id represents the Payment Method ID
     const paymentMethodID = paymentMethod.id;
     console.log(paymentMethodID)
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
 
-   try {
-    const response = await fetch('/payments/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`, 
-      },
-      body: JSON.stringify({
-        userID: userID,
-        paymentType: paymentType,
-        paymentToken: paymentMethodID,
-        BillingDetails: billingDetails,
-      }),
-    });
+    try {
+      const response = await fetch('/payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, 
+        },
+        body: JSON.stringify({
+          userID: userID,
+          paymentType: paymentType,
+          paymentMethodID: paymentMethodID,
+          BillingDetails: billingDetails,
+        }),
+      });
 
-    const result = await response.json();
-    console.log(result);
-  } catch (error) {
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+} catch (error) {
     console.error('Error:', error.message);
   }
 }

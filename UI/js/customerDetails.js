@@ -1,5 +1,9 @@
-import { displayUpdateForm } from './updateProfile.js';
-import { displayAddVehicleForm } from './addVehicle.js';
+// import { displayUpdateForm } from './updateProfile.js';
+// import { displayAddVehicleForm } from './addVehicle.js';
+
+localStorage.setItem('userID','12345678');
+localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIxMzk2MTMsImV4cCI6MTcwMjE0MDUxM30.1tK2KXGtP9Vf6TPLJ06hTP_N3QK9OSCyi-i44i71T74')
+
 
 document.addEventListener("DOMContentLoaded", function() {
   const contentDiv = document.getElementById('content');
@@ -28,9 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
             <strong>Date of Birth:</strong> ${userData.dateOfBirth}
           </div>
           <div class="user-detail">
-            <strong>Phone Number:</strong> ${userData.phoneNumber}
-          </div>
-          <div class="user-detail">
             <strong>Is Disabled:</strong> ${userData.isDisabled}
           </div>
         
@@ -53,7 +54,9 @@ document.addEventListener("DOMContentLoaded", function() {
         
         const updateButton = document.querySelector('.update-btn');
         updateButton.addEventListener('click', function() {
-          displayUpdateForm(userData, userID);
+          // displayUpdateForm(userData, userID);
+          window.location.href = '../screens/updateProfile.html';
+
         });
     } catch (error) {
       console.error('Error fetching user details:', error);
@@ -64,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function() {
   membershipLink.addEventListener('click', async function(event) {
     event.preventDefault();
     try {
-      const userEmail = localStorage.getItem('userEmail');
       const userID = localStorage.getItem('userID');
       const membershipResponse = await fetch(`/user/membership?userID=${userID}`);
       const membershipData = await membershipResponse.json();
@@ -108,8 +110,15 @@ document.addEventListener("DOMContentLoaded", function() {
     event.preventDefault();
     try {
       const userID = localStorage.getItem('userID');
-      const vehiclesResponse = await fetch(`api/vehicles?userID=${userID}`);
-      const vehiclesData = await vehiclesResponse.json();
+      const token = localStorage.getItem('token');
+      const vehiclesResponse = await fetch(`/api/vehicles?userID=${userID}`,{
+        headers: {
+                'Authorization': `Bearer ${token}`
+        },
+      });
+      const vehiclesResult = await vehiclesResponse.json();
+      const vehiclesData=vehiclesResult.data;
+      console.log(vehiclesData);
 
       // Display vehicles data
       let vehiclesInfo = '';
@@ -138,36 +147,43 @@ document.addEventListener("DOMContentLoaded", function() {
               <button class="add-btn">Add</button>
             </div>
           </div>`;
-
-          const addButton = document.querySelector('.add-btn');
-          addButton.addEventListener('click', function() {
-            displayAddVehicleForm();
-          });
-
-          const deleteButtons = document.querySelectorAll('.delete-btn');
-          deleteButtons.forEach(button => {
-            button.addEventListener('click', async function() {
-              const vehicleID = button.getAttribute('data-vehicle-id');
-              try {
-                const response = await fetch(`/api/vehicle/${vehicleID,userID}`, {
-                  method: 'DELETE'
-                });
-                if (response.ok) {
-                  button.parentElement.style.display = 'none'; // Hide the deleted vehicle
-                } else {
-                  // Handle deletion failure
-                  console.error('Failed to delete vehicle');
-                }
-              } catch (error) {
-                console.error('Error deleting vehicle:', error);
-              }
-            });
-          });
-
-      } else {
-        vehiclesInfo = '<p>No vehicles found</p>';
-      } 
+      }else{
+        vehiclesInfo = `<p>No vehicles found</p>
+        <div class="vehicle-buttons">
+              <button class="add-btn">Add</button>
+        </div>`;
+      }
       contentDiv.innerHTML = vehiclesInfo;
+
+        const addButton = document.querySelector('.add-btn');
+        addButton.addEventListener('click', function() {
+          //displayAddVehicleForm();
+          window.location.href = '../screens/addVehicle.html';
+        });
+
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+          button.addEventListener('click', async function() {
+            const vehicleID = button.getAttribute('data-vehicle-id');
+            try {
+              const response = await fetch(`/api/vehicle?vehicleID=${vehicleID}&userID=${userID}`, {
+                headers: {
+                'Authorization': `Bearer ${token}`
+              },
+                method: 'DELETE'
+              });
+              if (response.ok) {
+                // button.parentElement.style.display = 'none'; // Hide the deleted vehicle
+                button.closest('.vehicle-detail').style.display = 'none';
+              } else {
+                // Handle deletion failure
+                console.error('Failed to delete vehicle');
+              }
+            } catch (error) {
+              console.error('Error deleting vehicle:', error);
+            }
+          });
+        });
     } catch (error) {
       console.error('Error fetching vehicles:', error);
       contentDiv.innerHTML = '<p>Error fetching vehicles. Please try again later.</p>';
@@ -180,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const userID = localStorage.getItem('userID');
       const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
 
-      const paymentResponse = await fetch(`/payments?userID=${userID}`, {
+      const paymentResponse = await fetch(`/payments/?userID=${userID}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -208,43 +224,53 @@ document.addEventListener("DOMContentLoaded", function() {
               <button class="add-payment-btn">Add</button>
             </div>
           </div>`;
+      } else {
+        paymentInfo = `<p>No payment methods found</p>
+          <div class="payment-buttons">
+            <button class="add-payment-btn">Add</button>
+          </div>`;
+      }
 
-        const addButton = document.querySelector('.add-payment-btn');
-        addButton.addEventListener('click', function() {
-          // Execute function from addPaymentMethod.js
-          window.location.href = '../screens/customerAddPaymentMethod.html'; // Redirect to customerAddPaymentMethod.html
-        });
+      contentDiv.innerHTML = paymentInfo;
 
-        const deleteButtons = document.querySelectorAll('.delete-payment-btn');
-        deleteButtons.forEach(button => {
-          button.addEventListener('click', async function() {
-            try {
-                let paymentMethodID=button.getAttribute('data-payment-id');
-                const response = await fetch(`/payments/delete/`, {
-                   headers: {
-                    'Authorization': `Bearer ${token}`
-                   },
-                  method: 'DELETE',
-                  body:JSON.stringify({userID,paymentMethodID})
-                });
-                if (response.ok) {
-                  button.parentElement.style.display = 'none'; // Hide the deleted payment method
-                } else {
-                  // Handle deletion failure
-                  console.error('Failed to delete payment method');
-                }
-              } catch (error) {
-                console.error('Error deleting vehicle:', error);
-              }
-          });
+      const addButton = document.querySelector('.add-payment-btn');
+      addButton.addEventListener('click', function() {
+        window.location.href = '../screens/customerAddPaymentMethod.html';
+      });
+
+      const deleteButtons = document.querySelectorAll('.delete-payment-btn');
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+          try {
+            console.log("delete button clicked");
+            console.log(userID);
+            let paymentMethodID = button.getAttribute('data-payment-id');
+            reqBody={
+              userID,paymentMethodID
+            };
+            const response = await fetch(`/payments/delete`, {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              method: 'DELETE',
+              body: JSON.stringify(reqBody)
+            });
+            if (response.ok) {
+              //button.parentElement.style.display = 'none'; // Hide the deleted payment method
+              button.closest('.payment-detail').style.display = 'none';
+            } else {
+              // Handle deletion failure
+              console.error('Failed to delete payment method');
+            }
+          } catch (error) {
+            console.error('Error deleting payment method:', error);
+          }
         });
-    } else {
-      paymentInfo = '<p>No payment methods found</p>';
-    } 
-    contentDiv.innerHTML = paymentInfo;
-  } catch (error) {
-    console.error('Error fetching payment methods:', error);
-    contentDiv.innerHTML = '<p>Error fetching payment methods. Please try again later.</p>';
-  }
-})
+      });
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      contentDiv.innerHTML = '<p>Error fetching payment methods. Please try again later.</p>';
+    }
+  });
 })
