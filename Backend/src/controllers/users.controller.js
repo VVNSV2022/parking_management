@@ -137,7 +137,7 @@ async function getAccountDetailsByCustomerId(customerId) {
  */
 async function updateAccountDetailsByCustomerId(userID, data) {
   try {
-    if ( (data.phoneNumber && !(/^\d{10}$/.test(phoneNumber)))||( data.currentAddress && !(isValidAddress(data.currentAddress)) ) ||(data.permanantAddress && !(isValidAddress(data.permanantAddress)))) {
+    if ( (data.phoneNumber && !(/^\d{10}$/.test(data.phoneNumber)))||( data.currentAddress && !(isValidAddress(data.currentAddress)) ) ||(data.permanantAddress && !(isValidAddress(data.permanantAddress)))) {
       return {message: 'Invalid data', success: false};
     }
     const userResult = await getUser(userID, '');

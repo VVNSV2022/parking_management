@@ -2,7 +2,7 @@
 // import { displayAddVehicleForm } from './addVehicle.js';
 
 localStorage.setItem('userID','12345678');
-localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIxMzk2MTMsImV4cCI6MTcwMjE0MDUxM30.1tK2KXGtP9Vf6TPLJ06hTP_N3QK9OSCyi-i44i71T74')
+localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIxNDAzNzcsImV4cCI6MTcwMjE0MTI3N30.r4GFbw5Ov0YFUoZ78W_cKh4GtN_2WkcufVjSWBI1s3E')
 
 
 document.addEventListener("DOMContentLoaded", function() {
