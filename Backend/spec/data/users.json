@@ -1,0 +1,22 @@
+{
+    "users": [
+      {
+        "customer_id": "1234589",
+        "username": "haarika",
+        "dateOfBirth": "10/13/1998",
+        "licenseNumber": "UGRDJ",
+        "isDisabled": false,
+        "address": {
+          "zipcode": 8904,
+          "streetNumber": "jgej",
+          "city": "Highland Park",
+          "state": "New Jersey",
+          "aptUnit": "Apt I"
+        },
+        "membership": "GOLD",
+        "password": "jkl764",
+        "email": "jkl764@gmail.com"
+      }
+    ]
+  }
+  
