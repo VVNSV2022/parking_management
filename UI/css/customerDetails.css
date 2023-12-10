@@ -16,7 +16,8 @@ body {
 
 .sidebar {
     width: 250px;
-    background-color: #6b6b9e;
+    /* background-color: #6b6b9e; */
+    background-color: #042331;
     color: #fff;
     border-radius: 10px;
     overflow: hidden;
@@ -50,7 +51,7 @@ body {
 
 .sidebar ul li {
     width: 100%;
-    text-align: center;
+    /* text-align: center; */
 }
 
 .sidebar ul li a {
@@ -124,8 +125,11 @@ body {
 }
 
 .user-detail span {
-    margin-left: 10px;
-    /* Adjust spacing between label and value */
+    flex: 1;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    /* Optional: Add a border for each value */
 }
 
 .update-btn {
@@ -144,18 +148,22 @@ body {
     background-color: #8a8acc;
 }
 
+.detail-value {
+    background-color: #042331;
+    color: #fff;
+    border-radius: 5px;
+    padding: 8px;
+    margin-bottom: 5px;
+}
 /* vehicles styling */
 
 .vehicle-details-container {
-    /* background-color: #6b6b9e; */
     background-color: transparent;
-        /* Remove the purple background */
     color: #fff;
     border-radius: 10px;
     padding: 20px;
     text-align: center;
     margin-top: 20px;
-    /* Adjust margin top */
 }
 
 .vehicle-details-heading {
@@ -170,12 +178,6 @@ body {
     border: 2px solid #8a8acc;
 }
 
-.vehicle-details-content {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
 .vehicle-detail {
     display: flex;
     flex-direction: column;
@@ -184,45 +186,28 @@ body {
     /* Optional: Add border for visual separation */
     border-radius: 8px;
     padding: 10px;
-    margin-bottom: 10px;
-    background-color: #6b6b9e; 
+    /* margin-bottom: 10px; */
+    background-color: #6b6b9e;
     width: 400px;
     /* Adjust the width as needed */
 }
 
-.vehicle-info {
-    margin-bottom: 5px;
+.vehicle-detail strong {
+    min-width: 150px;
+    /* Set a minimum width for labels for uniform alignment */
+    margin-right: 10px;
+    /* Add some margin between label and value */
 }
 
-.delete-btn {
-    margin-top: 10px;
-    padding: 8px 16px;
-    border: none;
+.vehicle-detail span {
+    flex: 1;
+    padding: 8px;
     border-radius: 5px;
-    background-color: #6b6b9e;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    border: 1px solid #ccc;
+    /* Optional: Add a border for each value */
 }
 
-.delete-btn:hover {
-    background-color: #8a8acc;
-}
 
-.add-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #6b6b9e;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.add-btn:hover {
-    background-color: #8a8acc;
-}
 /* Add styles for the update form */
 #updateForm {
     display: flex;
@@ -340,14 +325,13 @@ body {
 }
 
 /*memberships*/
-
 .membership-heading {
-    background-color: #8a8acc;
-    color: #fff;
     border-radius: 10px;
     padding: 2px;
     text-align: center;
     margin-bottom: 20px;
+    background-color: #8a8acc;
+    color: white;
 }
 
 .membership-details {
@@ -357,23 +341,62 @@ body {
 }
 
 .membership-box {
-    background-color: #6b6b9e;
-    color: #fff;
     border-radius: 10px;
     padding: 10px;
     margin-bottom: 10px;
     width: 100%;
-    /* Adjust the width as needed */
     box-sizing: border-box;
+    background-color: #8a8acc;
 }
 
 .membership-detail {
-    background-color: #6b6b9e;
-    color: #fff;
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 10px;
     text-align: left;
-    margin-left: 10px;
-        /* Adjust the margin as needed for left spacing */
+    margin-left: 0;
+    /* Adjust the margin as needed for left spacing */
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.membership-detail strong {
+    min-width: 150px;
+    /* Set a minimum width for labels for uniform alignment */
+    margin-right: 10px;
+    /* Add some margin between label and value */
+}
+
+.membership-detail span {
+    flex: 1;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    /* Optional: Add a border for each value */
+}
+
+.update-btn,
+.delete-btn,
+.add-btn,
+.add-payment-btn,
+.delete-payment-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #042331;
+    /* Updated background color */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Hover effect */
+.update-btn:hover,
+.delete-btn:hover,
+.add-btn:hover,
+.add-payment-btn:hover,
+.delete-payment-btn:hover {
+    background-color: #8a8acc;
+    /* Updated hover color */
 }
