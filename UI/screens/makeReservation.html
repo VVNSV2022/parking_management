@@ -1,38 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Make Reservation</title>
-    <link rel="stylesheet" href="../css/makeReservationStyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make Reservation</title>
+  <link rel="stylesheet" href="../css/makeReservationStyle.css">
 </head>
+
 <body>
 
   <div class="container">
     <h1>Make Reservation</h1>
 
-    <form id="reservationForm" action="payment.html" method="get">
+    <form id="reservationForm" onsubmit="saveFormData()" action="payment.html" method="get">
       <label for="start-time">Start Time:</label>
-      <input type="time" id="start-time" name="start-time" required>
+      <input type="datetime-local" id="start-time" name="start-time" required>
 
       <label for="end-time">End Time:</label>
-      <input type="time" id="end-time" name="end-time" required>
+      <input type="datetime-local" id="end-time" name="end-time" required>
 
-      <label for="parking-lot-id">Parking Lot ID:</label>
-      <input type="text" id="parking-lot-id" name="parking-lot-id" required>
+      <label for="region-dropdown">Select Region:</label>
+      <select id="region-dropdown" name="region-dropdown" required>
+        <option value="" disabled selected>Select a region</option>
+        <option value="R123456789">College Avenue</option>
+        <option value="R1234567">Busch</option>
+        <option value="R12345678">Livingston</option>
+        <option value="R123456">Cook</option>
+      </select>
+
+      <label for="parking-lot-id-dropdown">Select Parking Lot ID:</label>
+      <select id="parking-lot-id-dropdown" name="parking-lot-id-dropdown" required>
+      </select>
+
+      <label for="vehicle-id">Select Vehicle License Plate:</label>
+      <select id="vehicle-id" name="vehicle-id" required>
+      </select>
 
       <label for="permit-type">Permit Type:</label>
-      <input type="text" id="permit-type" name="permit-type" required>
+      <select id="permit-type" name="permit-type" required>
+        <option value="" disabled selected>Select a permit type</option>
+        <option value="hourly">Hourly</option>
+        <option value="daily">Daily</option>
+      </select>
 
-      <label for="vehicle-id">Vehicle ID:</label>
-      <input type="text" id="vehicle-id" name="vehicle-id" required>
-
-      <!-- Change the button type to "submit" -->
       <button type="submit">Make Reservation</button>
     </form>
   </div>
 
-  <script src="../js/payment.js"></script>
-
+  <script src="../js/makeReservation.js"></script>
 </body>
+
 </html>

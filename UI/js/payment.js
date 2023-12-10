@@ -1,16 +1,21 @@
 let userID;
 let accessToken;
-const amount = 5
+let amount;
 let stripe;
 let elements;
 let cardElement;
-localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIwNjQ0MjksImV4cCI6MTcwMjA2NTMyOX0.85WOSs_A8K2flJLmygE2yEkJupdFXVpY2Xum3tcJwQs');
+let formData;
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     userID = localStorage.getItem('userID');
     accessToken = localStorage.getItem('accessToken');
     populateSavedCards(userID, accessToken);
+    formData = JSON.parse(localStorage.getItem('reservationData'));
+    amount = formData.cost;
+    initStripe();
+    //console.log(formData.parkingLotID);
+    document.getElementById('amount').innerText = amount.toFixed(2); 
     initStripe();
   } catch (error) {
     console.error('Error:', error.message);
@@ -49,12 +54,12 @@ async function populateSavedCards(userID, accessToken) {
       defaultOption.text = 'Select a payment option';
       savedCardDropdown.add(defaultOption);
 
-      // Add saved cards to the dropdown
+      // Adding saved cards to the dropdown
       result.data.forEach((element, index) => {
         const option = document.createElement('option');
         option.value = element.card.id;
         const paymentdisplay = element.card.last4;
-        option.text = `Payment Method ID: ${paymentdisplay}`;
+        option.text = `Last 4 digits : ${paymentdisplay}`;
         savedCardDropdown.add(option);
       });
     } else {
@@ -64,7 +69,6 @@ async function populateSavedCards(userID, accessToken) {
     console.error('Error fetching saved cards:', error.message);
   }
 }
-
 
 // Save user's payment method
 async function saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken) {
@@ -123,7 +127,7 @@ async function getUserPayment(userID, accessToken) {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',  // Include other headers as needed
+        'Content-Type': 'application/json', 
       },
     });
     const result = await response.json();
@@ -167,7 +171,7 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, accessTo
     const { paymentMethod, error } = await stripe.createPaymentMethod({
       type: paymentType,
       card: cardElement,
-      billing_details: billingDetails, // Assuming billingDetails has the card information
+      billing_details: billingDetails,
     });
 
     if (error) {
@@ -176,31 +180,41 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, accessTo
     } else {
       console.log('Payment Method created successfully:', paymentMethod);
     }
-
-    // Here, paymentMethod.id represents the Payment Method ID
-    const paymentMethodID = paymentMethod.id;
+    const paymentMethodID = paymentMethod.id;  // Here, paymentMethod.id represents the Payment Method ID
     console.log(paymentMethodID)
-    // await saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken);
-    const amount = 5;
-    const description = 'sample2';
-    await makeUserPayment(userID, amount, description, paymentMethodID, accessToken);
-    alert('Transaction successful!');
+    console.log(amount)
 
-    makeReservationAfterPayment(userID, paymentMethodID);
+    // await saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken);
+    // const amount = 5;
+    //const description = 'sample2';
+    //amount= 50
+
+    // const response = await makeUserPayment(userID, amount, description, paymentMethodID, accessToken);
+    //await makeUserPayment(userID, amount, description, paymentMethodID, accessToken)
+    // const paymentId = response.paymentID
+    //console.log(paymentId)
+    //alert('Transaction successful!');
+
+    makeReservationAfterPayment(userID, paymentMethodID, formData, paymentType);
 
   } catch (error) {
     console.error('Error:', error.message);
+    alert('Transaction failed. Please try again.');
   }
 }
 
-async function makeReservationAfterPayment(userID, paymentID) {
-  // Fetching reservation data from the form
-  const startTime = document.getElementById('start-time').value; 
-  const endTime = document.getElementById('end-time').value; 
-  const parkingLotID = document.getElementById('parking-lot-id').value; 
-  const permitType = document.getElementById('permit-type').value; 
-  const vehicleID = document.getElementById('vehicle-id').value; 
-  const isMembership = true
+async function makeReservationAfterPayment(userID, paymentMethodID, formData, paymentType) { // Here I am Fetching the reservation data from MakeReservation.js
+  const startTime = formData.startTime;
+  const endTime = formData.endTime;
+  const parkingLotID = formData.parkingLotID;
+  const permitType = formData.permitType;
+  const vehicleID = formData.vehicleID;
+  const isMembership = true;
+  const paymentMethod = "New"
+  console.log(startTime);
+  console.log(endTime);
+  console.log(vehicleID);
+  console.log(parkingLotID);
 
   try {
     const response = await fetch('/api/reservation', {
@@ -216,13 +230,12 @@ async function makeReservationAfterPayment(userID, paymentID) {
         parkingLotID,
         permitType,
         vehicleID,
-        paymentID,
+        paymentMethodID,
         paymentType,
         paymentMethod,
         isMembership,
       }),
     });
-
     const result = await response.json();
 
     if (response.ok) {
