@@ -1,4 +1,4 @@
-const {getRegionMemberships, getParkingLotByRegion} = require('../thirdParty/membership.firestore');
+const {getRegionMemberships, getParkingLotByRegion, getMemberships} = require('../thirdParty/membership.firestore');
 
 
 /**
@@ -22,6 +22,20 @@ async function getMembershipsByRegion(regionID) {
   }
 }
 
+async function getMembershipsByUser(userID){
+  try{
 
 
-module.exports = {getMembershipsByRegion};
+    const result = await getMemberships(userID);
+    if(result){
+      return {message: 'successfully fetched the memebership results', success: true, data: result};
+    }
+    return {message: 'cannot find the details with this userID', success: false};
+  }
+  catch(err){
+    console.error('Error occurred while handling the request to get the saved payment methods: ', err.message);
+    return {message: 'Internal Server Error', success: false};
+  }
+} 
+
+module.exports = {getMembershipsByRegion, getMembershipsByUser};

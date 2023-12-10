@@ -71,4 +71,36 @@ async function getParkingLotByRegion(regionID) {
   }
 }
 
-module.exports = {createMembership, getRegionMemberships, getParkingLotByRegion};
+/**
+ * 
+ * @param {string} userID 
+ * @return {object} - result 
+ */
+async function getMemberships(userID){
+try{
+// get the user memeberships from membership collection
+const docRef = await db.collection('memberships').where('userID', '==', userID).get();
+if(docRef.empty){
+  console.error('No such document!');
+  return null;
+}
+const membershipData = [];
+docRef.forEach((doc)=>{
+  const membership = doc.data();
+  if(membership.endDate.toDate() > new Date()){
+  membershipData.push(membership);
+  }
+  else{
+    console.log('membership expired');
+  }
+});
+return membershipData;
+
+}
+catch(err){
+  console.error('Error occured while reading from the firebase firestore: ', err.message);
+  throw err;
+}
+}
+
+module.exports = {createMembership, getRegionMemberships, getParkingLotByRegion, getMemberships};
