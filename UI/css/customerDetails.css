@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: darkgray;
     display: flex;
     min-height: 100vh;
 }
@@ -337,4 +337,43 @@ body {
 
 .delete-payment-btn:hover {
     background-color: #8a8acc;
+}
+
+/*memberships*/
+
+.membership-heading {
+    background-color: #8a8acc;
+    color: #fff;
+    border-radius: 10px;
+    padding: 2px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.membership-details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.membership-box {
+    background-color: #6b6b9e;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    /* Adjust the width as needed */
+    box-sizing: border-box;
+}
+
+.membership-detail {
+    background-color: #6b6b9e;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    margin-left: 10px;
+        /* Adjust the margin as needed for left spacing */
 }

@@ -1,5 +1,5 @@
 localStorage.setItem('userID','12345678');
-localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMjk0MTYsImV4cCI6MTcwMjIzMDMxNn0.yTUDyWEmss4A6vvwqrERxpDntd-GuKCyq-nhIhT4Z2o');
+localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMzk4MjcsImV4cCI6MTcwMjI0MDcyN30.n900GWnBPdWDVMi1zCY_v_FHinnMnAi0PjMFUxCBux0')
 document.addEventListener("DOMContentLoaded", function() {
   const contentDiv = document.getElementById('content');
   const profileLink = document.getElementById('profileLink');
@@ -85,44 +85,74 @@ document.addEventListener("DOMContentLoaded", function() {
   membershipLink.addEventListener('click', async function(event) {
     event.preventDefault();
     try {
-      const userID = localStorage.getItem('userID');
-      const membershipResponse = await fetch(`/user/membership?userID=${userID}`);
-      const membershipData = await membershipResponse.json();
+        const userID = localStorage.getItem('userID');
+        const token = localStorage.getItem('token');
+        const membershipResponse = await fetch(`/api/user/memberships?userID=${userID}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
 
-      let membershipInfo = '';
-        if (membershipData) {
-        membershipInfo = `
-            <div class="membership-details">
-            <h2>Membership Details</h2>
-            <div class="membership-detail">
-                <strong>Membership ID:</strong> ${membershipData.membershipID}
-            </div>
-            <div class="membership-detail">
-                <strong>Membership Type:</strong> ${membershipData.membershipType}
-            </div>
-            <div class="membership-detail">
-                <strong>Membership Period:</strong> ${membershipData.membershipPeriod}
-            </div>
-            <div class="membership-detail">
-                <strong>Start Date:</strong> ${membershipData.startDate}
-            </div>
-            <div class="membership-detail">
-                <strong>End Date:</strong> ${membershipData.endDate}
-            </div>
-            <div class="membership-detail">
-                <strong>Region ID:</strong> ${membershipData.regionID}
-            </div>
-            </div>
-        `;
+        const membershipResult = await membershipResponse.json();
+        const membershipData = membershipResult.data;
+        console.log(membershipData[0].startDate);
+        let membershipInfo = '';
+        if (membershipData && membershipData.length > 0) {
+            membershipInfo = `
+                <div class="membership-heading">
+                    <h2>Memberships</h2>
+                </div>
+                <div class="membership-details">
+                    ${membershipData.map(membership => {
+                        const startDate = new Date(membership.startDate._seconds * 1000); // Convert seconds to milliseconds
+                        const endDate = new Date(membership.endDate._seconds * 1000); // Convert seconds to milliseconds
+
+                        const dateFormatter = new Intl.DateTimeFormat('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            second: 'numeric',
+                            timeZoneName: 'short'
+                        });
+                        const formattedStartDate = dateFormatter.format(startDate);
+                        const formattedEndDate = dateFormatter.format(endDate);
+
+                        return `
+                            <div class="membership-box">
+                                <div class="membership-detail">
+                                    <strong>Membership ID:</strong> ${membership.membershipID}
+                                </div>
+                                <div class="membership-detail">
+                                    <strong>Membership Type:</strong> ${membership.membershipType}
+                                </div>
+                                <div class="membership-detail">
+                                    <strong>Membership Period:</strong> ${membership.membershipPeriod}
+                                </div>
+                                <div class="membership-detail">
+                                    <strong>Start Date:</strong> ${formattedStartDate}
+                                </div>
+                                <div class="membership-detail">
+                                    <strong>End Date:</strong> ${formattedEndDate}
+                                </div>
+                                <div class="membership-detail">
+                                    <strong>Region ID:</strong> ${membership.regionID}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>`;
         } else {
-        membershipInfo = '<p>No Active membership</p>';
+            membershipInfo = '<p>No Active memberships</p>';
         }
-      contentDiv.innerHTML = membershipInfo;
+        contentDiv.innerHTML = membershipInfo;
     } catch (error) {
-      console.error('Error fetching membership details:', error);
-      contentDiv.innerHTML = '<p>Error fetching membership details. Please try again later.</p>';
+        console.error('Error fetching membership details:', error);
+        contentDiv.innerHTML = '<p>Error fetching membership details. Please try again later.</p>';
     }
-  });
+});
+
 
   vehiclesLink.addEventListener('click', async function(event) {
     event.preventDefault();
