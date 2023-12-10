@@ -1,0 +1,82 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .split-container {
+    display: flex;
+  }
+  
+  .left-half,
+  .right-half {
+    flex: 1;
+  }
+  
+  .top-bar {
+    background-color: #4CAF50;
+    padding: 10px;
+    text-align: center;
+    color: white;
+  }
+  
+  h2 {
+    font-size: 0.9em;
+  }
+  
+  .parkingdetailsList {
+    font-size: 0.9em;
+    width: 200px;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .welcome-message {
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .page-container {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  .main-heading {
+    font-size: 24px;
+  }
+  
+  .form-container {
+    display: inline-block;
+    text-align: left;
+    margin-top: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  select {
+    width: 200px;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: not-allowed;
+    margin-top: 10px;
+    display: block;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  button:enabled {
+    cursor: pointer;
+  }
+  

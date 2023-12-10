@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css/booking.css">
+  <title>Your Page Title</title>
+</head>
+
+<body>
+  <div class="top-bar">
+    <p class="welcome-message">Rutgers ParkSmart - Parking Lot Management and Reservation System</p>
+  </div>
+
+  <div class="page-container">
+    <h1 class="main-heading">Book your parking spot now!</h1>
+
+    <div class="form-container">
+      <label for="regionDropdown">Select Region:</label>
+      <select id="regionDropdown">
+        <option value="" disabled selected>Select Region</option>
+      </select>
+
+      <label for="parkingLotDropdown">Select Parking Lot:</label>
+      <select id="parkingLotDropdown" disabled>
+        <option value="" disabled selected>Select Parking Lot</option>
+      </select>
+
+      <div id="parkingLotDetails"></div>
+
+      <button id="bookNowBtn">Book Now</button>
+    </div>
+  </div>
+
+  <script src="../js/booking.js"></script>
+</body>
+
+</html>
