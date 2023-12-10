@@ -88,7 +88,10 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, token) {
       });
 
       const result = await response.json();
-      console.log(result);
+      if(result.message==="Payment Method saved successfully"){
+        alert('Payment method successfully!');
+        window.location.href = '../screens/customerDetails.html';
+      }
     } catch (error) {
       console.error('Error:', error.message);
     }

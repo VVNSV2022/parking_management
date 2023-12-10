@@ -1,5 +1,5 @@
 localStorage.setItem('userID','12345678');
-localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMzk4MjcsImV4cCI6MTcwMjI0MDcyN30.n900GWnBPdWDVMi1zCY_v_FHinnMnAi0PjMFUxCBux0')
+localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyNDAxMTIsImV4cCI6MTcwMjI0MTAxMn0.7bTP9q-sn-Btf3TV2zuAuJt2ePvTUxAhVQx-OvMU19g')
 document.addEventListener("DOMContentLoaded", function() {
   const contentDiv = document.getElementById('content');
   const profileLink = document.getElementById('profileLink');

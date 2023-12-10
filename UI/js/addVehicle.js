@@ -33,7 +33,8 @@ try {
                     });
 
                     if (response.ok) {
-                        document.getElementById('result').innerHTML = '<p>Vehicle added successfully!</p>';
+                        alert('Added vehicle successfully!');
+                        window.location.href = '../screens/customerDetails.html';
                     } else {
                         document.getElementById('result').innerHTML = '<p>Failed to add vehicle. Please try again later.</p>';
                     }

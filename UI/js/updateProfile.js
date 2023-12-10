@@ -30,7 +30,8 @@ try {
                         });
 
                     if (response.ok) {
-                        document.getElementById('result').innerHTML = '<p>Profile updated successfully!</p>';
+                        alert('Profile updated successfully!');
+                        window.location.href = '../screens/customerDetails.html';
                     } else {
                         document.getElementById('result').innerHTML = '<p>Failed to update profile. Please try again later.</p>';
                     }
