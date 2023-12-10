@@ -192,8 +192,19 @@ class CustomServer {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
+      // Adding the URL Routes to the Web Pages
+      const weburl = req.url;
+      if(weburl === '/' || weburl === '/home') {
+        this.render(res, "booking.html");
+      }
+      else if (weburl === '/login') {
+        this.render(res, "login.html");
+      }
+      else if (weburl === '/profile') {
+        this.render(res, "customerDetails.html");
+      }
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
-      if (method == 'GET' && req.url.split('?')[0].match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
+      else if (method == 'GET' && req.url.split('?')[0].match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
         const filePath = path.join(__dirname, '..', '..', '..', 'UI', req.url.split('?')[0]);
         const extname = path.extname(filePath).toLowerCase();
 
@@ -297,6 +308,23 @@ class CustomServer {
     // basic error handler
     this.server.on('error', (err) => {
       this.handleServerError(err);
+    });
+  }
+
+  /**
+   * Render a HTML page
+   * @param {http.ServerResponse} res - The HTTP response object.
+   * @param {string} page - The header key to remove.
+   */
+  render(res, page) {
+    fs.readFile(path.join(__dirname, '../../../UI', 'screens', page), 'utf8', (err, content) => {
+      if (err) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('Internal Server Error');
+      } else {
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(content);
+      }
     });
   }
 
