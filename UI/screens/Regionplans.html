@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css/region-styles.css">
+  <title>Parking Plans</title>
+</head>
+<body>
+  <div class="container">
+    <h2>Available Plans:</h2>
+
+    <div class="plan-card">
+      <h3>Platinum Plan</h3>
+      <div id="p"><p id="platinum-price">Price: $</p></div>
+      <ul>
+        <li>Access to parking facilities across all Parking Lots.</li>
+        <li>Guaranteed reserved parking space.</li>
+        <li>24/7 access to parking facilities.</li>
+        <li>Priority access during special events.</li>
+        <li>Exclusive discounts for affiliated businesses.</li>
+        <li>Enhanced security measures (surveillance, well-lit areas).</li>
+    </ul>
+      <!-- <p id="platinum-price">Price: $150/month</p> -->
+      <button onclick="purchasePlan('Platinum')">Purchase</button>
+    </div>
+
+    <div class="plan-card">
+      <h3>Gold Plan</h3>
+      <div id="p"><p id="gold-price">Price: $</p></div>
+      <ul>
+        <li>Access limited to specified Parking Lots.</li>
+        <li>Priority access to reserved spaces (when available).</li>
+        <li>Access during business hours or peak times.</li>
+        <li>Limited access during events.</li>
+        <li>Standard discounts.</li>
+        <li>Standard security features.</li>
+    </ul>
+    <!-- <p id="gold-price">Price: $75/month</p> -->
+      <button onclick="purchasePlan('Gold')">Purchase</button>
+    </div>
+
+    <div class="plan-card">
+      <h3>Silver Plan</h3>
+      <div id="p"><p id="silver-price">Price: $</p></div>
+      <ul>
+        <li>Restricted to parking within a specific Parking Lot.</li>
+        <li>General access to available spaces.</li>
+        <li>Limited access during specified hours.</li>
+        <li>General access with restrictions during events.</li>
+        <li>Limited discounts.</li>
+        <li>Basic security measures.</li>
+    </ul>
+      <!-- <p id="silver-price">Price: $75/month</p> -->
+      <button onclick="purchasePlan('Silver')">Purchase</button>
+    </div>
+
+
+    <!-- <div class="plan-card">
+        <h3>Guest Plan</h3>
+        <div id="p"><p id="guest-price">Price: $75/month</p></div>
+        <ul>
+            <li>Restricted to parking within a specific Parking Lot.</li>
+            <li>Access during business hours or peak times.</li>
+            <li>Daily billing.</li>
+        </ul>
+        
+        
+        <button onclick="purchasePlan('Guest')">Purchase</button>
+    </div> -->
+    </div>
+
+  <script src="../js/regions-script.js"></script>
+</body>
+</html>
