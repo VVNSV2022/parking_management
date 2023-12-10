@@ -183,18 +183,6 @@ async function handlePaymentMethod(userID, paymentType, billingDetails, accessTo
     const paymentMethodID = paymentMethod.id;  // Here, paymentMethod.id represents the Payment Method ID
     console.log(paymentMethodID)
     console.log(amount)
-
-    // await saveUserPayment(userID, paymentType, paymentMethodID, billingDetails, accessToken);
-    // const amount = 5;
-    //const description = 'sample2';
-    //amount= 50
-
-    // const response = await makeUserPayment(userID, amount, description, paymentMethodID, accessToken);
-    //await makeUserPayment(userID, amount, description, paymentMethodID, accessToken)
-    // const paymentId = response.paymentID
-    //console.log(paymentId)
-    //alert('Transaction successful!');
-
     makeReservationAfterPayment(userID, paymentMethodID, formData, paymentType);
 
   } catch (error) {
@@ -241,7 +229,7 @@ async function makeReservationAfterPayment(userID, paymentMethodID, formData, pa
     if (response.ok) {
       console.log('Reservation created successfully:', result);
       alert('Reservation done successfully.');
-      window.location.href = 'makeReservation.html'; //Redirecting to the home page
+      window.location.href = 'customerDetails.html'; //Redirecting to the home page
     } else {
       console.error('Error creating reservation:', result.message);
     }

@@ -3,8 +3,7 @@ let accessToken;
 let hourlyRate;
 let dailyRate;
 
-localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMjU5NDcsImV4cCI6MTcwMjIyNjg0N30.arySfm6IvBF0qzitBV3CSuTR8eBpXPOGvoAVGkhbhUk');
-
+accessToken = localStorage.getItem('accessToken');
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     userID = localStorage.getItem('userID');
@@ -86,7 +85,34 @@ async function populateVehicleDropdown() { // Here I am populating the vehicle d
   }
 }
 
-function saveFormData() {
+async function checkMembershipStatus() {
+  try {
+    const response = await fetch(`/api/user/memberships?userID=${userID}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (result.success && result.data && result.data.length > 0) {
+      const membershipType = result.data[0].membershipType;
+      if (membershipType) {
+        return true; 
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error('Error occurred while checking membership status: ', error.message);
+    return false;
+  }
+}
+
+async function saveFormData() {
   const startTime = new Date(document.getElementById('start-time').value).getTime();
   const endTime = new Date(document.getElementById('end-time').value).getTime();
   const parkingLotID = document.getElementById('parking-lot-id-dropdown').value;
@@ -96,17 +122,20 @@ function saveFormData() {
   const timeDifferenceInHours = (endTime - startTime) / (1000 * 60 * 60);
 
   let cost;
-
-  if (permitType === 'hourly') {
-    cost = Math.abs(timeDifferenceInHours * hourlyRate);
-  } else if (permitType === 'daily') {
-    const timeDifferenceInDays = timeDifferenceInHours / 24;
-    cost = Math.abs(timeDifferenceInDays * dailyRate);
+  const isSubscribedMember = await checkMembershipStatus();
+  if (isSubscribedMember) {
+    cost = 'Subscribed Member'; 
   } else {
-    console.error('Unsupported permit type');
-    return;
+    if (permitType === 'hourly') {
+      cost = Math.abs(timeDifferenceInHours * hourlyRate);
+    } else if (permitType === 'daily') {
+      const timeDifferenceInDays = timeDifferenceInHours / 24;
+      cost = Math.abs(timeDifferenceInDays * dailyRate);
+    } else {
+      console.error('Unsupported permit type');
+      return;
+    }
   }
-
   console.log('Time Difference (hours):', timeDifferenceInHours);
   console.log('Cost:', cost);
 
@@ -119,4 +148,3 @@ function saveFormData() {
     cost,
   }));
 }
-

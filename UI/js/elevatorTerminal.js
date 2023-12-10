@@ -20,7 +20,7 @@ function handleLicensePlateButtonClick() {
                 return response.json()
                     .then(data => {
                         alert("Checking Successfully Initialted - Redirecting to the home page");
-                        window.location.href = '../index.html';
+                        window.location.href = '../screens/customerDetails.html';
                     });
             } else if (response.status === 404) {
                 // When license plate not found, we show not found message and redirect to notFound.html
