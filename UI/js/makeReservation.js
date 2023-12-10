@@ -3,7 +3,7 @@ let accessToken;
 let hourlyRate;
 let dailyRate;
 
-localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIxNzQyODIsImV4cCI6MTcwMjE3NTE4Mn0.bzDiQZMzbhZh73Nbb9NScucPgnxMWOnknPar_DA1b0E');
+localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMjUwODMsImV4cCI6MTcwMjIyNTk4M30.GFIN-6-XQjZciU9wR-EGu0EdlLg0sbH6faKY4T5Cu1c');
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -98,10 +98,10 @@ function saveFormData() {
   let cost;
 
   if (permitType === 'hourly') {
-    cost = timeDifferenceInHours * hourlyRate;
+    cost = Math.abs(timeDifferenceInHours * hourlyRate);
   } else if (permitType === 'daily') {
     const timeDifferenceInDays = timeDifferenceInHours / 24;
-    cost = timeDifferenceInDays * dailyRate;
+    cost = Math.abs(timeDifferenceInDays * dailyRate);
   } else {
     console.error('Unsupported permit type');
     return;

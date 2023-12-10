@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #f0f0f0;
+  background-color: #686868; 
 }
 
 .container {
@@ -20,11 +20,16 @@ form {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 300px;
   text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+form:hover {
+  transform: scale(1.02);
 }
 
 h1 {
   margin-bottom: 20px;
-  color: #333;
+  color: gold;
 }
 
 label {
@@ -35,23 +40,32 @@ label {
 
 input, select {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+  padding: 10px;
+  margin-bottom: 15px;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+input:hover, select:hover {
+  border-color: #4caf50;
 }
 
 select {
-  height: 50px; 
+  height: 40px;
 }
 
 button {
   background-color: #4caf50;
   color: #fff;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
+  font-size: 16px;
+  transition: background-color 0.3s ease-in-out;
 }
 
 button:hover {

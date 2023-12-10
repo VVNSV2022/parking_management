@@ -241,6 +241,7 @@ async function makeReservationAfterPayment(userID, paymentMethodID, formData, pa
     if (response.ok) {
       console.log('Reservation created successfully:', result);
       alert('Reservation done successfully.');
+      window.location.href = 'makeReservation.html'; //Redirecting to the home page
     } else {
       console.error('Error creating reservation:', result.message);
     }
