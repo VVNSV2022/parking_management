@@ -62,7 +62,8 @@ function login(event) {
       sessionStorage.setItem("accessToken", data["accessToken"]);
       sessionStorage.setItem("refreshToken", data["refreshToken"]);
       // Redirect to the home page or perform other actions
-      window.location.replace("booking.html");
+      // window.location.replace('/home');
+      window.location.href = '/home';
     })
     .catch(error => {
       console.log("Login error: ", error);
