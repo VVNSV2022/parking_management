@@ -1,24 +1,22 @@
-
 body {
     margin: 0;
     background-image: url(../Images/elevator.jpeg);
     background-size: cover; 
-    background-position: center; /* Center the background image */
+    background-position: center;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
         "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
+    justify-content: center;
+    align-items: center; 
     height: 100vh;
 }
 
-/* Center the header text at the top of the screen */
 header {
     background-color: #333;
-    color: #fff;
+    color: #DAA520;
     padding: 10px;
     text-align: center;
     position: absolute;
@@ -40,18 +38,19 @@ h1 {
     margin: 0;
 }
 
-/* Styles for the License Plate Number input */
 #licensePlate {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    margin-top: 10px; 
 }
 
 h2 {
     font-size: 24px;
-    color: #FF0000; /* Red color */
-    margin-bottom: 10px; /* Space between h2 and input field */
+    color: #A52A2A; 
+    margin-bottom: 5px; 
+    margin-top: 0px; 
 }
 
 .input-container {
@@ -66,12 +65,11 @@ h2 {
     width: 100%;
 }
 
-/* Styles for the Submit button */
 #licenseSubmitButton {
-    background-color: #007BFF; /* Blue background color */
-    color: #FFF; /* White text color */
-    padding: 10px 20px; 
-    font-size: 16px; 
-    border: none; 
-    cursor: pointer; /* Change cursor on hover */
+    background-color: #007BFF;
+    color: #FFF;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
 }

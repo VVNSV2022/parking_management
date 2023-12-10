@@ -3,7 +3,7 @@ let accessToken;
 let hourlyRate;
 let dailyRate;
 
-localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMjUwODMsImV4cCI6MTcwMjIyNTk4M30.GFIN-6-XQjZciU9wR-EGu0EdlLg0sbH6faKY4T5Cu1c');
+localStorage.setItem('accessToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyMjU5NDcsImV4cCI6MTcwMjIyNjg0N30.arySfm6IvBF0qzitBV3CSuTR8eBpXPOGvoAVGkhbhUk');
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {

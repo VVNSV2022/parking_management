@@ -1,12 +1,15 @@
+const accessToken = localStorage.getItem('accessToken');
+
 function handleLicensePlateButtonClick() {
     const licensePlateInput = document.getElementById("licenseInput").value;
 
     if (licensePlateInput) {
         // Making an API request to check the license plate
-        fetch('http://localhost:4000/api/elevator/scan-license-plate', {
+        fetch('/api/elevator/scan-license-plate', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`, 
             },
             body: JSON.stringify({ licensePlate: licensePlateInput })
 
@@ -16,7 +19,7 @@ function handleLicensePlateButtonClick() {
                 // When license plate found, we show success message and redirect to Reservations Page
                 return response.json()
                     .then(data => {
-                        alert(data.message);
+                        alert("Checking Successfully Initialted - Redirecting to the home page");
                         window.location.href = '../index.html';
                     });
             } else if (response.status === 404) {
@@ -36,7 +39,6 @@ function handleLicensePlateButtonClick() {
     }
 }
 
-// Calling the rendering functions when the page loads
 window.onload = function () {
     const licenseSubmitButton = document.getElementById("licenseSubmitButton");
     licenseSubmitButton.addEventListener("click", handleLicensePlateButtonClick);
