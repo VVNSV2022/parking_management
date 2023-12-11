@@ -1,5 +1,5 @@
 localStorage.setItem('userID','12345678');
-localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyNDczNTYsImV4cCI6MTcwMjI0ODI1Nn0.pvpFszY-NvFGLT3wTfzJzrHErXFYcwK-ZmzfCQW571U')
+localStorage.setItem('token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTE3MDExODExNTU3ODgiLCJpYXQiOjE3MDIyNjA5NTAsImV4cCI6MTcwMjI2MTg1MH0.n2-u43buGGwlLKbILFsKx_ZfV-FxQjDjdxcfkFaESWA');
 document.addEventListener("DOMContentLoaded", function() {
   const contentDiv = document.getElementById('content');
   const profileLink = document.getElementById('profileLink');
@@ -13,6 +13,12 @@ document.addEventListener("DOMContentLoaded", function() {
       const userID = localStorage.getItem('userID');
       const response = await fetch(`/api/customer?userID=${userID}`);
       const userData = await response.json();
+      let disabled;
+      if(userData.isDisabled=='false'){
+        disabled='Yes';
+      }else{
+        disabled='No'
+      }
 
           
       contentDiv.innerHTML = `
@@ -29,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         <strong>Date of Birth:</strong> <span>${userData.dateOfBirth}</span>
                     </div>
                     <div class="user-detail">
-                        <strong>Is Disabled:</strong> <span>${userData.isDisabled}</span>
+                        <strong>Disabled:</strong> <span>${disabled}</span>
                     </div>
                     
                     <h2 class="address-heading">Current Address</h2>
