@@ -203,6 +203,12 @@ class CustomServer {
       else if (weburl === '/profile') {
         this.render(res, "customerDetails.html");
       }
+      else if (weburl === '/addVehicle') {
+        this.render(res, "addVehicle.html");
+      }
+      else if (weburl === '/makeReservation') {
+        this.render(res, "makeReservation.html");
+      }
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
       else if (method == 'GET' && req.url.split('?')[0].match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
         const filePath = path.join(__dirname, '..', '..', '..', 'UI', req.url.split('?')[0]);
