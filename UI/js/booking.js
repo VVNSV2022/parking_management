@@ -172,7 +172,7 @@ function checkUserSignIn() {
         window.location.href = '/makeReservation';
       } else {
         // Redirect to the login page
-        window.location.replace('login.html');
+        window.location.href = '/login';
       }
     });
   

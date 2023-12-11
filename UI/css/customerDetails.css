@@ -400,3 +400,10 @@ body {
     background-color: #8a8acc;
     /* Updated hover color */
 }
+
+#returnHome {
+    color: crimson;
+    padding-left: 28px;
+    text-decoration: none;
+    font-size: large;
+}
