@@ -169,7 +169,7 @@ function purchasePlan(plan) {
     window.location.replace('payment.html');
   } else {
     // Redirect to the login page
-    window.location.replace('login.html');
+    window.location.href = '/login';
   }
   //alert(`${plan} Plan purchased successfully!`);
 }
