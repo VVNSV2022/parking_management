@@ -1,11 +1,12 @@
 const {v4: uuidv4} = require('uuid');
 
-const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation, getAllReservations, checkOverlappingReservations, getPenaltyAmount} = require('../thirdParty/reservation.firestore.js');
+const {addReservation, usersReservations, getReservation, updateDetails, deleteDetails, hasMaxReservations, hasReservation, getAllReservations, checkOverlappingReservations, getPenaltyAmount,getReservationDetailsByTimePeriodAndParkingLot} = require('../thirdParty/reservation.firestore.js');
 const {makePayment, checkMembershipStatus, refundPaidPayment} = require('./payment.controller.js');
 const {updatePaymentIntent} = require('../thirdParty/StripeAPI.js');
 const {verifyParkingLotID, verifyAndBookSlot} = require('./parkingLot.controller.js');
 const {verifyVehicleID} = require('./vehicle.controller.js');
 const {getUser} = require('./users.controller');
+const {getParkingLotID} = require('../thirdParty/parkingLot.firestore');
 
 const {currentFirestoreTimestamp} = require('../utilities/util.js');
 
@@ -322,7 +323,7 @@ async function getReservationsByID(reservationID) {
 }
 
 async function getReservationsAll() {
-  // we need to get the vehicle info and payment info for that
+
   try {
     const result = await getAllReservations();
     if (result) {
@@ -510,4 +511,70 @@ async function extendRequest(userID, reservationID, message, newEndTime) {
   }
 }
 
-module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout, extendRequest};
+/**
+ *
+ * @param {string} parkingLotID - id of the parkig lot
+ * @param {string} toTime - to time
+ * @param {string} fromTime - from time
+ * @return {object} result
+ */
+async function getDashboardDetailsbyTime(parkingLotID,toTime,fromTime) {
+  // we need to get the vehicle info and payment info for that
+  try {
+    
+    const result = await getReservationDetailsByTimePeriodAndParkingLot(parkingLotID,toTime,fromTime);
+    if (result) {
+      const parkingLotData = await getParkingLotID(parkingLotID);
+      if (!parkingLotData) {
+        return {message: 'No parking lot details to get', data: [], success: true};;
+      }
+      let overstays = 0;
+      let occupancies = 0;
+      let availabilities = 0;
+      let noShows = 0;
+
+      const {disabledParkingSpots, numberOfParkingSpots} = parkingLotData;
+      for (const reservation of result) {
+        const {
+          clockout_time,
+          endTime,
+          userID,
+          startTime,
+          reservationID,
+          checkin_time,
+          reservationStatus,
+        } = reservation;
+
+        occupancies++;
+
+        if (!clockout_time && (clockout_time > endTime)) {
+          overstays++;
+        }
+
+        if (!checkin_time) {
+          noShows++;
+        }
+      }
+
+      availabilities = disabledParkingSpots - occupancies;
+     
+      const responseData={
+        overstays,
+        occupancies,
+        availabilities,
+        noShows,
+      }
+      
+
+
+      console.log(responseData);
+      return {message: 'successfully got the reservations', data: responseData, success: true};
+    }
+    return {message: 'No reservation detail to get', data: [], success: true};
+  } catch (err) {
+    console.error('Error occured while getting the reservations: ', err.message);
+    throw err;
+  }
+}
+
+module.exports = {createReservation, getReservationsByUser, getReservationsByID, updateReservation, deleteReservation, getReservationsAll, checkin, checkout, extendRequest, getDashboardDetailsbyTime};

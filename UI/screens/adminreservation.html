@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/adminNav.css">
+    <link rel="stylesheet" href="../css/adminreservation.css">
+</head>
+<body>
+    <header>
+        <!-- INCLUDE_NAV -->
+        <nav class="nav" id="navId">
+            <!-- <a href="home.html" id="home-link">Home</a> -->
+            <a href="dashboard.html" id="dashboard-link">Dashboard</a>
+            <a href="adminreservation.html" id="reservation-link" class="active">Reservation</a>
+            <a href="extendRequest.html" id="reservation-link">Extend Request</a>
+            <a href="extendRequest.html" id="reservation-link">Parking Layout</a>
+            <a href="javascript:void(0);" class="icon" onclick="responsiveNav()"><i class="fa fa-bars"></i></a>
+            <a href="#" style="float:right">Logout</a>
+        </nav>
+    </header>
+    <main>
+            <h1>Reservations</h1>
+            <div style="overflow-y: auto;">
+            <div><input type="text" id="search-input" placeholder="Search ....."></div>
+            
+                <table id="reservations-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)" >Reservation ID</th>
+                            <th onclick="sortTable(1)" >Customer ID</th>
+                            <th onclick="sortTable(2)" >Date</th>
+                            <th onclick="sortTable(3)">Reservation Start Time</th>
+                            <th onclick="sortTable(4)">Reservation End Time</th>
+                            <th onclick="sortTable(5)">Reservation Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+                <!-- The Modal -->
+                <div id="myModal" class="modal">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Reservation Details:</h2>
+                    <div id="modalBody"></div>
+                    </div>
+                
+                </div>
+            <div>
+    </main>
+    <script src="../js/adminreservation.js"></script>
+</body>
+</html>

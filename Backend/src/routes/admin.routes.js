@@ -2,7 +2,7 @@ const {CustomRoutes, CustomResponse} = require('../utilities/server');
 const {loginUser, logoutUser} = require('../controllers/users.controller');
 const url = require('url');
 const authenticateToken = require('../utilities/authMiddleware');
-const {deleteReservation} = require('../controllers/reservation.controller');
+const {deleteReservation,getDashboardDetailsbyTime} = require('../controllers/reservation.controller');
 const {getParkingStats} = require('../controllers/admin.controller');
 
 const adminRouter = new CustomRoutes();
@@ -87,6 +87,30 @@ adminRouter.delete('/api/admin/reservation', async (req, res) => {
   }
 });
 
+adminRouter.get('/api/admin/dashboard', async (req, res) => {
+  try {
+    Assuming authenticateAdmin is a middleware to authenticate admin users
+    const authResult = authenticateToken(req);
+
+    if (authResult.error) {
+      return response.setResponse(res, {message: authResult.error, error: true}, authResult.status);
+    }
+
+    const { parkingLotID, fromTime, toTime } = req.queryParameters;
+    if (!parkingLotID, !fromTime, !toTime) {
+      return response.setResponse(res, {message: 'Missing important fields', success: false}, 400);
+    }
+
+    const result = await getDashboardDetailsbyTime(parkingLotID, fromTime, toTime); // Pass true for isAdmin
+    if (result.success) {
+      return response.setResponse(res, {message: result.message, success: true, data: result.data}, 200);
+    }
+    return response.setResponse(res, {message: result.message, error: true}, 400);
+  } catch (err) {
+    console.error('Error in fetching details: ', err.message);
+    return response.setResponse(res, {message: 'Internal Server Error'}, 500);
+  }
+});
 
 adminRouter.post('/api/admin/get-parking-stats', async (req, res) => {
   try {

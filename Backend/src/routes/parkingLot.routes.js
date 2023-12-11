@@ -28,7 +28,7 @@
 // module.exports = parkingLotRouter;
 
 const {CustomRoutes, CustomResponse} = require('../utilities/server');
-const {getRegionsAndParkingLots, getAllRegions} = require('../controllers/parkingLot.controller');
+const {getRegionsAndParkingLots, getAllRegions,getAllParkingLots} = require('../controllers/parkingLot.controller');
 
 const parkingLotRouter = new CustomRoutes();
 const response = new CustomResponse();
@@ -48,6 +48,20 @@ parkingLotRouter.get('/api/region', async (req, res) => {
     } else {
       return response.setResponse(res, {message: 'Missing regionId query parameter'}, 400);
     }
+  } catch (error) {
+    console.error('Error occurred while fetching regions and parking lots: ', error.message);
+    return response.setResponse(res, {error: 'An error occurred while processing your request'}, 500);
+  }
+});
+
+parkingLotRouter.get('/api/allParkingLots', async (req, res) => {
+  try {
+      const result = await getAllParkingLots();
+
+      if (result.success) {
+        return response.setResponse(res, {message: result.message, success: true, data: result.data}, 200);
+      }
+      return response.setResponse(res, {message: result.message, error: true}, 400);
   } catch (error) {
     console.error('Error occurred while fetching regions and parking lots: ', error.message);
     return response.setResponse(res, {error: 'An error occurred while processing your request'}, 500);

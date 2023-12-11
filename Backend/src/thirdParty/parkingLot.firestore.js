@@ -70,4 +70,27 @@ async function getParkingLotsInRegion(regionId) {
   }
 }
 
-module.exports = {getParkingLotID, getRegions, getParkingLotsInRegion};
+async function getParkingLots() {
+  try {
+    const parkingLotRef = db.collection('ParkingLots');
+    const parkingLotSnapshot = await parkingLotRef.get();
+    if (parkingLotSnapshot.empty) {
+      return null;
+    }
+    const parkingLotData = [];
+
+    parkingLotSnapshot.forEach((doc) => {
+      const docData = doc.data();
+        parkingLotData.push(docData);
+    });
+
+    return parkingLotData;
+  
+  } catch (err) {
+    console.error('Error occured while getting parking lot', err.message);
+    throw err;
+  }
+}
+
+
+module.exports = {getParkingLotID, getRegions, getParkingLotsInRegion,getParkingLots};

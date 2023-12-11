@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/adminNav.css">
+    <link rel="stylesheet" href="../css/extendRequest.css">
+</head>
+<body>
+    <header>
+        <!-- INCLUDE_NAV -->
+        <nav class="nav" id="navId">
+            <!-- <a href="home.html" id="home-link">Home</a> -->
+            <a href="dashboard.html" id="dashboard-link">Dashboard</a>
+            <a href="adminreservation.html" id="reservation-link">Reservation</a>
+            <a href="extendRequest.html" id="reservation-link" class="active">Extend Request</a>
+            <a href="extendRequest.html" id="reservation-link">Parking Layout</a>
+            <a href="javascript:void(0);" class="icon" onclick="responsiveNav()"><i class="fa fa-bars"></i></a>
+            <a href="#" style="float:right">Logout</a>
+        </nav>
+    </header>
+    <main>
+            <h1>Reservations</h1>
+            <div style="overflow-y: auto;">
+            <div><input type="text" id="search-input" placeholder="Search ....."></div>
+            
+                <table id="reservations-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)" >Reservation ID</th>
+                            <th onclick="sortTable(1)" >Customer ID</th>
+                            <th onclick="sortTable(2)" >Request Extend Time:</th>
+                            <th>Actions</th>
+                            <tr id="tr1">
+                            <td>user-1702054461922</td>
+                            <td>b509c6f7-1769-4524-b974-b04f713a6b12</td>
+                            <td>30 mins</td>
+                            <td><button class="btn" onclick="fun1()">Approve</button>
+                            <button class="btn" onclick="fun2()">Deny</button></td>
+                            </tr>
+                            <tr id="tr2">
+                            <td>user-1701181155788</td>
+                            <td>c74017d1-c399-48a4-a31b-2f9f1b7c213c</td>
+                            <td>20 mins</td>
+                            <td><button class="btn" onclick="alert('Overlap. Cannot approve.')">Approve</button>
+                            <button class="btn" onclick="fun2()">Deny</button></td>
+                            </tr>
+                            <!-- <th onclick="sortTable(3)">Reservation Start Time</th>
+                            <th onclick="sortTable(4)">Reservation End Time</th> -->
+                            <!-- <th onclick="sortTable(5)">Reservation Status</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+
+            <div>
+    </main>
+    <script src="../js/extendRequest.js"></script>
+</body>
+</html>

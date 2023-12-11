@@ -210,6 +210,39 @@ async function getReservation(reservationID) {
 
 /**
  *
+ * @param {string} parkingLotID - id of the parkig lot
+ * @param {string} toTime - to time
+ * @param {string} fromTime - from time
+ * @return {result} result
+ */
+async function getReservationDetailsByTimePeriodAndParkingLot(parkingLotID, toTime, fromTime) {
+  try {
+    const reservationRef = db.collection('reservations');
+
+    let reservations = await reservationRef.where('parkingLotId', '==', parkingLotID).get();
+
+    reservations = reservations.docs.filter(
+      (doc) => doc.data().startTime >= fromTime && doc.data().endTime <= toTime && doc.data().reservationStatus !== 'cancelled'
+    );
+
+    const reservationData = [];
+    reservations.forEach((doc) => {
+      const docData = doc.data();
+      reservationData.push(docData);
+    });
+
+    return reservationData;
+  } catch (err) {
+    console.error('Error occurred while getting reservation data from Firebase Firestore: ', err.message);
+    throw err;
+  }
+}
+
+
+
+
+/**
+ *
  * @return {result} result
  */
 async function getAllReservations() {
@@ -334,4 +367,4 @@ async function getReservationsWithinTimeFrame(parkingLotID, fromDate, toDate) {
 }
 
 
-module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations, getAllReservations, checkOverlappingReservations, getPenaltyAmount, getReservationsWithinTimeFrame};
+module.exports = {addReservation, updateDetails, deleteDetails, getReservationsByTime, hasMaxReservations, hasReservation, getReservation, usersReservations, getAllReservations, checkOverlappingReservations, getPenaltyAmount, getReservationsWithinTimeFrame,getReservationDetailsByTimePeriodAndParkingLot};

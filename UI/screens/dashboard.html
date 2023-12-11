@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/adminNav.css">
+        <link rel="stylesheet" href="../css/dashboard.css">
+    </head>
+    <body>
+        <header>
+            <!-- INCLUDE_NAV -->
+            <nav class="nav" id="navId">
+                <!-- <a href="home.html" id="home-link">Home</a> -->
+                <a href="dashboard.html" id="reservation-link" class="active">Dashboard</a>
+                <a href="adminreservation.html" id="reservation-link">Reservation</a>
+                <a href="extendRequest.html" id="reservation-link">Extend Request</a>
+                <a href="extendRequest.html" id="reservation-link">Parking Layout</a>
+                <a href="javascript:void(0);" class="icon" onclick="responsiveNav()"><i class="fa fa-bars"></i></a>
+                <a href="#" style="float:right">Logout</a>
+            </nav>
+        </header>
+        <main>
+            <div id="select">
+                
+            </div>
+            <div id="chart"></div>
+            <div id="chart"></div>
+<p>Click <a href="#" id="dynamicPricingLink">here</a> for dynamic pricing.</p>
+
+        </main>   
+        <script src="../js/dashboard.js"></script>
+    </body>
+</html>
