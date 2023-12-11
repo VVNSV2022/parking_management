@@ -1,0 +1,191 @@
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  padding: 0;
+}
+
+/* Heading Styles */
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+/* Button Styles */
+button {
+  display: block;
+  width: 200px;
+  padding: 20px;
+  margin: 20px auto;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+
+/*Parking Lot Styling  */
+.button-parking-lot,
+.layout-button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Enhancing the edit button */
+.button-edit {
+  background-color: #ccc;
+  display: block;
+  margin: 30px auto;
+  padding: 15px 30px; /* Increased padding */
+  font-size: 15px; /* Increased font size */
+  border: 2px solid #cccc; /* Added border */
+  color: #fff;
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.button-edit:hover {
+  background-color: #d32f2f; /* Darker color on hover */
+}
+
+/* Parking layout styles */
+.parking-layout {
+  margin-top: 20px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.parking-slot {
+  width: 60px; /* Increased width */
+  height: 60px; /* Increased height */
+  border: 1px solid #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.disabled {
+  background-color: blue;
+  color: #fff;
+}
+
+.normal {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+/* Layout buttons container */
+.layout-buttons {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+
+/*Garage Styling*/
+
+.garage-layout {
+  margin-top: 20px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.garage-slot {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.disabled {
+  background-color: blue;
+  color: #fff;
+}
+
+.normal {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+/* Garage slot hover effect */
+.garage-slot:hover {
+  background-color: #2E7D32;
+  cursor: pointer;
+}
+
+/* Edit button style */
+.garage-layout button {
+  background-color: #ccc;
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.garage-layout button:hover {
+  background-color: #d32f2f;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+main{
+  margin:10px;
+}
+
+.nav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.nav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.nav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.nav a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.nav .icon {
+  display: none;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Garage Layouts</title>
+  <link rel="stylesheet" type="text/css" href="../css/layout.css">
+</head>
+<body>
+  <nav class="nav" id="navId">
+    <!-- <a href="home.html" id="home-link">Home</a> -->
+    <a href="dashboard.html" id="dashboard-link">Dashboard</a>
+    <a href="adminreservation.html" id="reservation-link">Reservation</a>
+    <a href="extendRequest.html" id="reservation-link">Extend Request</a>
+    <a href="parkingLayout.html" class="active">Parking Layout</a>
+    <a href="javascript:void(0);" class="icon" onclick="responsiveNav()"><i class="fa fa-bars"></i></a>
+    <a href="#" style="float:right">Logout</a>
+</nav>
+  <h1 style="text-align: center;">Garage Layouts</h1>
+  <div class="layout-buttons">
+    <button class="layout-button" onclick="displayGarage(1)">Garage Layout 1</button>
+    <button class="layout-button" onclick="displayGarage(2)">Garage Layout 2</button>
+  </div>
+  <div class="garages-container" id="garagesContainer"></div>
+  <script src="../js/garage.js"></script>
+</body>
+</html>
