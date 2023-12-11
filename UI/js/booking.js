@@ -169,7 +169,7 @@ function checkUserSignIn() {
   
       if (isUserSignedIn) {
         console.log('Data:', data); // Log the data
-        window.location.replace('makereservation.html');
+        window.location.href = '/makeReservation';
       } else {
         // Redirect to the login page
         window.location.replace('login.html');
