@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Elevator Layouts</title>
+  <link rel="stylesheet" type="text/css" href="../css/elevator.css">
+</head>
+<body>
+  <nav class="nav" id="navId">
+    <!-- <a href="home.html" id="home-link">Home</a> -->
+    <a href="dashboard.html" id="dashboard-link">Dashboard</a>
+    <a href="adminreservation.html" id="reservation-link">Reservation</a>
+    <a href="extendRequest.html" id="reservation-link">Extend Request</a>
+    <a href="parkingLayout.html" class="active">Parking Layout</a>
+    <a href="javascript:void(0);" class="icon" onclick="responsiveNav()"><i class="fa fa-bars"></i></a>
+    <a href="#" style="float:right">Logout</a>
+</nav>
+  <h1 style="text-align: center;">Elevator Layouts</h1>
+  <div class="layout-buttons">
+    <button class="layout-button" onclick="displayElevatorLayout(1, 2, 50)">Elevator Layout 1</button>
+    <button class="layout-button" onclick="displayElevatorLayout(2, 4, 25)">Elevator Layout 2</button>
+    <button class="layout-button" onclick="displayElevatorLayout(3, 3, 30)">Elevator Layout 3</button>
+  </div>
+  <div class="elevator-container" id="elevatorContainer"></div>
+  <script src="../js/elevator.js"></script>
+</body>
+</html>

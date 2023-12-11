@@ -1,0 +1,119 @@
+/* Elevator layout styles */
+
+.elevator-layout {
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .elevator-slot {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+    font-weight: bold;
+    border-radius: 5px;
+  }
+  
+  .disabled {
+    background-color: blue;
+    color: #fff;
+  }
+  
+  .normal {
+    background-color: #4CAF50;
+    color: #fff;
+  }
+  
+  /* Elevator slot hover effect */
+  .elevator-slot:hover {
+    background-color: #2E7D32;
+    cursor: pointer;
+  }
+  
+  /* Elevator layout buttons container */
+  .layout-buttons {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* Elevator layout buttons styling */
+  .layout-button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .layout-button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Add your CSS styling for the edit button here */
+.button-edit {
+    background-color: #ccc;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button-edit:hover {
+    background-color: #d32f2f; /* Change the color on hover */
+  }
+  
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+main{
+  margin:10px;
+}
+
+.nav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.nav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.nav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.nav a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.nav .icon {
+  display: none;
+}
