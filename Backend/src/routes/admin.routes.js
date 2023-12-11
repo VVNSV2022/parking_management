@@ -89,7 +89,7 @@ adminRouter.delete('/api/admin/reservation', async (req, res) => {
 
 adminRouter.get('/api/admin/dashboard', async (req, res) => {
   try {
-    Assuming authenticateAdmin is a middleware to authenticate admin users
+    // Assuming authenticateAdmin is a middleware to authenticate admin users
     const authResult = authenticateToken(req);
 
     if (authResult.error) {
