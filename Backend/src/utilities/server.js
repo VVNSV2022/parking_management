@@ -209,6 +209,9 @@ class CustomServer {
       else if (weburl === '/makeReservation') {
         this.render(res, "makeReservation.html");
       }
+      else if (weburl === '/resetPassword') {
+        this.render(res, "resetPassword.html");
+      }
       // if the url ends with .html, .css, .js, .png, .jpg, .jpeg, .gif, .ico then we have to serve the static files
       else if (method == 'GET' && req.url.split('?')[0].match(/\.(html|css|js|png|jpg|jpeg|gif|ico)$/)) {
         const filePath = path.join(__dirname, '..', '..', '..', 'UI', req.url.split('?')[0]);
